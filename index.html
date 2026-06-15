@@ -435,7 +435,7 @@
         </div>
     </div>
     <div id="positionTable" class="position-table"></div>
-    <footer id="footerCounter">加载访问量中...</footer>
+    <footer id="footerCounter">加载数据中...</footer>
 </div>
 
 <script>
@@ -774,7 +774,7 @@
             }
             return true;
         } catch (err) {
-            console.error('投票请求失败', err);
+            console.error('评价失败', err);
             current.likes = newLikes;
             current.dislikes = newDislikes;
             current.userVote = oldVote;
@@ -877,7 +877,7 @@
         const uniqueHeroCount = allHeroes.length;
         const newCount = allHeroes.filter(h => h.status === 'new').length;
         const willCount = allHeroes.filter(h => h.status === 'will').length;
-        document.getElementById('heroStatsText').innerHTML = `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 动态评级`;
+        document.getElementById('heroStatsText').innerHTML = `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于2026.6.15`;
     }
 
     async function initSupabase() {
