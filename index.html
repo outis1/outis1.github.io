@@ -439,6 +439,52 @@
 </div>
 
 <script>
+
+(function() {
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    document.addEventListener('keydown', function(e) {
+        // F12
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+I
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.keyCode === 73)) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+J
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.keyCode === 74)) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+U
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.keyCode === 85)) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+C 
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.keyCode === 67)) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    setInterval(function() {
+        var before = new Date().getTime();
+        debugger;
+        var after = new Date().getTime();
+        if (after - before > 100) {
+            // 有可能打开了控制台，执行干扰操作
+            document.body.innerHTML = '';
+        }
+    }, 2000);
+})();
+
     const SUPABASE_URL = 'https://pwmpledeqzzdvwqqbbhh.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_DdFUyYqX6xOz28v6LXYO9w_JMW8l6kV';
     
@@ -886,9 +932,9 @@
             const { error } = await supabaseClient.from('heroes').select('id', { count: 'exact', head: true });
             if (error) throw error;
             isSupabaseAvailable = true;
-            console.log('Supabase connected');
+            console.log('connected');
         } catch (err) {
-            console.warn('Supabase连接失败，使用本地配置', err);
+            console.warn('连接失败，使用本地配置', err);
             isSupabaseAvailable = false;
             supabaseClient = null;
         }
