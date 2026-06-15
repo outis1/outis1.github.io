@@ -89,10 +89,6 @@
             transform: translateY(-1px);
             box-shadow: 0 2px 6px rgba(90,130,255,0.3);
         }
-        .action-btn.outline:hover {
-            background: #232e48;
-            transform: translateY(-1px);
-        }
         .filter-area {
             display: flex;
             flex-wrap: wrap;
@@ -223,7 +219,8 @@
         .heroes-grid {
             display: flex;
             flex-wrap: wrap;
-            margin: -5px;
+            gap: 10px;
+            min-height: 100px;
         }
         .hero-card {
             width: 100px;
@@ -233,8 +230,8 @@
             overflow: hidden;
             flex-shrink: 0;
             position: relative;
-            margin: 5px;
-            transition: 0.08s linear;
+            transition: background 0.08s linear;
+            will-change: transform, opacity;
         }
         .hero-card:hover {
             transform: translateY(-2px);
@@ -331,7 +328,6 @@
             border: 2px solid #fbbf24;
             background: #b33a3a;
         }
-
         .empty-msg {
             color: #6b7ba5;
             font-size: 0.75rem;
@@ -359,8 +355,6 @@
             border-top: 1px solid #20273f;
             padding-top: 1.2rem;
         }
-
-        /* Toast 动画 */
         .toast-message {
             position: fixed;
             top: 52px;
@@ -439,62 +433,28 @@
 </div>
 
 <script>
-
-(function() {
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        return false;
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.keyCode === 73)) {
-            e.preventDefault();
-            return false;
-        }
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.keyCode === 74)) {
-            e.preventDefault();
-            return false;
-        }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.keyCode === 85)) {
-            e.preventDefault();
-            return false;
-        }
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.keyCode === 67)) {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    setInterval(function() {
-        var before = new Date().getTime();
-        debugger;
-        var after = new Date().getTime();
-        if (after - before > 100) {
-            document.body.innerHTML = '';
-        }
-    }, 2000);
-})();
+    (function() {
+        document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.keyCode === 73)) { e.preventDefault(); return false; }
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.keyCode === 74)) { e.preventDefault(); return false; }
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.keyCode === 85)) { e.preventDefault(); return false; }
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.keyCode === 67)) { e.preventDefault(); return false; }
+        });
+        setInterval(() => { let before = Date.now(); debugger; let after = Date.now(); if (after - before > 100) document.body.innerHTML = ''; }, 2000);
+    })();
 
     const SUPABASE_URL = 'https://pwmpledeqzzdvwqqbbhh.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_DdFUyYqX6xOz28v6LXYO9w_JMW8l6kV';
-    
-    let supabaseClient = null;
-    let isSupabaseAvailable = false;
-    let allHeroes = [];
-    let votesMap = new Map();
+    let supabaseClient = null, isSupabaseAvailable = false;
+    let allHeroes = [], votesMap = new Map();
     let userFingerprint = '';
-    let currentRankFilter = 'all';
-    let currentStatusFilter = 'all';
-    let searchKeyword = '';
+    let currentRankFilter = 'all', currentStatusFilter = 'all', searchKeyword = '';
     let isVoting = false;
 
     const RANK_ORDER = ['S', 'A', 'B', 'C'];
     const DEFAULT_RANK = 'B';
-
     const LANES = [
         { key: "top", label: "上路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z"></path><path d="m5 21 4-4h8V9l4-4v16z" opacity="0.2"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
         { key: "jungle", label: "打野", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M5.14 2c1.58 1.21 5.58 5.023 6.976 9.953s0 10.047 0 10.047c-2.749-3.164-5.893-5.2-6.18-5.382l-.02-.013C5.45 13.814 3 8.79 3 8.79c3.536.867 4.93 4.279 4.93 4.279C7.558 8.698 5.14 2 5.14 2m14.976 5.907s-1.243 2.471-1.814 4.604c-.235.878-.285 2.2-.29 3.058v.282c.003.347.01.568.01.568s-1.738 2.397-3.38 3.678a27.5 27.5 0 0 0-.208-5.334c.928-2.023 2.846-5.454 5.682-6.856m-2.124-5.331s-2.325 3.052-2.836 6.029c-.11.636-.201 1.194-.284 1.695-.379.584-.73 1.166-1.05 1.733-.033-.125-.06-.25-.095-.375a21 21 0 0 0-1.16-3.08c.053-.146.103-.29.17-.438 0 0 1.814-3.78 5.255-5.564"></path></svg>` },
@@ -503,56 +463,31 @@
         { key: "support", label: "辅助", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M12.833 10.833 14.5 17.53v.804L12.833 20h-1.666L9.5 18.333v-.804l1.667-6.696zM7 7.5 9.5 10l-1.667 4.167-2.5-2.5L6.167 10h-2.5L2 7.5zm15 0L20.333 10h-2.5l.834 1.667-2.5 2.5L14.5 10 17 7.5zM13.743 5l.757.833v.834l-1.667 2.5h-1.666L9.5 6.667v-.834L10.257 5z"></path></svg>` }
     ];
 
-    function showToast(message, isError = false) {
-        const existingToasts = document.querySelectorAll('.toast-message');
-        existingToasts.forEach(toast => {
-            toast.classList.remove('show');
-            toast.classList.add('hide');
-            setTimeout(() => toast.remove(), 300);
-        });
-        
+    function showToast(msg, isError = false) {
+        const existing = document.querySelectorAll('.toast-message');
+        existing.forEach(t => { t.classList.remove('show'); t.classList.add('hide'); setTimeout(() => t.remove(), 300); });
         const toast = document.createElement('div');
         toast.className = 'toast-message';
-        toast.textContent = message;
+        toast.textContent = msg;
         toast.style.backgroundColor = isError ? '#b91c1c' : '#1e293b';
         document.body.appendChild(toast);
         void toast.offsetWidth;
         toast.classList.add('show');
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-            toast.classList.add('hide');
-            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
-        }, 2300);
+        setTimeout(() => { toast.classList.remove('show'); toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2300);
     }
 
     function getOrCreateFingerprint() {
         let fp = localStorage.getItem('vote_fingerprint');
-        if (!fp) {
-            fp = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36) + Date.now();
-            localStorage.setItem('vote_fingerprint', fp);
-        }
+        if (!fp) { fp = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36) + Date.now(); localStorage.setItem('vote_fingerprint', fp); }
         return fp;
     }
 
     function computeDynamicRating(likes, dislikes, originalTier) {
         let baseIndex = RANK_ORDER.indexOf(originalTier);
         if (baseIndex === -1) baseIndex = RANK_ORDER.indexOf(DEFAULT_RANK);
-        
-        if (likes === 0 && dislikes === 0) {
-            return RANK_ORDER[baseIndex];
-        }
-        
-        if (likes > 0 && dislikes === 0) {
-            let newIndex = Math.max(baseIndex - likes, 0);
-            return RANK_ORDER[newIndex];
-        }
-        
-        if (dislikes > 0 && likes === 0) {
-            let newIndex = Math.min(baseIndex + dislikes, RANK_ORDER.length - 1);
-            return RANK_ORDER[newIndex];
-        }
-        
+        if (likes === 0 && dislikes === 0) return RANK_ORDER[baseIndex];
+        if (likes > 0 && dislikes === 0) return RANK_ORDER[Math.max(baseIndex - likes, 0)];
+        if (dislikes > 0 && likes === 0) return RANK_ORDER[Math.min(baseIndex + dislikes, RANK_ORDER.length - 1)];
         if (likes > dislikes * 2) return 'S';
         if (likes > dislikes) return 'A';
         if (Math.abs(likes - dislikes) <= Math.max(1, Math.min(likes, dislikes) * 0.2)) return 'B';
@@ -564,263 +499,23 @@
         return computeDynamicRating(stats.likes, stats.dislikes, hero.tier);
     }
 
-    function updateHeroUI(heroId, stats) {
-        const heroCard = document.querySelector(`.hero-card[data-hero-id="${heroId}"]`);
-        if (!heroCard) return;
-        const likeBtn = heroCard.querySelector('.vote-btn.like');
-        const dislikeBtn = heroCard.querySelector('.vote-btn.dislike');
-        if (likeBtn) likeBtn.innerHTML = `👍 ${stats.likes}`;
-        if (dislikeBtn) dislikeBtn.innerHTML = `👎 ${stats.dislikes}`;
-        
-        if (likeBtn && dislikeBtn) {
-            likeBtn.classList.remove('active-vote');
-            dislikeBtn.classList.remove('active-vote');
-            if (stats.userVote === true) likeBtn.classList.add('active-vote');
-            else if (stats.userVote === false) dislikeBtn.classList.add('active-vote');
-        }
-        
-        const hero = allHeroes.find(h => h.id === heroId);
-        const currentTier = getCurrentRating(hero, stats);
-        const rankCorner = heroCard.querySelector('.rank-corner');
-        if (currentTier) {
-            const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ? 'rank-B' : 'rank-C'));
-            if (rankCorner) {
-                rankCorner.textContent = currentTier;
-                rankCorner.className = `rank-corner ${rankClass}`;
-            } else {
-                const imgDiv = heroCard.querySelector('.hero-img');
-                if (imgDiv) {
-                    const newRank = document.createElement('div');
-                    newRank.className = `rank-corner ${rankClass}`;
-                    newRank.textContent = currentTier;
-                    imgDiv.appendChild(newRank);
-                }
-            }
-        } else if (rankCorner) {
-            rankCorner.remove();
-        }
+    function compareHeroes(a, b) {
+        const aStats = votesMap.get(a.id) || { likes: 0, dislikes: 0 };
+        const bStats = votesMap.get(b.id) || { likes: 0, dislikes: 0 };
+        if (aStats.likes !== bStats.likes) return bStats.likes - aStats.likes;
+        const aRating = getCurrentRating(a, aStats);
+        const bRating = getCurrentRating(b, bStats);
+        const order = { S: 4, A: 3, B: 2, C: 1 };
+        if (order[aRating] !== order[bRating]) return (order[bRating] || 0) - (order[aRating] || 0);
+        return aStats.dislikes - bStats.dislikes;
     }
 
-    async function fetchSupabaseData() {
-        try {
-            const { data: heroesData, error: heroesError } = await supabaseClient
-                .from('heroes')
-                .select('id, en, zh, lane, tier, status');
-            if (heroesError) throw heroesError;
-            if (!heroesData || heroesData.length === 0) throw new Error('No heroes data');
-
-            const { data: votesData, error: votesError } = await supabaseClient
-                .from('votes')
-                .select('hero_id, vote_type, user_fingerprint');
-            if (votesError) throw votesError;
-            
-            const votesAgg = new Map();
-            heroesData.forEach(h => {
-                votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null });
-            });
-            if (votesData) {
-                votesData.forEach(v => {
-                    const entry = votesAgg.get(v.hero_id);
-                    if (entry) {
-                        if (v.vote_type === true) entry.likes++;
-                        else entry.dislikes++;
-                        if (v.user_fingerprint === userFingerprint) {
-                            entry.userVote = v.vote_type;
-                        }
-                    }
-                });
-            }
-            return { heroes: heroesData, votesAgg };
-        } catch (err) {
-            console.warn('Supabase fetch failed:', err);
-            return null;
-        }
-    }
-
-    async function loadLocalConfig() {
-        try {
-            const response = await fetch('heroes-config.json');
-            const config = await response.json();
-            const heroes = config.heroes.map((h, idx) => ({
-                id: idx + 1000,
-                en: h.en,
-                zh: h.zh,
-                lane: h.lane,
-                tier: h.tier || '',
-                status: h.status
-            }));
-            const votesAgg = new Map();
-            heroes.forEach(h => {
-                votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null });
-            });
-            return { heroes, votesAgg };
-        } catch (err) {
-            console.error('无法加载本地配置', err);
-            return { heroes: [], votesAgg: new Map() };
-        }
-    }
-
-    async function loadHeroesData() {
-        if (supabaseClient && isSupabaseAvailable) {
-            const result = await fetchSupabaseData();
-            if (result) {
-                allHeroes = result.heroes;
-                votesMap = result.votesAgg;
-                return true;
-            }
-        }
-        const local = await loadLocalConfig();
-        allHeroes = local.heroes;
-        votesMap = local.votesAgg;
-        return false;
-    }
-
-    async function updateVisitCount() {
-        const footer = document.getElementById('footerCounter');
-        if (!supabaseClient || !isSupabaseAvailable) {
-            let localCount = localStorage.getItem('visit_count_mock');
-            if (!localCount) localCount = Math.floor(Math.random() * 1000) + 100;
-            footer.innerHTML = `👥 访问人次: ${localCount} (本地模拟)`;
-            return;
-        }
-        try {
-            let { data: statsData, error: selectError } = await supabaseClient
-                .from('stats')
-                .select('value')
-                .eq('key', 'visit_count')
-                .maybeSingle();
-            
-            if (selectError && selectError.code !== 'PGRST116') throw selectError;
-            
-            let newCount = 1;
-            if (statsData && statsData.value !== undefined) {
-                newCount = statsData.value + 1;
-                const { error: updateError } = await supabaseClient
-                    .from('stats')
-                    .update({ value: newCount })
-                    .eq('key', 'visit_count');
-                if (updateError) throw updateError;
-            } else {
-                const { error: insertError } = await supabaseClient
-                    .from('stats')
-                    .insert({ key: 'visit_count', value: 1 });
-                if (insertError) throw insertError;
-                newCount = 1;
-            }
-            footer.innerHTML = `👥 访问人次: ${newCount}`;
-        } catch (err) {
-            console.warn('更新访问次数失败', err);
-            let localCount = localStorage.getItem('visit_count_mock');
-            if (!localCount) localCount = Math.floor(Math.random() * 1000) + 100;
-            footer.innerHTML = `👥 访问人次: ${localCount} (本地模拟)`;
-        }
-    }
-
-    async function submitVote(heroId, newVoteType) {
-        if (isVoting) {
-            showToast('请稍后...', false);
-            return false;
-        }
-        if (!supabaseClient || !isSupabaseAvailable) {
-            showToast('数据库未连接，点赞点踩功能不可用', true);
-            return false;
-        }
-        
-        const current = votesMap.get(heroId);
-        if (!current) return false;
-        const oldVote = current.userVote;
-        
-        let actionText = '';
-        let newLikes = current.likes;
-        let newDislikes = current.dislikes;
-        let newUserVote = oldVote;
-        
-        if (oldVote === null) {
-            if (newVoteType === true) {
-                newLikes++;
-                actionText = '点赞成功 👍';
-            } else {
-                newDislikes++;
-                actionText = '点踩成功 👎';
-            }
-            newUserVote = newVoteType;
-        } else if (oldVote === newVoteType) {
-            if (newVoteType === true) {
-                newLikes--;
-                actionText = '已取消点赞';
-            } else {
-                newDislikes--;
-                actionText = '已取消点踩';
-            }
-            newUserVote = null;
-        } else {
-            if (newVoteType === true) {
-                newLikes++;
-                newDislikes--;
-                actionText = '点赞成功 👍';
-            } else {
-                newLikes--;
-                newDislikes++;
-                actionText = '点踩成功 👎';
-            }
-            newUserVote = newVoteType;
-        }
-        
-        current.likes = newLikes;
-        current.dislikes = newDislikes;
-        current.userVote = newUserVote;
-        votesMap.set(heroId, current);
-        updateHeroUI(heroId, current);
-        showToast(actionText, false);
-        
-        isVoting = true;
-        try {
-            if (oldVote === null) {
-                const { error } = await supabaseClient
-                    .from('votes')
-                    .insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
-                if (error) throw error;
-            } else if (oldVote === newVoteType) {
-                const { error } = await supabaseClient
-                    .from('votes')
-                    .delete()
-                    .eq('hero_id', heroId)
-                    .eq('user_fingerprint', userFingerprint);
-                if (error) throw error;
-            } else {
-                const { error: delError } = await supabaseClient
-                    .from('votes')
-                    .delete()
-                    .eq('hero_id', heroId)
-                    .eq('user_fingerprint', userFingerprint);
-                if (delError) throw delError;
-                const { error: insError } = await supabaseClient
-                    .from('votes')
-                    .insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
-                if (insError) throw insError;
-            }
-            return true;
-        } catch (err) {
-            console.error('评价失败', err);
-            current.likes = newLikes;
-            current.dislikes = newDislikes;
-            current.userVote = oldVote;
-            votesMap.set(heroId, current);
-            updateHeroUI(heroId, current);
-            showToast(`${newVoteType ? '点赞' : '点踩'}失败，请重试`, true);
-            return false;
-        } finally {
-            isVoting = false;
-        }
-    }
-
-    function render() {
+    function computeFilteredSortedHeroes() {
         let filtered = [...allHeroes];
         if (currentRankFilter !== 'all') {
             filtered = filtered.filter(hero => {
                 const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
-                const currentRating = getCurrentRating(hero, stats);
-                return currentRating === currentRankFilter;
+                return getCurrentRating(hero, stats) === currentRankFilter;
             });
         }
         if (currentStatusFilter !== 'all') {
@@ -830,112 +525,347 @@
             const kw = searchKeyword.trim().toLowerCase();
             filtered = filtered.filter(h => h.zh.toLowerCase().includes(kw) || h.en.toLowerCase().includes(kw));
         }
-
         const groups = { top: [], jungle: [], mid: [], bot: [], support: [] };
         filtered.forEach(hero => {
             const lanes = hero.lane.split(',').map(l => l.trim());
-            lanes.forEach(laneKey => {
-                if (groups[laneKey]) groups[laneKey].push(hero);
-            });
+            lanes.forEach(lane => { if (groups[lane]) groups[lane].push(hero); });
         });
+        for (let lane in groups) {
+            const normal = groups[lane].filter(h => h.status !== 'will');
+            const will = groups[lane].filter(h => h.status === 'will');
+            normal.sort(compareHeroes);
+            will.sort(compareHeroes);
+            groups[lane] = [...normal, ...will];
+        }
+        return groups;
+    }
 
+    function buildTableStructure() {
+        const container = document.getElementById('positionTable');
         let html = '';
         for (let lane of LANES) {
-            let laneHeroes = groups[lane.key] || [];
-            // 排序：WILL 英雄放在最后，其余按点赞数降序，点赞相同按评级降序
-            const normalHeroes = laneHeroes.filter(h => h.status !== 'will');
-            const willHeroes = laneHeroes.filter(h => h.status === 'will');
-            
-            const sortByLikesThenRating = (a, b) => {
-                const aStats = votesMap.get(a.id) || { likes: 0 };
-                const bStats = votesMap.get(b.id) || { likes: 0 };
-                if (aStats.likes !== bStats.likes) return bStats.likes - aStats.likes;
-                const aRating = getCurrentRating(a, aStats);
-                const bRating = getCurrentRating(b, bStats);
-                const rankOrder = { S: 4, A: 3, B: 2, C: 1 };
-                return (rankOrder[bRating] || 0) - (rankOrder[aRating] || 0);
-            };
-            
-            normalHeroes.sort(sortByLikesThenRating);
-            willHeroes.sort(sortByLikesThenRating);
-            const sortedHeroes = [...normalHeroes, ...willHeroes];
-            
-            const count = sortedHeroes.length;
             html += `<div class="position-row">
                         <div class="row-icon">
                             <div class="lane-svg">${lane.iconSvg}</div>
-                            <div class="lane-count">${count} 位英雄</div>
+                            <div class="lane-count" id="lane-count-${lane.key}">0 位英雄</div>
                         </div>
                         <div class="row-heroes">
-                            <div class="heroes-grid">`;
-            if (count === 0) {
-                html += `<div class="empty-msg">✨ 暂无英雄，调整筛选试试</div>`;
-            } else {
-                sortedHeroes.forEach(hero => {
-                    const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0, userVote: null };
-                    const currentTier = getCurrentRating(hero, stats);
-                    const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ? 'rank-B' : 'rank-C'));
-                    const rankHtml = `<div class="rank-corner ${rankClass}">${currentTier}</div>`;
-                    let statusHtml = '';
-                    if (hero.status === 'new') statusHtml = `<div class="status-badge-sm status-new">NEW</div>`;
-                    else if (hero.status === 'will') statusHtml = `<div class="status-badge-sm status-will">WILL</div>`;
-                    const willClass = hero.status === 'will' ? 'will-hero' : '';
-                    const imgUrl = `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
-                    const fallbackIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
-                    const likeActiveClass = stats.userVote === true ? 'active-vote' : '';
-                    const dislikeActiveClass = stats.userVote === false ? 'active-vote' : '';
-                    html += `<div class="hero-card ${willClass}" data-hero-id="${hero.id}" data-hero-zh="${hero.zh}">
-                                <div class="hero-img">
-                                    <img src="${imgUrl}" alt="${hero.zh}" loading="lazy" onerror="this.src='${fallbackIcon}'">
-                                    ${rankHtml}
-                                    <div class="status-corner">${statusHtml}</div>
-                                </div>
-                                <div class="vote-buttons">
-                                    <div class="vote-btn like ${likeActiveClass}" data-id="${hero.id}" data-type="like">👍 ${stats.likes}</div>
-                                    <div class="vote-btn dislike ${dislikeActiveClass}" data-id="${hero.id}" data-type="dislike">👎 ${stats.dislikes}</div>
-                                </div>
-                            </div>`;
-                });
-            }
-            html += `</div></div></div>`;
+                            <div class="heroes-grid" id="grid-${lane.key}"></div>
+                        </div>
+                    </div>`;
         }
-        document.getElementById('positionTable').innerHTML = html;
+        container.innerHTML = html;
+    }
 
-        document.querySelectorAll('.vote-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const heroId = parseInt(btn.getAttribute('data-id'));
-                const type = btn.getAttribute('data-type');
-                const newVoteType = type === 'like';
-                await submitVote(heroId, newVoteType);
+    function createHeroCard(hero) {
+        const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0, userVote: null };
+        const currentTier = getCurrentRating(hero, stats);
+        const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ? 'rank-B' : 'rank-C'));
+        let statusHtml = '';
+        if (hero.status === 'new') statusHtml = `<div class="status-badge-sm status-new">NEW</div>`;
+        else if (hero.status === 'will') statusHtml = `<div class="status-badge-sm status-will">WILL</div>`;
+        const willClass = hero.status === 'will' ? 'will-hero' : '';
+        const imgUrl = `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
+        const fallbackIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
+        const likeActive = stats.userVote === true ? 'active-vote' : '';
+        const dislikeActive = stats.userVote === false ? 'active-vote' : '';
+        const card = document.createElement('div');
+        card.className = `hero-card ${willClass}`;
+        card.setAttribute('data-id', hero.id);
+        card.setAttribute('data-hero-zh', hero.zh);
+        card.innerHTML = `
+            <div class="hero-img">
+                <img src="${imgUrl}" alt="${hero.zh}" loading="lazy" onerror="this.src='${fallbackIcon}'">
+                <div class="rank-corner ${rankClass}">${currentTier}</div>
+                <div class="status-corner">${statusHtml}</div>
+            </div>
+            <div class="vote-buttons">
+                <div class="vote-btn like ${likeActive}" data-id="${hero.id}" data-type="like">👍 ${stats.likes}</div>
+                <div class="vote-btn dislike ${dislikeActive}" data-id="${hero.id}" data-type="dislike">👎 ${stats.dislikes}</div>
+            </div>
+        `;
+        return card;
+    }
+
+    function updateCardContent(card, hero, stats) {
+        const likeBtn = card.querySelector('.vote-btn.like');
+        const dislikeBtn = card.querySelector('.vote-btn.dislike');
+        if (likeBtn) likeBtn.innerHTML = `👍 ${stats.likes}`;
+        if (dislikeBtn) dislikeBtn.innerHTML = `👎 ${stats.dislikes}`;
+        const rankDiv = card.querySelector('.rank-corner');
+        const currentTier = getCurrentRating(hero, stats);
+        if (currentTier) {
+            const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ? 'rank-B' : 'rank-C'));
+            if (rankDiv) {
+                rankDiv.textContent = currentTier;
+                rankDiv.className = `rank-corner ${rankClass}`;
+            } else {
+                const imgDiv = card.querySelector('.hero-img');
+                if (imgDiv) {
+                    const newRank = document.createElement('div');
+                    newRank.className = `rank-corner ${rankClass}`;
+                    newRank.textContent = currentTier;
+                    imgDiv.appendChild(newRank);
+                }
+            }
+        } else if (rankDiv) rankDiv.remove();
+        const likeBtn2 = card.querySelector('.vote-btn.like');
+        const dislikeBtn2 = card.querySelector('.vote-btn.dislike');
+        if (likeBtn2 && dislikeBtn2) {
+            likeBtn2.classList.remove('active-vote');
+            dislikeBtn2.classList.remove('active-vote');
+            if (stats.userVote === true) likeBtn2.classList.add('active-vote');
+            else if (stats.userVote === false) dislikeBtn2.classList.add('active-vote');
+        }
+    }
+
+    async function updateAllLanesWithAnimation() {
+        const groups = computeFilteredSortedHeroes();
+        for (let lane of LANES) {
+            const grid = document.getElementById(`grid-${lane.key}`);
+            if (!grid) continue;
+            const targetHeroes = groups[lane.key] || [];
+            const currentCards = Array.from(grid.children);
+            const currentIdSet = new Set(currentCards.map(c => parseInt(c.getAttribute('data-id'))));
+            const targetIdSet = new Set(targetHeroes.map(h => h.id));
+
+            // 删除不需要的卡片：同时淡出缩小，速度更快（0.12s）
+            const cardsToRemove = currentCards.filter(c => !targetIdSet.has(parseInt(c.getAttribute('data-id'))));
+            if (cardsToRemove.length) {
+                await Promise.all(cardsToRemove.map(card => {
+                    return new Promise(resolve => {
+                        card.style.transition = 'opacity 0.12s ease, transform 0.12s ease';
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.8)';
+                        setTimeout(() => {
+                            if (card.parentNode) card.remove();
+                            resolve();
+                        }, 120);
+                    });
+                }));
+            }
+
+            // 重新获取当前卡片（删除后）
+            const remainingCards = Array.from(grid.children);
+            const remainingIdSet = new Set(remainingCards.map(c => parseInt(c.getAttribute('data-id'))));
+            
+            // 新增卡片（先添加，透明缩小）
+            const cardsToAdd = targetHeroes.filter(h => !remainingIdSet.has(h.id));
+            cardsToAdd.forEach(hero => {
+                const card = createHeroCard(hero);
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                card.style.transition = 'none';
+                grid.appendChild(card);
             });
-        });
-        document.querySelectorAll('.hero-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                if (e.target.closest('.vote-btn')) return;
-                const msgs = [`请发送一段剪辑视频`, `没什么好抱怨的`, `每个人都会得到慷慨的补偿`, `很快你会知道，一切的等待都是有意义的`, `如果你认为这很难，我认为你不适合我的平台`, `请不要频繁重复提问没有意义的问题`, `事情并没有那么简单`, `当然`, `我会在2080年发送给你`, `你至少检查一下后再提问`, `很快`];
-                showToast(msgs[Math.floor(Math.random() * msgs.length)]);
+            
+            const allCurrentCards = Array.from(grid.children);
+            const oldPositions = new Map();
+            allCurrentCards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const parentRect = grid.getBoundingClientRect();
+                oldPositions.set(card, { top: rect.top - parentRect.top, left: rect.left - parentRect.left });
             });
-        });
+            
+            // 重排顺序
+            const cardMap = new Map();
+            allCurrentCards.forEach(card => {
+                const id = parseInt(card.getAttribute('data-id'));
+                cardMap.set(id, card);
+            });
+            const fragment = document.createDocumentFragment();
+            targetHeroes.forEach(hero => {
+                const card = cardMap.get(hero.id);
+                if (card) fragment.appendChild(card);
+            });
+            grid.appendChild(fragment);
+            
+            const reorderedCards = Array.from(grid.children);
+            const newPositions = new Map();
+            reorderedCards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const parentRect = grid.getBoundingClientRect();
+                newPositions.set(card, { top: rect.top - parentRect.top, left: rect.left - parentRect.left });
+            });
+            
+            reorderedCards.forEach(card => {
+                const oldPos = oldPositions.get(card);
+                const newPos = newPositions.get(card);
+                if (oldPos && newPos) {
+                    const dx = oldPos.left - newPos.left;
+                    const dy = oldPos.top - newPos.top;
+                    if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) card.style.transform = `translate(${dx}px, ${dy}px)`;
+                    else card.style.transform = '';
+                } else {
+                    card.style.transform = '';
+                }
+                card.style.transition = 'none';
+            });
+            
+            grid.offsetHeight;
+            
+            requestAnimationFrame(() => {
+                reorderedCards.forEach(card => {
+                    card.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.25s ease';
+                    card.style.transform = '';
+                    card.style.opacity = '1';
+                });
+            });
+            
+            targetHeroes.forEach(hero => {
+                const card = Array.from(grid.children).find(c => parseInt(c.getAttribute('data-id')) === hero.id);
+                if (card) updateCardContent(card, hero, votesMap.get(hero.id));
+            });
+        }
         
+        // 更新统计文本和分路计数
         const uniqueHeroCount = allHeroes.length;
         const newCount = allHeroes.filter(h => h.status === 'new').length;
         const willCount = allHeroes.filter(h => h.status === 'will').length;
         document.getElementById('heroStatsText').innerHTML = `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于2026.6.15`;
+        const freshGroups = computeFilteredSortedHeroes();
+        for (let lane of LANES) {
+            const count = freshGroups[lane.key]?.length || 0;
+            const countSpan = document.getElementById(`lane-count-${lane.key}`);
+            if (countSpan) countSpan.innerText = `${count} 位英雄`;
+        }
+    }
+
+    function bindGlobalVoteEvents() {
+        document.getElementById('positionTable').addEventListener('click', async (e) => {
+            const btn = e.target.closest('.vote-btn');
+            if (!btn) return;
+            e.stopPropagation();
+            const heroId = parseInt(btn.getAttribute('data-id'));
+            const type = btn.getAttribute('data-type');
+            const newVoteType = type === 'like';
+            await submitVote(heroId, newVoteType);
+        });
+        document.getElementById('positionTable').addEventListener('click', (e) => {
+            const card = e.target.closest('.hero-card');
+            if (!card) return;
+            if (e.target.closest('.vote-btn')) return;
+            const msgs = [`请发送一段剪辑视频`, `没什么好抱怨的`, `每个人都会得到慷慨的补偿`, `很快你会知道，一切的等待都是有意义的`, `如果你认为这很难，我认为你不适合我的平台`, `请不要频繁重复提问没有意义的问题`, `事情并没有那么简单`, `当然`, `我会在2080年发送给你`, `你至少检查一下后再提问`, `很快`];
+            showToast(msgs[Math.floor(Math.random() * msgs.length)]);
+        });
+    }
+
+    async function submitVote(heroId, newVoteType) {
+        if (isVoting) { showToast('请稍后...'); return false; }
+        if (!supabaseClient || !isSupabaseAvailable) { showToast('数据库未连接，点赞点踩功能不可用', true); return false; }
+        const current = votesMap.get(heroId);
+        if (!current) return false;
+        const oldVote = current.userVote;
+        let actionText = '', newLikes = current.likes, newDislikes = current.dislikes, newUserVote = oldVote;
+        if (oldVote === null) {
+            if (newVoteType) { newLikes++; actionText = '点赞成功 👍'; } else { newDislikes++; actionText = '点踩成功 👎'; }
+            newUserVote = newVoteType;
+        } else if (oldVote === newVoteType) {
+            if (newVoteType) { newLikes--; actionText = '已取消点赞'; } else { newDislikes--; actionText = '已取消点踩'; }
+            newUserVote = null;
+        } else {
+            if (newVoteType) { newLikes++; newDislikes--; actionText = '点赞成功 👍'; } else { newLikes--; newDislikes++; actionText = '点踩成功 👎'; }
+            newUserVote = newVoteType;
+        }
+        current.likes = newLikes; current.dislikes = newDislikes; current.userVote = newUserVote;
+        votesMap.set(heroId, current);
+        const card = document.querySelector(`.hero-card[data-id="${heroId}"]`);
+        if (card) updateCardContent(card, allHeroes.find(h => h.id === heroId), current);
+        showToast(actionText);
+        isVoting = true;
+        try {
+            if (oldVote === null) {
+                const { error } = await supabaseClient.from('votes').insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
+                if (error) throw error;
+            } else if (oldVote === newVoteType) {
+                const { error } = await supabaseClient.from('votes').delete().eq('hero_id', heroId).eq('user_fingerprint', userFingerprint);
+                if (error) throw error;
+            } else {
+                await supabaseClient.from('votes').delete().eq('hero_id', heroId).eq('user_fingerprint', userFingerprint);
+                await supabaseClient.from('votes').insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
+            }
+            await updateAllLanesWithAnimation();
+        } catch (err) {
+            console.error('评价失败', err);
+            current.likes = newLikes; current.dislikes = newDislikes; current.userVote = oldVote;
+            votesMap.set(heroId, current);
+            if (card) updateCardContent(card, allHeroes.find(h => h.id === heroId), current);
+            showToast(`${newVoteType ? '点赞' : '点踩'}失败，请重试`, true);
+        } finally { isVoting = false; }
+    }
+
+    async function fetchSupabaseData() {
+        try {
+            const { data: heroesData, error: heroesError } = await supabaseClient.from('heroes').select('id, en, zh, lane, tier, status');
+            if (heroesError) throw heroesError;
+            const { data: votesData, error: votesError } = await supabaseClient.from('votes').select('hero_id, vote_type, user_fingerprint');
+            if (votesError) throw votesError;
+            const votesAgg = new Map();
+            heroesData.forEach(h => votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null }));
+            if (votesData) {
+                votesData.forEach(v => {
+                    const entry = votesAgg.get(v.hero_id);
+                    if (entry) {
+                        if (v.vote_type === true) entry.likes++;
+                        else entry.dislikes++;
+                        if (v.user_fingerprint === userFingerprint) entry.userVote = v.vote_type;
+                    }
+                });
+            }
+            return { heroes: heroesData, votesAgg };
+        } catch (err) { return null; }
+    }
+
+    async function loadLocalConfig() {
+        try {
+            const resp = await fetch('heroes-config.json');
+            const cfg = await resp.json();
+            const heroes = cfg.heroes.map((h, idx) => ({ id: idx + 1000, en: h.en, zh: h.zh, lane: h.lane, tier: h.tier || '', status: h.status }));
+            const votesAgg = new Map();
+            heroes.forEach(h => votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null }));
+            return { heroes, votesAgg };
+        } catch { return { heroes: [], votesAgg: new Map() }; }
+    }
+
+    async function loadHeroesData() {
+        if (supabaseClient && isSupabaseAvailable) {
+            const res = await fetchSupabaseData();
+            if (res) { allHeroes = res.heroes; votesMap = res.votesAgg; return true; }
+        }
+        const local = await loadLocalConfig();
+        allHeroes = local.heroes; votesMap = local.votesAgg;
+        return false;
+    }
+
+    async function updateVisitCount() {
+        const footer = document.getElementById('footerCounter');
+        if (!supabaseClient || !isSupabaseAvailable) {
+            let local = localStorage.getItem('visit_count_mock');
+            if (!local) local = Math.floor(Math.random() * 1000) + 100;
+            footer.innerHTML = `👥 访问人次: ${local} (本地模拟)`;
+            return;
+        }
+        try {
+            let { data, error } = await supabaseClient.from('stats').select('value').eq('key', 'visit_count').maybeSingle();
+            if (error && error.code !== 'PGRST116') throw error;
+            let newCount = 1;
+            if (data && data.value !== undefined) {
+                newCount = data.value + 1;
+                await supabaseClient.from('stats').update({ value: newCount }).eq('key', 'visit_count');
+            } else await supabaseClient.from('stats').insert({ key: 'visit_count', value: 1 });
+            footer.innerHTML = `👥 访问人次: ${newCount}`;
+        } catch (err) {
+            console.warn(err);
+            footer.innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
+        }
     }
 
     async function initSupabase() {
         try {
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            const { error } = await supabaseClient.from('heroes').select('id', { count: 'exact', head: true });
-            if (error) throw error;
+            await supabaseClient.from('heroes').select('id', { count: 'exact', head: true });
             isSupabaseAvailable = true;
-            console.log('connected');
-        } catch (err) {
-            console.warn('连接失败，使用本地配置', err);
-            isSupabaseAvailable = false;
-            supabaseClient = null;
-        }
+        } catch { isSupabaseAvailable = false; supabaseClient = null; }
     }
 
     (async function main() {
@@ -943,14 +873,27 @@
         userFingerprint = getOrCreateFingerprint();
         await loadHeroesData();
         await updateVisitCount();
-        render();
-
+        buildTableStructure();
+        // 首次填充卡片（无动画）
+        const initialGroups = computeFilteredSortedHeroes();
+        for (let lane of LANES) {
+            const grid = document.getElementById(`grid-${lane.key}`);
+            const laneHeroes = initialGroups[lane.key] || [];
+            laneHeroes.forEach(hero => {
+                const card = createHeroCard(hero);
+                grid.appendChild(card);
+            });
+            const countSpan = document.getElementById(`lane-count-${lane.key}`);
+            if (countSpan) countSpan.innerText = `${laneHeroes.length} 位英雄`;
+        }
+        bindGlobalVoteEvents();
+        const refresh = () => updateAllLanesWithAnimation();
         document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(el => {
             el.addEventListener('click', function() {
                 document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
                 currentRankFilter = this.getAttribute('data-rank');
-                render();
+                refresh();
             });
         });
         document.querySelectorAll('#statusFilterGroup .filter-chip').forEach(el => {
@@ -958,14 +901,19 @@
                 document.querySelectorAll('#statusFilterGroup .filter-chip').forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
                 currentStatusFilter = this.getAttribute('data-status');
-                render();
+                refresh();
             });
         });
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchKeyword = e.target.value;
-            render();
+            refresh();
         });
         document.getElementById('moreBtn').addEventListener('click', () => showToast('很快你会知道，一切的等待都是有意义的'));
+        // 确保统计文本正确
+        const uniqueHeroCount = allHeroes.length;
+        const newCount = allHeroes.filter(h => h.status === 'new').length;
+        const willCount = allHeroes.filter(h => h.status === 'will').length;
+        document.getElementById('heroStatsText').innerHTML = `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于2026.6.15`;
     })();
 </script>
 </body>
