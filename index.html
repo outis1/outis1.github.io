@@ -3,31 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Outis冠军支持表 · 分路强度榜</title>
-    <!-- Supabase JS -->
+    <title>Outis英雄支持表 · 分路强度榜</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0b0e18;
             font-family: system-ui, -apple-system, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
             color: #eef2ff;
             padding: 1.2rem 1rem;
         }
-
-        .container {
-            max-width: 1500px;
-            margin: 0 auto;
-        }
-
-        .main-header {
-            margin-bottom: 1rem;
-        }
+        .container { max-width: 1500px; margin: 0 auto; }
+        .main-header { margin-bottom: 1rem; }
         .title {
             font-size: 1.7rem;
             font-weight: 800;
@@ -35,7 +22,6 @@
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            letter-spacing: -0.3px;
             margin-bottom: 0.5rem;
         }
         .info-line {
@@ -97,7 +83,6 @@
             background: #2a3e70;
             border-color: #5a82ff;
         }
-
         .filter-area {
             display: flex;
             flex-wrap: wrap;
@@ -190,9 +175,7 @@
             display: flex;
             border-bottom: 1px solid #1f2742;
         }
-        .position-row:last-child {
-            border-bottom: none;
-        }
+        .position-row:last-child { border-bottom: none; }
         .row-icon {
             width: 130px;
             flex-shrink: 0;
@@ -210,15 +193,8 @@
             height: 66px;
             display: block;
         }
-        .lane-svg svg path,
-        .lane-svg svg g {
-            fill: #ffffff;
-            stroke: none;
-        }
-        .lane-svg svg g[opacity="0.2"] {
-            opacity: 0.35;
-            fill: #fff9c4;
-        }
+        .lane-svg svg path, .lane-svg svg g { fill: #ffffff; stroke: none; }
+        .lane-svg svg g[opacity="0.2"] { opacity: 0.35; fill: #fff9c4; }
         .lane-count {
             font-size: 0.75rem;
             font-weight: 600;
@@ -307,7 +283,6 @@
         .status-new { background: #f87171; color: white; }
         .status-will { background: #86efac; color: #1f3a1f; }
 
-        /* 赞踩按钮样式 */
         .vote-buttons {
             display: flex;
             justify-content: center;
@@ -331,22 +306,10 @@
             background: rgba(0,0,0,0.4);
             color: #fff;
         }
-        .vote-btn.like {
-            background: #166534;
-        }
-        .vote-btn.like:hover {
-            background: #15803d;
-        }
-        .vote-btn.dislike {
-            background: #991b1b;
-        }
-        .vote-btn.dislike:hover {
-            background: #b91c1c;
-        }
-        .vote-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .vote-btn.like { background: #166534; }
+        .vote-btn.like:hover { background: #15803d; }
+        .vote-btn.dislike { background: #991b1b; }
+        .vote-btn.dislike:hover { background: #b91c1c; }
 
         .empty-msg {
             color: #6b7ba5;
@@ -355,22 +318,18 @@
             text-align: center;
             width: 100%;
         }
-
         @media (max-width: 800px) {
             .row-icon { width: 100px; }
             .lane-svg svg { width: 52px; height: 52px; }
             .hero-card { width: 90px; }
             .filter-area { flex-direction: column; align-items: stretch; }
             .search-box { width: 100%; }
-            .right-group { justify-content: flex-end; }
-            .vote-btn { font-size: 0.65rem; padding: 2px 0; }
         }
         @media (max-width: 600px) {
             .hero-card { width: 80px; }
             .row-icon { width: 85px; }
             .lane-svg svg { width: 44px; height: 44px; }
         }
-
         footer {
             text-align: center;
             margin-top: 1.8rem;
@@ -378,6 +337,28 @@
             color: #64708f;
             border-top: 1px solid #20273f;
             padding-top: 1.2rem;
+        }
+        /* Toast 悬浮提示 */
+        #toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2d3e6e;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid #5a74b0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #toast-message.show {
+            opacity: 1;
         }
     </style>
 </head>
@@ -399,7 +380,6 @@
             </div>
         </div>
     </div>
-
     <div class="filter-area">
         <div class="search-box">
             <span>🔍</span>
@@ -426,23 +406,20 @@
             </div>
         </div>
     </div>
-
     <div id="positionTable" class="position-table"></div>
     <footer id="footerCounter">加载访问量中...</footer>
 </div>
+<div id="toast-message"></div>
 
 <script>
-    // Supabase 配置
     const SUPABASE_URL = 'https://pwmpledeqzzdvwqqbbhh.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_DdFUyYqX6xOz28v6LXYO9w_JMW8l6kV';
-    let supabase = null;
+    
+    let supabaseClient = null;
     let isSupabaseAvailable = false;
-
-    // 全局数据
-    let allHeroes = [];        // 原始英雄列表（含多分路字符串）
-    let votesMap = new Map();  // hero_id -> { likes, dislikes }
+    let allHeroes = [];
+    let votesMap = new Map();          // hero_id -> { likes, dislikes, userVote: true/false/null }
     let userFingerprint = '';
-    let visitCount = 0;
     let currentRankFilter = 'all';
     let currentStatusFilter = 'all';
     let searchKeyword = '';
@@ -455,7 +432,19 @@
         { key: "support", label: "辅助", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M12.833 10.833 14.5 17.53v.804L12.833 20h-1.666L9.5 18.333v-.804l1.667-6.696zM7 7.5 9.5 10l-1.667 4.167-2.5-2.5L6.167 10h-2.5L2 7.5zm15 0L20.333 10h-2.5l.834 1.667-2.5 2.5L14.5 10 17 7.5zM13.743 5l.757.833v.834l-1.667 2.5h-1.666L9.5 6.667v-.834L10.257 5z"></path></svg>` }
     ];
 
-    // 工具函数：生成用户指纹（用于防重复投票）
+    // 显示悬浮提示
+    let toastTimeout = null;
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toast-message');
+        toast.textContent = message;
+        toast.style.backgroundColor = isError ? '#b91c1c' : '#2d3e6e';
+        toast.classList.add('show');
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
     function getOrCreateFingerprint() {
         let fp = localStorage.getItem('vote_fingerprint');
         if (!fp) {
@@ -465,10 +454,8 @@
         return fp;
     }
 
-    // 根据赞踩计算动态评级
     function computeDynamicRating(likes, dislikes) {
         if (likes === 0 && dislikes === 0) return '';
-        const ratio = likes / (dislikes + 1); // 避免除零
         if (likes > dislikes * 2) return 'S';
         if (likes > dislikes) return 'A';
         if (Math.abs(likes - dislikes) <= Math.max(1, Math.min(likes, dislikes) * 0.2)) return 'B';
@@ -476,29 +463,48 @@
         return 'B';
     }
 
-    // 从Supabase获取英雄数据 + 赞踩数据
+    // 从 Supabase 获取英雄数据和用户投票记录
     async function fetchSupabaseData() {
         try {
-            // 1. 获取英雄
-            const { data: heroesData, error: heroesError } = await supabase
+            // 获取英雄列表
+            const { data: heroesData, error: heroesError } = await supabaseClient
                 .from('heroes')
                 .select('id, en, zh, lane, tier, status');
             if (heroesError) throw heroesError;
             if (!heroesData || heroesData.length === 0) throw new Error('No heroes data');
 
-            // 2. 获取赞踩统计
-            const { data: votesData, error: votesError } = await supabase
+            // 获取所有投票统计
+            const { data: votesData, error: votesError } = await supabaseClient
                 .from('votes')
-                .select('hero_id, vote_type');
+                .select('hero_id, vote_type, user_fingerprint');
             if (votesError) throw votesError;
             
-            const votesAgg = new Map();
+            const votesAgg = new Map();   // hero_id -> { likes, dislikes, userVote }
+            // 初始化
+            heroesData.forEach(h => {
+                votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null });
+            });
             if (votesData) {
                 votesData.forEach(v => {
-                    if (!votesAgg.has(v.hero_id)) votesAgg.set(v.hero_id, { likes: 0, dislikes: 0 });
                     const entry = votesAgg.get(v.hero_id);
-                    if (v.vote_type === true) entry.likes++;
-                    else entry.dislikes++;
+                    if (entry) {
+                        if (v.vote_type === true) entry.likes++;
+                        else entry.dislikes++;
+                        if (v.user_fingerprint === userFingerprint) {
+                            entry.userVote = v.vote_type;
+                        }
+                    } else {
+                        // 如果 hero 未在英雄表中（理论上不会），但为安全起见
+                        if (!votesAgg.has(v.hero_id)) {
+                            votesAgg.set(v.hero_id, { likes: 0, dislikes: 0, userVote: null });
+                        }
+                        const newEntry = votesAgg.get(v.hero_id);
+                        if (v.vote_type === true) newEntry.likes++;
+                        else newEntry.dislikes++;
+                        if (v.user_fingerprint === userFingerprint) {
+                            newEntry.userVote = v.vote_type;
+                        }
+                    }
                 });
             }
             return { heroes: heroesData, votesAgg };
@@ -508,29 +514,31 @@
         }
     }
 
-    // fallback: 加载本地 heroes-config.json
     async function loadLocalConfig() {
         try {
             const response = await fetch('heroes-config.json');
             const config = await response.json();
             const heroes = config.heroes.map((h, idx) => ({
-                id: idx + 1000, // 避免与supabase id冲突
+                id: idx + 1000,
                 en: h.en,
                 zh: h.zh,
                 lane: h.lane,
                 tier: h.tier || '',
                 status: h.status
             }));
-            return { heroes, votesAgg: new Map() };
+            const votesAgg = new Map();
+            heroes.forEach(h => {
+                votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null });
+            });
+            return { heroes, votesAgg };
         } catch (err) {
             console.error('无法加载本地配置', err);
             return { heroes: [], votesAgg: new Map() };
         }
     }
 
-    // 获取英雄数据（优先Supabase，失败则本地）
     async function loadHeroesData() {
-        if (supabase && isSupabaseAvailable) {
+        if (supabaseClient && isSupabaseAvailable) {
             const result = await fetchSupabaseData();
             if (result) {
                 allHeroes = result.heroes;
@@ -538,81 +546,99 @@
                 return true;
             }
         }
-        // fallback
         const local = await loadLocalConfig();
         allHeroes = local.heroes;
         votesMap = local.votesAgg;
         return false;
     }
 
-    // 更新访问计数（仅Supabase可用时）
     async function updateVisitCount() {
-        if (!supabase || !isSupabaseAvailable) {
-            // 显示本地模拟计数
+        if (!supabaseClient || !isSupabaseAvailable) {
             let localCount = localStorage.getItem('visit_count_mock');
             if (!localCount) localCount = Math.floor(Math.random() * 1000) + 100;
-            visitCount = parseInt(localCount);
-            document.getElementById('footerCounter').innerHTML = `👥 访问人次: ${visitCount} (本地模拟)`;
+            document.getElementById('footerCounter').innerHTML = `👥 访问人次: ${localCount} (本地模拟)`;
             return;
         }
         try {
-            // 调用RPC或直接更新stats表，这里使用upsert方式
-            const { data, error } = await supabase.rpc('increment_visit_counter');
+            const { data, error } = await supabaseClient.rpc('increment_visit_counter');
             if (error) throw error;
-            visitCount = data;
-            document.getElementById('footerCounter').innerHTML = `👥 访问人次: ${visitCount}`;
+            document.getElementById('footerCounter').innerHTML = `👥 访问人次: ${data}`;
         } catch (err) {
             console.warn('更新访问次数失败', err);
-            // 降级显示
             document.getElementById('footerCounter').innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
         }
     }
 
-    // 投票函数
-    async function castVote(heroId, voteType) {
-        if (!supabase || !isSupabaseAvailable) {
-            alert('数据库未连接，投票功能不可用');
+    // 核心投票逻辑：支持取消/切换
+    async function submitVote(heroId, newVoteType) {
+        if (!supabaseClient || !isSupabaseAvailable) {
+            showToast('数据库未连接，点赞点踩功能不可用', true);
             return false;
         }
-        const fp = userFingerprint;
+        const current = votesMap.get(heroId);
+        const oldVote = current.userVote;
+        
         try {
-            // 先检查是否已投票
-            const { data: existing, error: checkErr } = await supabase
-                .from('votes')
-                .select('vote_type')
-                .eq('hero_id', heroId)
-                .eq('user_fingerprint', fp)
-                .maybeSingle();
-            if (checkErr) throw checkErr;
-            if (existing) {
-                alert('您已经对这个英雄投过票了！');
-                return false;
+            if (oldVote === null) {
+                // 从未投票：直接插入
+                const { error } = await supabaseClient
+                    .from('votes')
+                    .insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
+                if (error) throw error;
+                // 更新本地统计
+                if (newVoteType === true) current.likes++;
+                else current.dislikes++;
+                current.userVote = newVoteType;
+                showToast(`点赞成功 👍`, false);
+            } else if (oldVote === newVoteType) {
+                // 相同类型：取消投票（删除）
+                const { error } = await supabaseClient
+                    .from('votes')
+                    .delete()
+                    .eq('hero_id', heroId)
+                    .eq('user_fingerprint', userFingerprint);
+                if (error) throw error;
+                // 更新本地统计
+                if (newVoteType === true) current.likes--;
+                else current.dislikes--;
+                current.userVote = null;
+                showToast(`已取消点赞 👎`, false);
+            } else {
+                // 不同类型：先删除旧记录，再插入新记录
+                const { error: delError } = await supabaseClient
+                    .from('votes')
+                    .delete()
+                    .eq('hero_id', heroId)
+                    .eq('user_fingerprint', userFingerprint);
+                if (delError) throw delError;
+                const { error: insError } = await supabaseClient
+                    .from('votes')
+                    .insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
+                if (insError) throw insError;
+                // 更新本地统计
+                if (oldVote === true) current.likes--;
+                else current.dislikes--;
+                if (newVoteType === true) current.likes++;
+                else current.dislikes++;
+                current.userVote = newVoteType;
+                showToast(`已切换为${newVoteType ? '点赞' : '点踩'}`, false);
             }
-            const { error } = await supabase
-                .from('votes')
-                .insert({ hero_id: heroId, vote_type: voteType, user_fingerprint: fp });
-            if (error) throw error;
-            // 更新本地votesMap
-            const current = votesMap.get(heroId) || { likes: 0, dislikes: 0 };
-            if (voteType) current.likes++;
-            else current.dislikes++;
             votesMap.set(heroId, current);
             return true;
         } catch (err) {
-            console.error('投票失败', err);
-            alert('投票失败，请稍后重试');
+            console.error('投票操作失败', err);
+            showToast(`${newVoteType ? '点赞' : '点踩'}失败，请稍后重试`, true);
             return false;
         }
     }
 
-    // 渲染整个表格
     function render() {
-        // 筛选逻辑
         let filtered = [...allHeroes];
+        // 动态评级筛选
         if (currentRankFilter !== 'all') {
             filtered = filtered.filter(hero => {
-                const votes = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
-                const dynamicTier = computeDynamicRating(votes.likes, votes.dislikes);
+                const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
+                const dynamicTier = computeDynamicRating(stats.likes, stats.dislikes);
                 return dynamicTier === currentRankFilter;
             });
         }
@@ -624,7 +650,6 @@
             filtered = filtered.filter(h => h.zh.toLowerCase().includes(kw) || h.en.toLowerCase().includes(kw));
         }
 
-        // 按分路分组（支持多分路，lane字段用逗号分割）
         const groups = { top: [], jungle: [], mid: [], bot: [], support: [] };
         filtered.forEach(hero => {
             const lanes = hero.lane.split(',').map(l => l.trim());
@@ -648,9 +673,9 @@
                 html += `<div class="empty-msg">✨ 暂无英雄，调整筛选试试</div>`;
             } else {
                 laneHeroes.forEach(hero => {
-                    const votes = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
-                    const dynamicTier = computeDynamicRating(votes.likes, votes.dislikes);
-                    const tierToShow = dynamicTier || hero.tier; // 动态优先
+                    const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0, userVote: null };
+                    const dynamicTier = computeDynamicRating(stats.likes, stats.dislikes);
+                    const tierToShow = dynamicTier || hero.tier;
                     const rankClass = tierToShow === 'S' ? 'rank-S' : (tierToShow === 'A' ? 'rank-A' : (tierToShow === 'B' ? 'rank-B' : (tierToShow === 'C' ? 'rank-C' : '')));
                     const rankHtml = tierToShow ? `<div class="rank-corner ${rankClass}">${tierToShow}</div>` : '';
                     let statusHtml = '';
@@ -659,16 +684,15 @@
                     const willClass = hero.status === 'will' ? 'will-hero' : '';
                     const imgUrl = `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
                     const fallbackIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
-                    
-                    html += `<div class="hero-card ${willClass}" data-hero-id="${hero.id}" data-hero-en="${hero.en}" data-hero-zh="${hero.zh}">
+                    html += `<div class="hero-card ${willClass}" data-hero-id="${hero.id}" data-hero-zh="${hero.zh}">
                                 <div class="hero-img">
                                     <img src="${imgUrl}" alt="${hero.zh}" loading="lazy" onerror="this.src='${fallbackIcon}'">
                                     ${rankHtml}
                                     <div class="status-corner">${statusHtml}</div>
                                 </div>
                                 <div class="vote-buttons">
-                                    <div class="vote-btn like" data-id="${hero.id}" data-type="like">👍 ${votes.likes}</div>
-                                    <div class="vote-btn dislike" data-id="${hero.id}" data-type="dislike">👎 ${votes.dislikes}</div>
+                                    <div class="vote-btn like" data-id="${hero.id}" data-type="like">👍 ${stats.likes}</div>
+                                    <div class="vote-btn dislike" data-id="${hero.id}" data-type="dislike">👎 ${stats.dislikes}</div>
                                 </div>
                             </div>`;
                 });
@@ -683,80 +707,51 @@
                 e.stopPropagation();
                 const heroId = parseInt(btn.getAttribute('data-id'));
                 const type = btn.getAttribute('data-type');
-                const voteBool = type === 'like';
-                const success = await castVote(heroId, voteBool);
+                const newVoteType = type === 'like';
+                const success = await submitVote(heroId, newVoteType);
                 if (success) {
-                    // 刷新整个视图
+                    // 重新渲染整个页面以更新计数和动态评级
                     render();
                 }
             });
         });
-        // 绑定头像点击彩蛋（保持原有）
+        // 头像点击彩蛋
         document.querySelectorAll('.hero-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 if (e.target.closest('.vote-btn')) return;
                 const heroName = card.getAttribute('data-hero-zh');
                 const msgs = [`${heroName}：今日对线强度在线！`, `${heroName} 版本支援效率↑`, `OS认证，${heroName} 团战发挥稳定`];
-                toastMsg(msgs[Math.floor(Math.random() * msgs.length)]);
+                showToast(msgs[Math.floor(Math.random() * msgs.length)]);
             });
         });
         
-        // 更新统计文本（总英雄数去重）
         const uniqueHeroCount = allHeroes.length;
         const newCount = allHeroes.filter(h => h.status === 'new').length;
         const willCount = allHeroes.filter(h => h.status === 'will').length;
         document.getElementById('heroStatsText').innerHTML = `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 动态评级`;
     }
 
-    let toastTimer = null;
-    function toastMsg(msg) {
-        let existing = document.getElementById('dynamicToast');
-        if (existing) existing.remove();
-        const div = document.createElement('div');
-        div.id = 'dynamicToast';
-        div.innerText = msg;
-        div.style.position = 'fixed';
-        div.style.bottom = '24px';
-        div.style.left = '50%';
-        div.style.transform = 'translateX(-50%)';
-        div.style.backgroundColor = '#2d3e6e';
-        div.style.color = 'white';
-        div.style.padding = '6px 18px';
-        div.style.borderRadius = '40px';
-        div.style.fontSize = '0.8rem';
-        div.style.zIndex = '9999';
-        div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-        document.body.appendChild(div);
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => div.remove(), 1800);
-    }
-
-    // 初始化Supabase
     async function initSupabase() {
         try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            // 测试连接
-            const { error } = await supabase.from('heroes').select('id', { count: 'exact', head: true });
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const { error } = await supabaseClient.from('heroes').select('id', { count: 'exact', head: true });
             if (error) throw error;
             isSupabaseAvailable = true;
-            // 创建存储过程用于计数（如果不存在，可先执行）
-            await supabase.rpc('increment_visit_counter').catch(() => {});
+            console.log('Supabase connected');
         } catch (err) {
             console.warn('Supabase连接失败，使用本地配置', err);
             isSupabaseAvailable = false;
-            supabase = null;
+            supabaseClient = null;
         }
     }
 
-    // 主流程
     (async function main() {
         await initSupabase();
         userFingerprint = getOrCreateFingerprint();
         await loadHeroesData();
-        // 更新访问计数
         await updateVisitCount();
-        // 初始渲染
         render();
+
         // 绑定筛选事件
         document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(el => {
             el.addEventListener('click', function() {
@@ -778,7 +773,7 @@
             searchKeyword = e.target.value;
             render();
         });
-        document.getElementById('moreBtn').addEventListener('click', () => toastMsg('🚀 更多内容即将推出：英雄连招模拟器、BP建议'));
+        document.getElementById('moreBtn').addEventListener('click', () => showToast('🚀 更多内容即将推出：英雄连招模拟器、BP建议'));
     })();
 </script>
 </body>
