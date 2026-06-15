@@ -338,20 +338,22 @@
             border-top: 1px solid #20273f;
             padding-top: 1.2rem;
         }
-        /* Toast 悬浮提示 */
+        /* Toast 悬浮提示 - 顶部居中，半透明，字体加大 */
         #toast-message {
             position: fixed;
-            bottom: 30px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: #2d3e6e;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
             color: white;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-size: 0.85rem;
+            padding: 12px 24px;
+            border-radius: 48px;
+            font-size: 1rem;
+            font-weight: 500;
             z-index: 10000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border: 1px solid #5a74b0;
+            border: 1px solid rgba(255,255,255,0.2);
             opacity: 0;
             transition: opacity 0.2s ease;
             pointer-events: none;
@@ -418,11 +420,12 @@
     let supabaseClient = null;
     let isSupabaseAvailable = false;
     let allHeroes = [];
-    let votesMap = new Map();          // hero_id -> { likes, dislikes, userVote: true/false/null }
+    let votesMap = new Map();          // hero_id -> { likes, dislikes, userVote }
     let userFingerprint = '';
     let currentRankFilter = 'all';
     let currentStatusFilter = 'all';
     let searchKeyword = '';
+    let isVoting = false;              // 防连点锁
 
     const LANES = [
         { key: "top", label: "上路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z"></path><path d="m5 21 4-4h8V9l4-4v16z" opacity="0.2"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
@@ -432,12 +435,12 @@
         { key: "support", label: "辅助", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M12.833 10.833 14.5 17.53v.804L12.833 20h-1.666L9.5 18.333v-.804l1.667-6.696zM7 7.5 9.5 10l-1.667 4.167-2.5-2.5L6.167 10h-2.5L2 7.5zm15 0L20.333 10h-2.5l.834 1.667-2.5 2.5L14.5 10 17 7.5zM13.743 5l.757.833v.834l-1.667 2.5h-1.666L9.5 6.667v-.834L10.257 5z"></path></svg>` }
     ];
 
-    // 显示悬浮提示
+    // 显示悬浮提示（顶部居中）
     let toastTimeout = null;
     function showToast(message, isError = false) {
         const toast = document.getElementById('toast-message');
         toast.textContent = message;
-        toast.style.backgroundColor = isError ? '#b91c1c' : '#2d3e6e';
+        toast.style.backgroundColor = isError ? 'rgba(185, 28, 28, 0.85)' : 'rgba(0, 0, 0, 0.75)';
         toast.classList.add('show');
         if (toastTimeout) clearTimeout(toastTimeout);
         toastTimeout = setTimeout(() => {
@@ -463,24 +466,54 @@
         return 'B';
     }
 
+    // 局部更新英雄卡片的计数和评级
+    function updateHeroUI(heroId, stats) {
+        const heroCard = document.querySelector(`.hero-card[data-hero-id="${heroId}"]`);
+        if (!heroCard) return;
+        const likeBtn = heroCard.querySelector('.vote-btn.like');
+        const dislikeBtn = heroCard.querySelector('.vote-btn.dislike');
+        if (likeBtn) likeBtn.innerHTML = `👍 ${stats.likes}`;
+        if (dislikeBtn) dislikeBtn.innerHTML = `👎 ${stats.dislikes}`;
+        
+        // 更新动态评级角标
+        const dynamicTier = computeDynamicRating(stats.likes, stats.dislikes);
+        const originalTier = allHeroes.find(h => h.id === heroId)?.tier || '';
+        const tierToShow = dynamicTier || originalTier;
+        const rankCorner = heroCard.querySelector('.rank-corner');
+        if (tierToShow) {
+            const rankClass = tierToShow === 'S' ? 'rank-S' : (tierToShow === 'A' ? 'rank-A' : (tierToShow === 'B' ? 'rank-B' : 'rank-C'));
+            if (rankCorner) {
+                rankCorner.textContent = tierToShow;
+                rankCorner.className = `rank-corner ${rankClass}`;
+            } else {
+                const imgDiv = heroCard.querySelector('.hero-img');
+                if (imgDiv) {
+                    const newRank = document.createElement('div');
+                    newRank.className = `rank-corner ${rankClass}`;
+                    newRank.textContent = tierToShow;
+                    imgDiv.appendChild(newRank);
+                }
+            }
+        } else if (rankCorner) {
+            rankCorner.remove();
+        }
+    }
+
     // 从 Supabase 获取英雄数据和用户投票记录
     async function fetchSupabaseData() {
         try {
-            // 获取英雄列表
             const { data: heroesData, error: heroesError } = await supabaseClient
                 .from('heroes')
                 .select('id, en, zh, lane, tier, status');
             if (heroesError) throw heroesError;
             if (!heroesData || heroesData.length === 0) throw new Error('No heroes data');
 
-            // 获取所有投票统计
             const { data: votesData, error: votesError } = await supabaseClient
                 .from('votes')
                 .select('hero_id, vote_type, user_fingerprint');
             if (votesError) throw votesError;
             
-            const votesAgg = new Map();   // hero_id -> { likes, dislikes, userVote }
-            // 初始化
+            const votesAgg = new Map();
             heroesData.forEach(h => {
                 votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null });
             });
@@ -492,17 +525,6 @@
                         else entry.dislikes++;
                         if (v.user_fingerprint === userFingerprint) {
                             entry.userVote = v.vote_type;
-                        }
-                    } else {
-                        // 如果 hero 未在英雄表中（理论上不会），但为安全起见
-                        if (!votesAgg.has(v.hero_id)) {
-                            votesAgg.set(v.hero_id, { likes: 0, dislikes: 0, userVote: null });
-                        }
-                        const newEntry = votesAgg.get(v.hero_id);
-                        if (v.vote_type === true) newEntry.likes++;
-                        else newEntry.dislikes++;
-                        if (v.user_fingerprint === userFingerprint) {
-                            newEntry.userVote = v.vote_type;
                         }
                     }
                 });
@@ -553,58 +575,108 @@
     }
 
     async function updateVisitCount() {
+        const footer = document.getElementById('footerCounter');
         if (!supabaseClient || !isSupabaseAvailable) {
             let localCount = localStorage.getItem('visit_count_mock');
             if (!localCount) localCount = Math.floor(Math.random() * 1000) + 100;
-            document.getElementById('footerCounter').innerHTML = `👥 访问人次: ${localCount} (本地模拟)`;
+            footer.innerHTML = `👥 访问人次: ${localCount} (本地模拟)`;
             return;
         }
         try {
             const { data, error } = await supabaseClient.rpc('increment_visit_counter');
             if (error) throw error;
-            document.getElementById('footerCounter').innerHTML = `👥 访问人次: ${data}`;
+            const count = (data !== null && data !== undefined) ? data : 0;
+            footer.innerHTML = `👥 访问人次: ${count}`;
         } catch (err) {
             console.warn('更新访问次数失败', err);
-            document.getElementById('footerCounter').innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
+            let localCount = localStorage.getItem('visit_count_mock');
+            if (!localCount) localCount = Math.floor(Math.random() * 1000) + 100;
+            footer.innerHTML = `👥 访问人次: ${localCount} (本地模拟)`;
         }
     }
 
-    // 核心投票逻辑：支持取消/切换
+    // 投票逻辑（带锁，乐观更新UI，发送请求）
     async function submitVote(heroId, newVoteType) {
+        if (isVoting) {
+            showToast('请稍后...', false);
+            return false;
+        }
         if (!supabaseClient || !isSupabaseAvailable) {
             showToast('数据库未连接，点赞点踩功能不可用', true);
             return false;
         }
+        
         const current = votesMap.get(heroId);
+        if (!current) return false;
         const oldVote = current.userVote;
         
+        // 乐观更新UI (先更新本地数据和界面)
+        let actionText = '';
+        let newLikes = current.likes;
+        let newDislikes = current.dislikes;
+        let newUserVote = oldVote;
+        
+        if (oldVote === null) {
+            // 新增投票
+            if (newVoteType === true) {
+                newLikes++;
+                actionText = '点赞成功 👍';
+            } else {
+                newDislikes++;
+                actionText = '点踩成功 👎';
+            }
+            newUserVote = newVoteType;
+        } else if (oldVote === newVoteType) {
+            // 取消投票
+            if (newVoteType === true) {
+                newLikes--;
+                actionText = '已取消点赞';
+            } else {
+                newDislikes--;
+                actionText = '已取消点踩';
+            }
+            newUserVote = null;
+        } else {
+            // 切换投票
+            if (newVoteType === true) {
+                newLikes++;
+                newDislikes--;
+                actionText = '点赞成功 👍';
+            } else {
+                newLikes--;
+                newDislikes++;
+                actionText = '点踩成功 👎';
+            }
+            newUserVote = newVoteType;
+        }
+        
+        // 本地更新
+        current.likes = newLikes;
+        current.dislikes = newDislikes;
+        current.userVote = newUserVote;
+        votesMap.set(heroId, current);
+        updateHeroUI(heroId, current);
+        showToast(actionText, false);
+        
+        // 发送实际请求（防锁）
+        isVoting = true;
         try {
             if (oldVote === null) {
-                // 从未投票：直接插入
+                // 插入
                 const { error } = await supabaseClient
                     .from('votes')
                     .insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
                 if (error) throw error;
-                // 更新本地统计
-                if (newVoteType === true) current.likes++;
-                else current.dislikes++;
-                current.userVote = newVoteType;
-                showToast(`点赞成功 👍`, false);
             } else if (oldVote === newVoteType) {
-                // 相同类型：取消投票（删除）
+                // 删除
                 const { error } = await supabaseClient
                     .from('votes')
                     .delete()
                     .eq('hero_id', heroId)
                     .eq('user_fingerprint', userFingerprint);
                 if (error) throw error;
-                // 更新本地统计
-                if (newVoteType === true) current.likes--;
-                else current.dislikes--;
-                current.userVote = null;
-                showToast(`已取消点赞 👎`, false);
             } else {
-                // 不同类型：先删除旧记录，再插入新记录
+                // 先删后插
                 const { error: delError } = await supabaseClient
                     .from('votes')
                     .delete()
@@ -615,26 +687,26 @@
                     .from('votes')
                     .insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
                 if (insError) throw insError;
-                // 更新本地统计
-                if (oldVote === true) current.likes--;
-                else current.dislikes--;
-                if (newVoteType === true) current.likes++;
-                else current.dislikes++;
-                current.userVote = newVoteType;
-                showToast(`已切换为${newVoteType ? '点赞' : '点踩'}`, false);
             }
-            votesMap.set(heroId, current);
             return true;
         } catch (err) {
-            console.error('投票操作失败', err);
-            showToast(`${newVoteType ? '点赞' : '点踩'}失败，请稍后重试`, true);
+            console.error('投票请求失败', err);
+            // 回滚本地更改
+            const rollback = votesMap.get(heroId);
+            rollback.likes = current.likes;
+            rollback.dislikes = current.dislikes;
+            rollback.userVote = oldVote;
+            votesMap.set(heroId, rollback);
+            updateHeroUI(heroId, rollback);
+            showToast(`${newVoteType ? '点赞' : '点踩'}失败，请重试`, true);
             return false;
+        } finally {
+            isVoting = false;
         }
     }
 
     function render() {
         let filtered = [...allHeroes];
-        // 动态评级筛选
         if (currentRankFilter !== 'all') {
             filtered = filtered.filter(hero => {
                 const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
@@ -708,11 +780,7 @@
                 const heroId = parseInt(btn.getAttribute('data-id'));
                 const type = btn.getAttribute('data-type');
                 const newVoteType = type === 'like';
-                const success = await submitVote(heroId, newVoteType);
-                if (success) {
-                    // 重新渲染整个页面以更新计数和动态评级
-                    render();
-                }
+                await submitVote(heroId, newVoteType);
             });
         });
         // 头像点击彩蛋
@@ -752,7 +820,6 @@
         await updateVisitCount();
         render();
 
-        // 绑定筛选事件
         document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(el => {
             el.addEventListener('click', function() {
                 document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(c => c.classList.remove('active'));
