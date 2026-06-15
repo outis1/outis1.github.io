@@ -447,27 +447,22 @@
     });
 
     document.addEventListener('keydown', function(e) {
-        // F12
         if (e.key === 'F12' || e.keyCode === 123) {
             e.preventDefault();
             return false;
         }
-        // Ctrl+Shift+I
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.keyCode === 73)) {
             e.preventDefault();
             return false;
         }
-        // Ctrl+Shift+J
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.keyCode === 74)) {
             e.preventDefault();
             return false;
         }
-        // Ctrl+U
         if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.keyCode === 85)) {
             e.preventDefault();
             return false;
         }
-        // Ctrl+Shift+C 
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.keyCode === 67)) {
             e.preventDefault();
             return false;
@@ -479,7 +474,6 @@
         debugger;
         var after = new Date().getTime();
         if (after - before > 100) {
-            // 有可能打开了控制台，执行干扰操作
             document.body.innerHTML = '';
         }
     }, 2000);
@@ -498,8 +492,8 @@
     let searchKeyword = '';
     let isVoting = false;
 
-    const RANK_ORDER = ['S', 'A', 'B', 'C'];  // 索引0最高
-    const DEFAULT_RANK = 'B';                 // 默认评级（当原始 tier 为空时）
+    const RANK_ORDER = ['S', 'A', 'B', 'C'];
+    const DEFAULT_RANK = 'B';
 
     const LANES = [
         { key: "top", label: "上路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z"></path><path d="m5 21 4-4h8V9l4-4v16z" opacity="0.2"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
@@ -541,36 +535,24 @@
         return fp;
     }
 
-    /**
-     * 动态评级算法（新规则）
-     * @param {number} likes 点赞数
-     * @param {number} dislikes 点踩数
-     * @param {string} originalTier 原始评级（S/A/B/C 或空）
-     * @returns {string} 动态评级
-     */
     function computeDynamicRating(likes, dislikes, originalTier) {
-        // 确定原始评级索引
         let baseIndex = RANK_ORDER.indexOf(originalTier);
         if (baseIndex === -1) baseIndex = RANK_ORDER.indexOf(DEFAULT_RANK);
         
-        // 0赞0踩 → 原始评级
         if (likes === 0 && dislikes === 0) {
             return RANK_ORDER[baseIndex];
         }
         
-        // 仅有点赞（点踩为0）
         if (likes > 0 && dislikes === 0) {
-            let newIndex = Math.max(baseIndex - likes, 0);      // 每1点赞升一级，不低于S
+            let newIndex = Math.max(baseIndex - likes, 0);
             return RANK_ORDER[newIndex];
         }
         
-        // 仅有点踩（点赞为0）
         if (dislikes > 0 && likes === 0) {
-            let newIndex = Math.min(baseIndex + dislikes, RANK_ORDER.length - 1); // 每1点踩降一级，不高于C
+            let newIndex = Math.min(baseIndex + dislikes, RANK_ORDER.length - 1);
             return RANK_ORDER[newIndex];
         }
         
-        // 两者都有 → 使用原来的阈值算法
         if (likes > dislikes * 2) return 'S';
         if (likes > dislikes) return 'A';
         if (Math.abs(likes - dislikes) <= Math.max(1, Math.min(likes, dislikes) * 0.2)) return 'B';
@@ -578,7 +560,6 @@
         return 'B';
     }
 
-    // 获取英雄当前展示的评级（动态优先，否则原始）
     function getCurrentRating(hero, stats) {
         return computeDynamicRating(stats.likes, stats.dislikes, hero.tier);
     }
@@ -835,7 +816,6 @@
 
     function render() {
         let filtered = [...allHeroes];
-        // 评级筛选：使用动态评级
         if (currentRankFilter !== 'all') {
             filtered = filtered.filter(hero => {
                 const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
@@ -861,8 +841,26 @@
 
         let html = '';
         for (let lane of LANES) {
-            const laneHeroes = groups[lane.key] || [];
-            const count = laneHeroes.length;
+            let laneHeroes = groups[lane.key] || [];
+            // 排序：WILL 英雄放在最后，其余按点赞数降序，点赞相同按评级降序
+            const normalHeroes = laneHeroes.filter(h => h.status !== 'will');
+            const willHeroes = laneHeroes.filter(h => h.status === 'will');
+            
+            const sortByLikesThenRating = (a, b) => {
+                const aStats = votesMap.get(a.id) || { likes: 0 };
+                const bStats = votesMap.get(b.id) || { likes: 0 };
+                if (aStats.likes !== bStats.likes) return bStats.likes - aStats.likes;
+                const aRating = getCurrentRating(a, aStats);
+                const bRating = getCurrentRating(b, bStats);
+                const rankOrder = { S: 4, A: 3, B: 2, C: 1 };
+                return (rankOrder[bRating] || 0) - (rankOrder[aRating] || 0);
+            };
+            
+            normalHeroes.sort(sortByLikesThenRating);
+            willHeroes.sort(sortByLikesThenRating);
+            const sortedHeroes = [...normalHeroes, ...willHeroes];
+            
+            const count = sortedHeroes.length;
             html += `<div class="position-row">
                         <div class="row-icon">
                             <div class="lane-svg">${lane.iconSvg}</div>
@@ -873,7 +871,7 @@
             if (count === 0) {
                 html += `<div class="empty-msg">✨ 暂无英雄，调整筛选试试</div>`;
             } else {
-                laneHeroes.forEach(hero => {
+                sortedHeroes.forEach(hero => {
                     const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0, userVote: null };
                     const currentTier = getCurrentRating(hero, stats);
                     const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ? 'rank-B' : 'rank-C'));
