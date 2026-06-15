@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Outis冠军支持表 · 分路强度榜</title>
     <style>
         * {
@@ -11,155 +11,167 @@
             box-sizing: border-box;
         }
 
-        body {
+        /* 确保全屏背景，无滚动灰色区域 */
+        html, body {
+            height: 100%;
             background: #0b0e18;
+        }
+
+        body {
             font-family: system-ui, -apple-system, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
             color: #eef2ff;
-            padding: 1.2rem 1rem;
+            padding: 1rem 0.75rem;
+            min-height: 100%;
+            background: #0b0e18;
+            /* 优化滚动体验 */
+            -webkit-overflow-scrolling: touch;
+            overflow-y: auto;
         }
 
         .container {
             max-width: 1500px;
             margin: 0 auto;
+            width: 100%;
         }
 
+        /* 头部区域微调 */
         .main-header {
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
         }
         .title {
-            font-size: 1.7rem;
+            font-size: 1.5rem;
             font-weight: 800;
             background: linear-gradient(135deg, #ffffff, #8aadff);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
             letter-spacing: -0.3px;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
         .info-line {
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
-            font-size: 0.8rem;
+            gap: 0.8rem;
+            font-size: 0.7rem;
             color: #b9c7f0;
         }
         .stats-text {
             background: #0a0f1a;
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 30px;
             white-space: nowrap;
+            font-size: 0.7rem;
         }
         .right-group {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 1rem;
+            gap: 0.6rem;
         }
         .feature-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.8rem;
+            gap: 0.5rem;
         }
         .feature {
             background: #111722;
             border: 1px solid #2a365a;
             border-radius: 60px;
-            padding: 4px 14px;
-            font-size: 0.75rem;
+            padding: 3px 10px;
+            font-size: 0.65rem;
             font-weight: 500;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
         .action-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
         .action-btn {
             background: #191f30;
             border: 1px solid #31406a;
-            padding: 4px 16px;
+            padding: 3px 12px;
             border-radius: 40px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 500;
             color: #eef2ff;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
         .action-btn.primary {
             background: #2a3e70;
             border-color: #5a82ff;
         }
-        .action-btn.primary:hover { background: #345493; }
-        .action-btn.outline:hover { background: #232e48; }
 
+        /* 筛选区域 - 移动端垂直排列 */
         .filter-area {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 1rem;
-            margin: 0.8rem 0 0;
+            gap: 0.8rem;
+            margin: 0.6rem 0 0;
             background: #0e1322;
             border-radius: 18px;
-            padding: 0.6rem 1rem;
+            padding: 0.6rem;
         }
         .search-box {
             background: #111722;
             border: 1px solid #2d385a;
             border-radius: 48px;
-            padding: 5px 16px;
+            padding: 4px 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            width: 220px;
-            flex-shrink: 0;
+            gap: 6px;
+            flex: 1;
+            min-width: 160px;
         }
         .search-box input {
             background: transparent;
             border: none;
             outline: none;
             color: #f0f4ff;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             width: 100%;
         }
         .filter-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 1.2rem;
+            gap: 0.8rem;
             align-items: center;
         }
         .filter-cat {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
         .filter-label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
             color: #bfd0ff;
         }
         .filter-options {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
         .filter-chip {
             background: #1a2135;
-            padding: 3px 12px;
+            padding: 2px 10px;
             border-radius: 40px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             color: #cfddff;
             cursor: pointer;
-            transition: 0.08s;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
         .filter-chip.active {
             background: #3b6eff;
@@ -167,17 +179,18 @@
         }
         .dot {
             display: inline-block;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
         }
-        .dot-s { background-color: #fbbf24; box-shadow: 0 0 2px #fbbf24; }
+        .dot-s { background-color: #fbbf24; }
         .dot-a { background-color: #a855f7; }
         .dot-b { background-color: #3b82f6; }
         .dot-c { background-color: #9ca3af; }
         .dot-new { background-color: #f87171; }
         .dot-will { background-color: #86efac; }
 
+        /* 英雄列表表格 - 移动端适配 */
         .position-table {
             display: flex;
             flex-direction: column;
@@ -194,68 +207,59 @@
         .position-row:last-child {
             border-bottom: none;
         }
+        /* 左侧分路图标 - 移动端宽度减小 */
         .row-icon {
-            width: 130px;
+            width: 90px;
             flex-shrink: 0;
             background: #0f1424;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 0.8rem 0.5rem;
-            gap: 6px;
+            padding: 0.5rem 0.3rem;
+            gap: 4px;
             border-right: 1px solid #25305a;
         }
         .lane-svg svg {
-            width: 66px;
-            height: 66px;
+            width: 44px;
+            height: 44px;
             display: block;
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-        }
-        .lane-svg svg path,
-        .lane-svg svg g {
-            fill: #ffffff;
-            stroke: none;
-        }
-        .lane-svg svg g[opacity="0.2"] {
-            opacity: 0.35;
-            fill: #fff9c4;
         }
         .lane-count {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             font-weight: 600;
             background: rgba(0,0,0,0.5);
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 30px;
-            color: #fff5e0;
+            white-space: nowrap;
         }
         .row-heroes {
             flex: 1;
             background: #0c1020;
-            padding: 8px 12px;
+            padding: 6px 8px;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .heroes-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
+        /* 英雄卡片 - 移动端缩小 */
         .hero-card {
-            width: 88px;
+            width: 70px;
             background: #121826;
-            border-radius: 14px;
+            border-radius: 12px;
             border: 1px solid #2c365e;
             overflow: hidden;
-            transition: 0.08s linear;
             flex-shrink: 0;
-            position: relative;
             cursor: pointer;
+            position: relative;
         }
         .hero-card:hover {
             transform: translateY(-2px);
             border-color: #5d7eff;
-            background: #161f30;
         }
         .hero-card.will-hero .hero-img img {
             filter: grayscale(0.85);
@@ -266,9 +270,6 @@
             aspect-ratio: 1 / 1;
             background: #1b2338;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .hero-img img {
             width: 100%;
@@ -278,14 +279,13 @@
         }
         .rank-corner {
             position: absolute;
-            bottom: 5px;
-            left: 5px;
-            z-index: 3;
+            bottom: 4px;
+            left: 4px;
             background: #000000cc;
             backdrop-filter: blur(2px);
-            padding: 2px 7px;
-            border-radius: 18px;
-            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 14px;
+            font-size: 0.6rem;
             font-weight: 800;
             color: white;
         }
@@ -295,57 +295,65 @@
         .rank-C { background: #9ca3af; }
         .status-corner {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 4px;
+            right: 4px;
             z-index: 3;
-            display: flex;
-            gap: 3px;
         }
         .status-badge-sm {
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 16px;
+            padding: 2px 5px;
+            border-radius: 12px;
             background: #000000aa;
             backdrop-filter: blur(2px);
         }
-        .status-new {
-            background: #f87171;
-            color: white;
-        }
-        .status-will {
-            background: #86efac;
-            color: #1f3a1f;
-        }
+        .status-new { background: #f87171; color: white; }
+        .status-will { background: #86efac; color: #1f3a1f; }
+
         .empty-msg {
             color: #6b7ba5;
-            font-size: 0.75rem;
-            padding: 16px;
+            font-size: 0.7rem;
+            padding: 12px;
             text-align: center;
             width: 100%;
         }
 
-        @media (max-width: 800px) {
-            .row-icon { width: 100px; }
-            .lane-svg svg { width: 52px; height: 52px; }
-            .hero-card { width: 78px; }
-            .filter-area { flex-direction: column; align-items: stretch; }
-            .search-box { width: 100%; }
-            .right-group { justify-content: flex-end; }
-        }
-        @media (max-width: 600px) {
-            .hero-card { width: 70px; }
-            .row-icon { width: 85px; }
-            .lane-svg svg { width: 44px; height: 44px; }
-        }
-
         footer {
             text-align: center;
-            margin-top: 1.8rem;
-            font-size: 0.65rem;
+            margin-top: 1.2rem;
+            font-size: 0.6rem;
             color: #64708f;
             border-top: 1px solid #20273f;
-            padding-top: 1.2rem;
+            padding-top: 0.8rem;
+        }
+
+        /* 小屏手机进一步调整 */
+        @media (max-width: 480px) {
+            body {
+                padding: 0.6rem;
+            }
+            .row-icon {
+                width: 75px;
+            }
+            .lane-svg svg {
+                width: 36px;
+                height: 36px;
+            }
+            .hero-card {
+                width: 62px;
+            }
+            .rank-corner {
+                font-size: 0.5rem;
+                padding: 1px 4px;
+            }
+            .status-badge-sm {
+                font-size: 0.45rem;
+                padding: 1px 4px;
+            }
+            .filter-chip {
+                padding: 2px 8px;
+                font-size: 0.6rem;
+            }
         }
     </style>
 </head>
@@ -362,7 +370,7 @@
                     <div class="feature">🎯 精确意识与监测</div>
                 </div>
                 <div class="action-bar">
-                    <button class="action-btn primary" id="moreBtn">📈 正在推进更多内容</button>
+                    <button class="action-btn primary" id="moreBtn">📈 更多内容</button>
                 </div>
             </div>
         </div>
@@ -378,25 +386,25 @@
                 <span class="filter-label">评级</span>
                 <div class="filter-options" id="rankFilterGroup">
                     <span data-rank="all" class="filter-chip active">全部</span>
-                    <span data-rank="S" class="filter-chip"><span class="dot dot-s"></span>S 优秀</span>
-                    <span data-rank="A" class="filter-chip"><span class="dot dot-a"></span>A 良好</span>
-                    <span data-rank="B" class="filter-chip"><span class="dot dot-b"></span>B 一般</span>
-                    <span data-rank="C" class="filter-chip"><span class="dot dot-c"></span>C 差劲</span>
+                    <span data-rank="S" class="filter-chip"><span class="dot dot-s"></span>S</span>
+                    <span data-rank="A" class="filter-chip"><span class="dot dot-a"></span>A</span>
+                    <span data-rank="B" class="filter-chip"><span class="dot dot-b"></span>B</span>
+                    <span data-rank="C" class="filter-chip"><span class="dot dot-c"></span>C</span>
                 </div>
             </div>
             <div class="filter-cat">
                 <span class="filter-label">状态</span>
                 <div class="filter-options" id="statusFilterGroup">
                     <span data-status="all" class="filter-chip active">全部</span>
-                    <span data-status="new" class="filter-chip"><span class="dot dot-new"></span>NEW 新增</span>
-                    <span data-status="will" class="filter-chip"><span class="dot dot-will"></span>WILL 即将推出</span>
+                    <span data-status="new" class="filter-chip"><span class="dot dot-new"></span>NEW</span>
+                    <span data-status="will" class="filter-chip"><span class="dot dot-will"></span>WILL</span>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="positionTable" class="position-table"></div>
-    <footer>英雄数据基于外部配置文件 · 点击头像获得随机彩蛋</footer>
+    <footer>英雄数据基于外部配置 | 点击头像获得彩蛋</footer>
 </div>
 
 <script>
@@ -452,12 +460,12 @@
             html += `<div class="position-row">
                         <div class="row-icon">
                             <div class="lane-svg">${lane.iconSvg}</div>
-                            <div class="lane-count">${count} 位英雄</div>
+                            <div class="lane-count">${count}</div>
                         </div>
                         <div class="row-heroes">
                             <div class="heroes-grid">`;
             if (count === 0) {
-                html += `<div class="empty-msg">✨ 暂无英雄，调整筛选试试</div>`;
+                html += `<div class="empty-msg">✨ 暂无英雄</div>`;
             } else {
                 laneHeroes.forEach(hero => {
                     let rankHtml = '';
@@ -510,16 +518,17 @@
         div.id = 'dynamicToast';
         div.innerText = msg;
         div.style.position = 'fixed';
-        div.style.bottom = '24px';
+        div.style.bottom = '20px';
         div.style.left = '50%';
         div.style.transform = 'translateX(-50%)';
         div.style.backgroundColor = '#2d3e6e';
         div.style.color = 'white';
-        div.style.padding = '6px 18px';
+        div.style.padding = '5px 16px';
         div.style.borderRadius = '40px';
-        div.style.fontSize = '0.8rem';
+        div.style.fontSize = '0.75rem';
         div.style.zIndex = '9999';
-        div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+        div.style.whiteSpace = 'nowrap';
+        div.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
         div.style.border = '1px solid #5a74b0';
         document.body.appendChild(div);
         clearTimeout(toastTimer);
@@ -556,16 +565,16 @@
             heroes = config.heroes.map((h, idx) => ({ ...h, id: idx }));
             const newCount = heroes.filter(h => h.status === 'new').length;
             const willCount = heroes.filter(h => h.status === 'will').length;
-            statsText.innerText = `共 ${heroes.length} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于 ${config.lastUpdated || '2026.06.15'}`;
+            statsText.innerText = `共 ${heroes.length} 位 · ${newCount} 新增 · ${willCount} 即将推出 · ${config.lastUpdated || '2026.06.15'}`;
             bindEvents();
             render();
         } catch (err) {
-            console.error('加载配置文件失败', err);
-            statsText.innerText = '加载配置失败，请确保 heroes-config.json 存在';
+            console.error('加载配置失败', err);
+            statsText.innerText = '加载配置失败，请检查网络';
         }
     }
 
-    document.getElementById('moreBtn').addEventListener('click', () => toastMsg('🚀 更多内容即将推出：英雄连招模拟器、BP建议', 'fun'));
+    document.getElementById('moreBtn').addEventListener('click', () => toastMsg('🚀 更多内容即将推出', 'fun'));
 
     loadConfig();
 </script>
