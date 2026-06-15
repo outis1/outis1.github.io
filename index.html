@@ -2,8 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Outis冠军支持表 · 分路强度榜</title>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -37,13 +39,9 @@
             margin-bottom: 0.5rem;
         }
         .info-line {
-            display: -webkit-flex;
             display: flex;
-            -webkit-flex-wrap: wrap;
             flex-wrap: wrap;
-            -webkit-justify-content: space-between;
             justify-content: space-between;
-            -webkit-align-items: center;
             align-items: center;
             gap: 1rem;
             font-size: 0.8rem;
@@ -56,18 +54,13 @@
             white-space: nowrap;
         }
         .right-group {
-            display: -webkit-flex;
             display: flex;
-            -webkit-flex-wrap: wrap;
             flex-wrap: wrap;
-            -webkit-align-items: center;
             align-items: center;
             gap: 1rem;
         }
         .feature-row {
-            display: -webkit-flex;
             display: flex;
-            -webkit-flex-wrap: wrap;
             flex-wrap: wrap;
             gap: 0.8rem;
         }
@@ -78,16 +71,12 @@
             padding: 4px 14px;
             font-size: 0.75rem;
             font-weight: 500;
-            display: -webkit-inline-flex;
             display: inline-flex;
-            -webkit-align-items: center;
             align-items: center;
             gap: 6px;
         }
         .action-bar {
-            display: -webkit-flex;
             display: flex;
-            -webkit-flex-wrap: wrap;
             flex-wrap: wrap;
             gap: 8px;
         }
@@ -100,9 +89,7 @@
             font-weight: 500;
             color: #eef2ff;
             cursor: pointer;
-            display: -webkit-inline-flex;
             display: inline-flex;
-            -webkit-align-items: center;
             align-items: center;
             gap: 5px;
         }
@@ -110,15 +97,10 @@
             background: #2a3e70;
             border-color: #5a82ff;
         }
-        .action-btn.primary:hover { background: #345493; }
-        .action-btn.outline:hover { background: #232e48; }
 
         .filter-area {
-            display: -webkit-flex;
             display: flex;
-            -webkit-flex-wrap: wrap;
             flex-wrap: wrap;
-            -webkit-align-items: center;
             align-items: center;
             gap: 1rem;
             margin: 0.8rem 0 0;
@@ -131,13 +113,10 @@
             border: 1px solid #2d385a;
             border-radius: 48px;
             padding: 5px 16px;
-            display: -webkit-flex;
             display: flex;
-            -webkit-align-items: center;
             align-items: center;
             gap: 8px;
             width: 220px;
-            -webkit-flex-shrink: 0;
             flex-shrink: 0;
         }
         .search-box input {
@@ -149,18 +128,13 @@
             width: 100%;
         }
         .filter-group {
-            display: -webkit-flex;
             display: flex;
-            -webkit-flex-wrap: wrap;
             flex-wrap: wrap;
             gap: 1.2rem;
-            -webkit-align-items: center;
             align-items: center;
         }
         .filter-cat {
-            display: -webkit-flex;
             display: flex;
-            -webkit-align-items: center;
             align-items: center;
             gap: 10px;
         }
@@ -170,10 +144,8 @@
             color: #bfd0ff;
         }
         .filter-options {
-            display: -webkit-flex;
             display: flex;
             gap: 8px;
-            -webkit-flex-wrap: wrap;
             flex-wrap: wrap;
         }
         .filter-chip {
@@ -184,9 +156,7 @@
             font-weight: 600;
             color: #cfddff;
             cursor: pointer;
-            display: -webkit-inline-flex;
             display: inline-flex;
-            -webkit-align-items: center;
             align-items: center;
             gap: 5px;
         }
@@ -208,9 +178,7 @@
         .dot-will { background-color: #86efac; }
 
         .position-table {
-            display: -webkit-flex;
             display: flex;
-            -webkit-flex-direction: column;
             flex-direction: column;
             border-radius: 20px;
             overflow: hidden;
@@ -219,7 +187,6 @@
             margin-top: 0.8rem;
         }
         .position-row {
-            display: -webkit-flex;
             display: flex;
             border-bottom: 1px solid #1f2742;
         }
@@ -228,16 +195,11 @@
         }
         .row-icon {
             width: 130px;
-            -webkit-flex-shrink: 0;
             flex-shrink: 0;
             background: #0f1424;
-            display: -webkit-flex;
             display: flex;
-            -webkit-flex-direction: column;
             flex-direction: column;
-            -webkit-align-items: center;
             align-items: center;
-            -webkit-justify-content: center;
             justify-content: center;
             padding: 0.8rem 0.5rem;
             gap: 6px;
@@ -266,30 +228,26 @@
             color: #fff5e0;
         }
         .row-heroes {
-            -webkit-flex: 1;
             flex: 1;
             background: #0c1020;
             padding: 8px 12px;
             overflow-x: auto;
         }
         .heroes-grid {
-            display: -webkit-flex;
             display: flex;
-            -webkit-flex-wrap: wrap;
             flex-wrap: wrap;
             margin: -5px;
         }
         .hero-card {
-            width: 88px;
+            width: 100px;
             background: #121826;
             border-radius: 14px;
             border: 1px solid #2c365e;
             overflow: hidden;
-            -webkit-flex-shrink: 0;
             flex-shrink: 0;
             position: relative;
-            cursor: pointer;
             margin: 5px;
+            transition: 0.08s linear;
         }
         .hero-card:hover {
             transform: translateY(-2px);
@@ -297,7 +255,6 @@
             background: #161f30;
         }
         .hero-card.will-hero .hero-img img {
-            -webkit-filter: grayscale(0.85);
             filter: grayscale(0.85);
             opacity: 0.8;
         }
@@ -306,11 +263,8 @@
             aspect-ratio: 1 / 1;
             background: #1b2338;
             position: relative;
-            display: -webkit-flex;
             display: flex;
-            -webkit-align-items: center;
             align-items: center;
-            -webkit-justify-content: center;
             justify-content: center;
         }
         .hero-img img {
@@ -327,7 +281,7 @@
             background: rgba(0,0,0,0.7);
             padding: 2px 7px;
             border-radius: 18px;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             font-weight: 800;
             color: white;
         }
@@ -340,25 +294,60 @@
             top: 5px;
             right: 5px;
             z-index: 3;
-            display: -webkit-flex;
             display: flex;
             gap: 3px;
         }
         .status-badge-sm {
-            font-size: 0.55rem;
+            font-size: 0.6rem;
             font-weight: 800;
             padding: 2px 6px;
             border-radius: 16px;
             background: rgba(0,0,0,0.7);
         }
-        .status-new {
-            background: #f87171;
-            color: white;
+        .status-new { background: #f87171; color: white; }
+        .status-will { background: #86efac; color: #1f3a1f; }
+
+        /* 赞踩按钮样式 */
+        .vote-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 6px 4px 8px;
+            background: #0f1420;
+            border-top: 1px solid #262f50;
         }
-        .status-will {
-            background: #86efac;
-            color: #1f3a1f;
+        .vote-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 0;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.1s;
+            background: rgba(0,0,0,0.4);
+            color: #fff;
         }
+        .vote-btn.like {
+            background: #166534;
+        }
+        .vote-btn.like:hover {
+            background: #15803d;
+        }
+        .vote-btn.dislike {
+            background: #991b1b;
+        }
+        .vote-btn.dislike:hover {
+            background: #b91c1c;
+        }
+        .vote-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .empty-msg {
             color: #6b7ba5;
             font-size: 0.75rem;
@@ -370,13 +359,14 @@
         @media (max-width: 800px) {
             .row-icon { width: 100px; }
             .lane-svg svg { width: 52px; height: 52px; }
-            .hero-card { width: 78px; }
-            .filter-area { -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: stretch; align-items: stretch; }
+            .hero-card { width: 90px; }
+            .filter-area { flex-direction: column; align-items: stretch; }
             .search-box { width: 100%; }
-            .right-group { -webkit-justify-content: flex-end; justify-content: flex-end; }
+            .right-group { justify-content: flex-end; }
+            .vote-btn { font-size: 0.65rem; padding: 2px 0; }
         }
         @media (max-width: 600px) {
-            .hero-card { width: 70px; }
+            .hero-card { width: 80px; }
             .row-icon { width: 85px; }
             .lane-svg svg { width: 44px; height: 44px; }
         }
@@ -384,7 +374,7 @@
         footer {
             text-align: center;
             margin-top: 1.8rem;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             color: #64708f;
             border-top: 1px solid #20273f;
             padding-top: 1.2rem;
@@ -438,72 +428,24 @@
     </div>
 
     <div id="positionTable" class="position-table"></div>
-    <footer>英雄数据基于外部配置文件 · 点击头像获得随机彩蛋</footer>
+    <footer id="footerCounter">加载访问量中...</footer>
 </div>
 
 <script>
+    // Supabase 配置
+    const SUPABASE_URL = 'https://pwmpledeqzzdvwqqbbhh.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_DdFUyYqX6xOz28v6LXYO9w_JMW8l6kV';
+    let supabase = null;
+    let isSupabaseAvailable = false;
 
-    // 阻止开发者工具打开（仅增加阻力，非绝对安全）
-(function() {
-    // 1. 阻止右键菜单
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        return false;
-    });
-
-    // 2. 阻止 F12、Ctrl+Shift+I、Ctrl+Shift+J、Ctrl+U 等快捷键
-    document.addEventListener('keydown', function(e) {
-        // F12
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-        // Ctrl+Shift+I (Windows/Linux) 或 Cmd+Option+I (Mac)
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.keyCode === 73)) {
-            e.preventDefault();
-            return false;
-        }
-        // Ctrl+Shift+J (打开控制台)
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.keyCode === 74)) {
-            e.preventDefault();
-            return false;
-        }
-        // Ctrl+U (查看源代码)
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.keyCode === 85)) {
-            e.preventDefault();
-            return false;
-        }
-        // Ctrl+Shift+C (元素选择)
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.keyCode === 67)) {
-            e.preventDefault();
-            return false;
-        }
-    });
-    
-
-    // 方法二：通过 debugger 语句干扰（无法真正阻止，但会让控制台不断进入断点）
-    setInterval(function() {
-        var before = new Date().getTime();
-        debugger;
-        var after = new Date().getTime();
-        if (after - before > 100) {
-            // 有可能打开了控制台，执行干扰操作
-            document.body.innerHTML = '';
-        }
-    }, 2000);
-})();
-
-    let heroes = [];
-    let currentRank = 'all';
-    let currentStatus = 'all';
+    // 全局数据
+    let allHeroes = [];        // 原始英雄列表（含多分路字符串）
+    let votesMap = new Map();  // hero_id -> { likes, dislikes }
+    let userFingerprint = '';
+    let visitCount = 0;
+    let currentRankFilter = 'all';
+    let currentStatusFilter = 'all';
     let searchKeyword = '';
-
-    const tableContainer = document.getElementById('positionTable');
-    const searchInput = document.getElementById('searchInput');
-    const statsText = document.getElementById('heroStatsText');
-
-    const getImgUrl = (en) => `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${en}.png`;
-    const fallbackIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
 
     const LANES = [
         { key: "top", label: "上路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z"></path><path d="m5 21 4-4h8V9l4-4v16z" opacity="0.2"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
@@ -513,34 +455,187 @@
         { key: "support", label: "辅助", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M12.833 10.833 14.5 17.53v.804L12.833 20h-1.666L9.5 18.333v-.804l1.667-6.696zM7 7.5 9.5 10l-1.667 4.167-2.5-2.5L6.167 10h-2.5L2 7.5zm15 0L20.333 10h-2.5l.834 1.667-2.5 2.5L14.5 10 17 7.5zM13.743 5l.757.833v.834l-1.667 2.5h-1.666L9.5 6.667v-.834L10.257 5z"></path></svg>` }
     ];
 
-    function filterHeroes() {
-        let filtered = [...heroes];
-        if (currentRank !== 'all') {
-            filtered = filtered.filter(h => h.tier === currentRank);
+    // 工具函数：生成用户指纹（用于防重复投票）
+    function getOrCreateFingerprint() {
+        let fp = localStorage.getItem('vote_fingerprint');
+        if (!fp) {
+            fp = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36) + Date.now();
+            localStorage.setItem('vote_fingerprint', fp);
         }
-        if (currentStatus !== 'all') {
-            filtered = filtered.filter(h => h.status === currentStatus);
+        return fp;
+    }
+
+    // 根据赞踩计算动态评级
+    function computeDynamicRating(likes, dislikes) {
+        if (likes === 0 && dislikes === 0) return '';
+        const ratio = likes / (dislikes + 1); // 避免除零
+        if (likes > dislikes * 2) return 'S';
+        if (likes > dislikes) return 'A';
+        if (Math.abs(likes - dislikes) <= Math.max(1, Math.min(likes, dislikes) * 0.2)) return 'B';
+        if (dislikes > likes * 1.2) return 'C';
+        return 'B';
+    }
+
+    // 从Supabase获取英雄数据 + 赞踩数据
+    async function fetchSupabaseData() {
+        try {
+            // 1. 获取英雄
+            const { data: heroesData, error: heroesError } = await supabase
+                .from('heroes')
+                .select('id, en, zh, lane, tier, status');
+            if (heroesError) throw heroesError;
+            if (!heroesData || heroesData.length === 0) throw new Error('No heroes data');
+
+            // 2. 获取赞踩统计
+            const { data: votesData, error: votesError } = await supabase
+                .from('votes')
+                .select('hero_id, vote_type');
+            if (votesError) throw votesError;
+            
+            const votesAgg = new Map();
+            if (votesData) {
+                votesData.forEach(v => {
+                    if (!votesAgg.has(v.hero_id)) votesAgg.set(v.hero_id, { likes: 0, dislikes: 0 });
+                    const entry = votesAgg.get(v.hero_id);
+                    if (v.vote_type === true) entry.likes++;
+                    else entry.dislikes++;
+                });
+            }
+            return { heroes: heroesData, votesAgg };
+        } catch (err) {
+            console.warn('Supabase fetch failed:', err);
+            return null;
+        }
+    }
+
+    // fallback: 加载本地 heroes-config.json
+    async function loadLocalConfig() {
+        try {
+            const response = await fetch('heroes-config.json');
+            const config = await response.json();
+            const heroes = config.heroes.map((h, idx) => ({
+                id: idx + 1000, // 避免与supabase id冲突
+                en: h.en,
+                zh: h.zh,
+                lane: h.lane,
+                tier: h.tier || '',
+                status: h.status
+            }));
+            return { heroes, votesAgg: new Map() };
+        } catch (err) {
+            console.error('无法加载本地配置', err);
+            return { heroes: [], votesAgg: new Map() };
+        }
+    }
+
+    // 获取英雄数据（优先Supabase，失败则本地）
+    async function loadHeroesData() {
+        if (supabase && isSupabaseAvailable) {
+            const result = await fetchSupabaseData();
+            if (result) {
+                allHeroes = result.heroes;
+                votesMap = result.votesAgg;
+                return true;
+            }
+        }
+        // fallback
+        const local = await loadLocalConfig();
+        allHeroes = local.heroes;
+        votesMap = local.votesAgg;
+        return false;
+    }
+
+    // 更新访问计数（仅Supabase可用时）
+    async function updateVisitCount() {
+        if (!supabase || !isSupabaseAvailable) {
+            // 显示本地模拟计数
+            let localCount = localStorage.getItem('visit_count_mock');
+            if (!localCount) localCount = Math.floor(Math.random() * 1000) + 100;
+            visitCount = parseInt(localCount);
+            document.getElementById('footerCounter').innerHTML = `👥 访问人次: ${visitCount} (本地模拟)`;
+            return;
+        }
+        try {
+            // 调用RPC或直接更新stats表，这里使用upsert方式
+            const { data, error } = await supabase.rpc('increment_visit_counter');
+            if (error) throw error;
+            visitCount = data;
+            document.getElementById('footerCounter').innerHTML = `👥 访问人次: ${visitCount}`;
+        } catch (err) {
+            console.warn('更新访问次数失败', err);
+            // 降级显示
+            document.getElementById('footerCounter').innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
+        }
+    }
+
+    // 投票函数
+    async function castVote(heroId, voteType) {
+        if (!supabase || !isSupabaseAvailable) {
+            alert('数据库未连接，投票功能不可用');
+            return false;
+        }
+        const fp = userFingerprint;
+        try {
+            // 先检查是否已投票
+            const { data: existing, error: checkErr } = await supabase
+                .from('votes')
+                .select('vote_type')
+                .eq('hero_id', heroId)
+                .eq('user_fingerprint', fp)
+                .maybeSingle();
+            if (checkErr) throw checkErr;
+            if (existing) {
+                alert('您已经对这个英雄投过票了！');
+                return false;
+            }
+            const { error } = await supabase
+                .from('votes')
+                .insert({ hero_id: heroId, vote_type: voteType, user_fingerprint: fp });
+            if (error) throw error;
+            // 更新本地votesMap
+            const current = votesMap.get(heroId) || { likes: 0, dislikes: 0 };
+            if (voteType) current.likes++;
+            else current.dislikes++;
+            votesMap.set(heroId, current);
+            return true;
+        } catch (err) {
+            console.error('投票失败', err);
+            alert('投票失败，请稍后重试');
+            return false;
+        }
+    }
+
+    // 渲染整个表格
+    function render() {
+        // 筛选逻辑
+        let filtered = [...allHeroes];
+        if (currentRankFilter !== 'all') {
+            filtered = filtered.filter(hero => {
+                const votes = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
+                const dynamicTier = computeDynamicRating(votes.likes, votes.dislikes);
+                return dynamicTier === currentRankFilter;
+            });
+        }
+        if (currentStatusFilter !== 'all') {
+            filtered = filtered.filter(hero => hero.status === currentStatusFilter);
         }
         if (searchKeyword.trim() !== '') {
             const kw = searchKeyword.trim().toLowerCase();
             filtered = filtered.filter(h => h.zh.toLowerCase().includes(kw) || h.en.toLowerCase().includes(kw));
         }
-        return filtered;
-    }
 
-    function groupByLane(arr) {
-        const groups = { top: [], mid: [], jungle: [], bot: [], support: [] };
-        arr.forEach(h => { if (groups[h.lane]) groups[h.lane].push(h); });
-        return groups;
-    }
-
-    function render() {
-        const filtered = filterHeroes();
-        const grouped = groupByLane(filtered);
+        // 按分路分组（支持多分路，lane字段用逗号分割）
+        const groups = { top: [], jungle: [], mid: [], bot: [], support: [] };
+        filtered.forEach(hero => {
+            const lanes = hero.lane.split(',').map(l => l.trim());
+            lanes.forEach(laneKey => {
+                if (groups[laneKey]) groups[laneKey].push(hero);
+            });
+        });
 
         let html = '';
         for (let lane of LANES) {
-            const laneHeroes = grouped[lane.key] || [];
+            const laneHeroes = groups[lane.key] || [];
             const count = laneHeroes.length;
             html += `<div class="position-row">
                         <div class="row-icon">
@@ -553,50 +648,68 @@
                 html += `<div class="empty-msg">✨ 暂无英雄，调整筛选试试</div>`;
             } else {
                 laneHeroes.forEach(hero => {
-                    let rankHtml = '';
-                    if (hero.tier && ['S','A','B','C'].includes(hero.tier)) {
-                        const rankClass = hero.tier === 'S' ? 'rank-S' : (hero.tier === 'A' ? 'rank-A' : (hero.tier === 'B' ? 'rank-B' : 'rank-C'));
-                        rankHtml = `<div class="rank-corner ${rankClass}">${hero.tier}</div>`;
-                    }
+                    const votes = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
+                    const dynamicTier = computeDynamicRating(votes.likes, votes.dislikes);
+                    const tierToShow = dynamicTier || hero.tier; // 动态优先
+                    const rankClass = tierToShow === 'S' ? 'rank-S' : (tierToShow === 'A' ? 'rank-A' : (tierToShow === 'B' ? 'rank-B' : (tierToShow === 'C' ? 'rank-C' : '')));
+                    const rankHtml = tierToShow ? `<div class="rank-corner ${rankClass}">${tierToShow}</div>` : '';
                     let statusHtml = '';
                     if (hero.status === 'new') statusHtml = `<div class="status-badge-sm status-new">NEW</div>`;
                     else if (hero.status === 'will') statusHtml = `<div class="status-badge-sm status-will">WILL</div>`;
                     const willClass = hero.status === 'will' ? 'will-hero' : '';
-                    const imgUrl = getImgUrl(hero.en);
-                    html += `<div class="hero-card ${willClass}" data-hero-id="${hero.id}" title="${hero.zh}">
+                    const imgUrl = `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
+                    const fallbackIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
+                    
+                    html += `<div class="hero-card ${willClass}" data-hero-id="${hero.id}" data-hero-en="${hero.en}" data-hero-zh="${hero.zh}">
                                 <div class="hero-img">
                                     <img src="${imgUrl}" alt="${hero.zh}" loading="lazy" onerror="this.src='${fallbackIcon}'">
                                     ${rankHtml}
                                     <div class="status-corner">${statusHtml}</div>
+                                </div>
+                                <div class="vote-buttons">
+                                    <div class="vote-btn like" data-id="${hero.id}" data-type="like">👍 ${votes.likes}</div>
+                                    <div class="vote-btn dislike" data-id="${hero.id}" data-type="dislike">👎 ${votes.dislikes}</div>
                                 </div>
                             </div>`;
                 });
             }
             html += `</div></div></div>`;
         }
-        tableContainer.innerHTML = html;
+        document.getElementById('positionTable').innerHTML = html;
 
-        document.querySelectorAll('.hero-card').forEach(card => {
-            card.addEventListener('click', (e) => {
+        // 绑定投票按钮事件
+        document.querySelectorAll('.vote-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                const id = parseInt(card.getAttribute('data-hero-id'));
-                const hero = heroes.find(h => h.id === id);
-                if (hero) {
-                    const msgs = [
-                        `${hero.zh}：今日对线强度在线！`,
-                        `${hero.zh} 版本支援效率↑`,
-                        `OS认证，${hero.zh} 团战发挥稳定`,
-                        `选 ${hero.zh}，队友压力少一半`,
-                        `${hero.zh} 已经在分路打出气势`
-                    ];
-                    toastMsg(msgs[Math.floor(Math.random() * msgs.length)], 'fun');
+                const heroId = parseInt(btn.getAttribute('data-id'));
+                const type = btn.getAttribute('data-type');
+                const voteBool = type === 'like';
+                const success = await castVote(heroId, voteBool);
+                if (success) {
+                    // 刷新整个视图
+                    render();
                 }
             });
         });
+        // 绑定头像点击彩蛋（保持原有）
+        document.querySelectorAll('.hero-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('.vote-btn')) return;
+                const heroName = card.getAttribute('data-hero-zh');
+                const msgs = [`${heroName}：今日对线强度在线！`, `${heroName} 版本支援效率↑`, `OS认证，${heroName} 团战发挥稳定`];
+                toastMsg(msgs[Math.floor(Math.random() * msgs.length)]);
+            });
+        });
+        
+        // 更新统计文本（总英雄数去重）
+        const uniqueHeroCount = allHeroes.length;
+        const newCount = allHeroes.filter(h => h.status === 'new').length;
+        const willCount = allHeroes.filter(h => h.status === 'will').length;
+        document.getElementById('heroStatsText').innerHTML = `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 动态评级`;
     }
 
     let toastTimer = null;
-    function toastMsg(msg, type) {
+    function toastMsg(msg) {
         let existing = document.getElementById('dynamicToast');
         if (existing) existing.remove();
         const div = document.createElement('div');
@@ -613,18 +726,43 @@
         div.style.fontSize = '0.8rem';
         div.style.zIndex = '9999';
         div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-        div.style.border = '1px solid #5a74b0';
         document.body.appendChild(div);
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => div.remove(), 1800);
     }
 
-    function bindEvents() {
+    // 初始化Supabase
+    async function initSupabase() {
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            // 测试连接
+            const { error } = await supabase.from('heroes').select('id', { count: 'exact', head: true });
+            if (error) throw error;
+            isSupabaseAvailable = true;
+            // 创建存储过程用于计数（如果不存在，可先执行）
+            await supabase.rpc('increment_visit_counter').catch(() => {});
+        } catch (err) {
+            console.warn('Supabase连接失败，使用本地配置', err);
+            isSupabaseAvailable = false;
+            supabase = null;
+        }
+    }
+
+    // 主流程
+    (async function main() {
+        await initSupabase();
+        userFingerprint = getOrCreateFingerprint();
+        await loadHeroesData();
+        // 更新访问计数
+        await updateVisitCount();
+        // 初始渲染
+        render();
+        // 绑定筛选事件
         document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(el => {
             el.addEventListener('click', function() {
                 document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
-                currentRank = this.getAttribute('data-rank');
+                currentRankFilter = this.getAttribute('data-rank');
                 render();
             });
         });
@@ -632,35 +770,16 @@
             el.addEventListener('click', function() {
                 document.querySelectorAll('#statusFilterGroup .filter-chip').forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
-                currentStatus = this.getAttribute('data-status');
+                currentStatusFilter = this.getAttribute('data-status');
                 render();
             });
         });
-        searchInput.addEventListener('input', (e) => {
+        document.getElementById('searchInput').addEventListener('input', (e) => {
             searchKeyword = e.target.value;
             render();
         });
-    }
-
-    async function loadConfig() {
-        try {
-            const response = await fetch('heroes-config.json');
-            const config = await response.json();
-            heroes = config.heroes.map((h, idx) => ({ ...h, id: idx }));
-            const newCount = heroes.filter(h => h.status === 'new').length;
-            const willCount = heroes.filter(h => h.status === 'will').length;
-            statsText.innerText = `共 ${heroes.length} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于 ${config.lastUpdated || '2026.06.15'}`;
-            bindEvents();
-            render();
-        } catch (err) {
-            console.error('加载配置文件失败', err);
-            statsText.innerText = '加载配置失败，请确保 heroes-config.json 存在';
-        }
-    }
-
-    document.getElementById('moreBtn').addEventListener('click', () => toastMsg('🚀 更多内容即将推出：英雄连招模拟器、BP建议', 'fun'));
-
-    loadConfig();
+        document.getElementById('moreBtn').addEventListener('click', () => toastMsg('🚀 更多内容即将推出：英雄连招模拟器、BP建议'));
+    })();
 </script>
 </body>
 </html>
