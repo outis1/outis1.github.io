@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Outis英雄支持表 · 分路强度榜</title>
+    <title>Outis英雄支持表</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -78,10 +78,20 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            transition: all 0.2s ease;
         }
         .action-btn.primary {
             background: #2a3e70;
             border-color: #5a82ff;
+        }
+        .action-btn.primary:hover {
+            background: #345493;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(90,130,255,0.3);
+        }
+        .action-btn.outline:hover {
+            background: #232e48;
+            transform: translateY(-1px);
         }
         .filter-area {
             display: flex;
@@ -144,6 +154,7 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            transition: all 0.1s ease;
         }
         .filter-chip.active {
             background: #3b6eff;
@@ -302,14 +313,24 @@
             padding: 3px 0;
             border-radius: 40px;
             cursor: pointer;
-            transition: 0.1s;
+            transition: all 0.1s ease;
             background: rgba(0,0,0,0.4);
             color: #fff;
+            border: 1px solid transparent;
         }
         .vote-btn.like { background: #166534; }
         .vote-btn.like:hover { background: #15803d; }
         .vote-btn.dislike { background: #991b1b; }
         .vote-btn.dislike:hover { background: #b91c1c; }
+        .vote-btn.active-vote {
+            border: 2px solid #fbbf24;
+            background: #2d5a2d;
+            box-shadow: 0 0 6px rgba(251,191,36,0.5);
+        }
+        .vote-btn.dislike.active-vote {
+            border: 2px solid #fbbf24;
+            background: #b33a3a;
+        }
 
         .empty-msg {
             color: #6b7ba5;
@@ -338,29 +359,34 @@
             border-top: 1px solid #20273f;
             padding-top: 1.2rem;
         }
-        /* Toast 悬浮提示 - 顶部居中，半透明，字体加大 */
-        #toast-message {
+
+        /* Toast 动画 */
+        .toast-message {
             position: fixed;
-            top: 20px;
+            top: 52px;
             left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
+            transform: translateX(-50%) translateY(20px);
+            background: #1e293b;
             color: white;
-            padding: 12px 24px;
-            border-radius: 48px;
-            font-size: 1rem;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
             font-weight: 500;
             z-index: 10000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            border: 1px solid #475569;
             opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.2s ease, transform 0.25s ease;
             pointer-events: none;
             white-space: nowrap;
         }
-        #toast-message.show {
+        .toast-message.show {
             opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-message.hide {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
         }
     </style>
 </head>
@@ -411,7 +437,6 @@
     <div id="positionTable" class="position-table"></div>
     <footer id="footerCounter">加载访问量中...</footer>
 </div>
-<div id="toast-message"></div>
 
 <script>
     const SUPABASE_URL = 'https://pwmpledeqzzdvwqqbbhh.supabase.co';
@@ -420,12 +445,15 @@
     let supabaseClient = null;
     let isSupabaseAvailable = false;
     let allHeroes = [];
-    let votesMap = new Map();          // hero_id -> { likes, dislikes, userVote }
+    let votesMap = new Map();
     let userFingerprint = '';
     let currentRankFilter = 'all';
     let currentStatusFilter = 'all';
     let searchKeyword = '';
-    let isVoting = false;              // 防连点锁
+    let isVoting = false;
+
+    const RANK_ORDER = ['S', 'A', 'B', 'C'];  // 索引0最高
+    const DEFAULT_RANK = 'B';                 // 默认评级（当原始 tier 为空时）
 
     const LANES = [
         { key: "top", label: "上路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z"></path><path d="m5 21 4-4h8V9l4-4v16z" opacity="0.2"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
@@ -435,17 +463,27 @@
         { key: "support", label: "辅助", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M12.833 10.833 14.5 17.53v.804L12.833 20h-1.666L9.5 18.333v-.804l1.667-6.696zM7 7.5 9.5 10l-1.667 4.167-2.5-2.5L6.167 10h-2.5L2 7.5zm15 0L20.333 10h-2.5l.834 1.667-2.5 2.5L14.5 10 17 7.5zM13.743 5l.757.833v.834l-1.667 2.5h-1.666L9.5 6.667v-.834L10.257 5z"></path></svg>` }
     ];
 
-    // 显示悬浮提示（顶部居中）
-    let toastTimeout = null;
     function showToast(message, isError = false) {
-        const toast = document.getElementById('toast-message');
-        toast.textContent = message;
-        toast.style.backgroundColor = isError ? 'rgba(185, 28, 28, 0.85)' : 'rgba(0, 0, 0, 0.75)';
-        toast.classList.add('show');
-        if (toastTimeout) clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => {
+        const existingToasts = document.querySelectorAll('.toast-message');
+        existingToasts.forEach(toast => {
             toast.classList.remove('show');
-        }, 2000);
+            toast.classList.add('hide');
+            setTimeout(() => toast.remove(), 300);
+        });
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.textContent = message;
+        toast.style.backgroundColor = isError ? '#b91c1c' : '#1e293b';
+        document.body.appendChild(toast);
+        void toast.offsetWidth;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.classList.add('hide');
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
+        }, 2300);
     }
 
     function getOrCreateFingerprint() {
@@ -457,8 +495,36 @@
         return fp;
     }
 
-    function computeDynamicRating(likes, dislikes) {
-        if (likes === 0 && dislikes === 0) return '';
+    /**
+     * 动态评级算法（新规则）
+     * @param {number} likes 点赞数
+     * @param {number} dislikes 点踩数
+     * @param {string} originalTier 原始评级（S/A/B/C 或空）
+     * @returns {string} 动态评级
+     */
+    function computeDynamicRating(likes, dislikes, originalTier) {
+        // 确定原始评级索引
+        let baseIndex = RANK_ORDER.indexOf(originalTier);
+        if (baseIndex === -1) baseIndex = RANK_ORDER.indexOf(DEFAULT_RANK);
+        
+        // 0赞0踩 → 原始评级
+        if (likes === 0 && dislikes === 0) {
+            return RANK_ORDER[baseIndex];
+        }
+        
+        // 仅有点赞（点踩为0）
+        if (likes > 0 && dislikes === 0) {
+            let newIndex = Math.max(baseIndex - likes, 0);      // 每1点赞升一级，不低于S
+            return RANK_ORDER[newIndex];
+        }
+        
+        // 仅有点踩（点赞为0）
+        if (dislikes > 0 && likes === 0) {
+            let newIndex = Math.min(baseIndex + dislikes, RANK_ORDER.length - 1); // 每1点踩降一级，不高于C
+            return RANK_ORDER[newIndex];
+        }
+        
+        // 两者都有 → 使用原来的阈值算法
         if (likes > dislikes * 2) return 'S';
         if (likes > dislikes) return 'A';
         if (Math.abs(likes - dislikes) <= Math.max(1, Math.min(likes, dislikes) * 0.2)) return 'B';
@@ -466,7 +532,11 @@
         return 'B';
     }
 
-    // 局部更新英雄卡片的计数和评级
+    // 获取英雄当前展示的评级（动态优先，否则原始）
+    function getCurrentRating(hero, stats) {
+        return computeDynamicRating(stats.likes, stats.dislikes, hero.tier);
+    }
+
     function updateHeroUI(heroId, stats) {
         const heroCard = document.querySelector(`.hero-card[data-hero-id="${heroId}"]`);
         if (!heroCard) return;
@@ -475,22 +545,27 @@
         if (likeBtn) likeBtn.innerHTML = `👍 ${stats.likes}`;
         if (dislikeBtn) dislikeBtn.innerHTML = `👎 ${stats.dislikes}`;
         
-        // 更新动态评级角标
-        const dynamicTier = computeDynamicRating(stats.likes, stats.dislikes);
-        const originalTier = allHeroes.find(h => h.id === heroId)?.tier || '';
-        const tierToShow = dynamicTier || originalTier;
+        if (likeBtn && dislikeBtn) {
+            likeBtn.classList.remove('active-vote');
+            dislikeBtn.classList.remove('active-vote');
+            if (stats.userVote === true) likeBtn.classList.add('active-vote');
+            else if (stats.userVote === false) dislikeBtn.classList.add('active-vote');
+        }
+        
+        const hero = allHeroes.find(h => h.id === heroId);
+        const currentTier = getCurrentRating(hero, stats);
         const rankCorner = heroCard.querySelector('.rank-corner');
-        if (tierToShow) {
-            const rankClass = tierToShow === 'S' ? 'rank-S' : (tierToShow === 'A' ? 'rank-A' : (tierToShow === 'B' ? 'rank-B' : 'rank-C'));
+        if (currentTier) {
+            const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ? 'rank-B' : 'rank-C'));
             if (rankCorner) {
-                rankCorner.textContent = tierToShow;
+                rankCorner.textContent = currentTier;
                 rankCorner.className = `rank-corner ${rankClass}`;
             } else {
                 const imgDiv = heroCard.querySelector('.hero-img');
                 if (imgDiv) {
                     const newRank = document.createElement('div');
                     newRank.className = `rank-corner ${rankClass}`;
-                    newRank.textContent = tierToShow;
+                    newRank.textContent = currentTier;
                     imgDiv.appendChild(newRank);
                 }
             }
@@ -499,7 +574,6 @@
         }
     }
 
-    // 从 Supabase 获取英雄数据和用户投票记录
     async function fetchSupabaseData() {
         try {
             const { data: heroesData, error: heroesError } = await supabaseClient
@@ -583,10 +657,30 @@
             return;
         }
         try {
-            const { data, error } = await supabaseClient.rpc('increment_visit_counter');
-            if (error) throw error;
-            const count = (data !== null && data !== undefined) ? data : 0;
-            footer.innerHTML = `👥 访问人次: ${count}`;
+            let { data: statsData, error: selectError } = await supabaseClient
+                .from('stats')
+                .select('value')
+                .eq('key', 'visit_count')
+                .maybeSingle();
+            
+            if (selectError && selectError.code !== 'PGRST116') throw selectError;
+            
+            let newCount = 1;
+            if (statsData && statsData.value !== undefined) {
+                newCount = statsData.value + 1;
+                const { error: updateError } = await supabaseClient
+                    .from('stats')
+                    .update({ value: newCount })
+                    .eq('key', 'visit_count');
+                if (updateError) throw updateError;
+            } else {
+                const { error: insertError } = await supabaseClient
+                    .from('stats')
+                    .insert({ key: 'visit_count', value: 1 });
+                if (insertError) throw insertError;
+                newCount = 1;
+            }
+            footer.innerHTML = `👥 访问人次: ${newCount}`;
         } catch (err) {
             console.warn('更新访问次数失败', err);
             let localCount = localStorage.getItem('visit_count_mock');
@@ -595,7 +689,6 @@
         }
     }
 
-    // 投票逻辑（带锁，乐观更新UI，发送请求）
     async function submitVote(heroId, newVoteType) {
         if (isVoting) {
             showToast('请稍后...', false);
@@ -610,14 +703,12 @@
         if (!current) return false;
         const oldVote = current.userVote;
         
-        // 乐观更新UI (先更新本地数据和界面)
         let actionText = '';
         let newLikes = current.likes;
         let newDislikes = current.dislikes;
         let newUserVote = oldVote;
         
         if (oldVote === null) {
-            // 新增投票
             if (newVoteType === true) {
                 newLikes++;
                 actionText = '点赞成功 👍';
@@ -627,7 +718,6 @@
             }
             newUserVote = newVoteType;
         } else if (oldVote === newVoteType) {
-            // 取消投票
             if (newVoteType === true) {
                 newLikes--;
                 actionText = '已取消点赞';
@@ -637,7 +727,6 @@
             }
             newUserVote = null;
         } else {
-            // 切换投票
             if (newVoteType === true) {
                 newLikes++;
                 newDislikes--;
@@ -650,7 +739,6 @@
             newUserVote = newVoteType;
         }
         
-        // 本地更新
         current.likes = newLikes;
         current.dislikes = newDislikes;
         current.userVote = newUserVote;
@@ -658,17 +746,14 @@
         updateHeroUI(heroId, current);
         showToast(actionText, false);
         
-        // 发送实际请求（防锁）
         isVoting = true;
         try {
             if (oldVote === null) {
-                // 插入
                 const { error } = await supabaseClient
                     .from('votes')
                     .insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
                 if (error) throw error;
             } else if (oldVote === newVoteType) {
-                // 删除
                 const { error } = await supabaseClient
                     .from('votes')
                     .delete()
@@ -676,7 +761,6 @@
                     .eq('user_fingerprint', userFingerprint);
                 if (error) throw error;
             } else {
-                // 先删后插
                 const { error: delError } = await supabaseClient
                     .from('votes')
                     .delete()
@@ -691,13 +775,11 @@
             return true;
         } catch (err) {
             console.error('投票请求失败', err);
-            // 回滚本地更改
-            const rollback = votesMap.get(heroId);
-            rollback.likes = current.likes;
-            rollback.dislikes = current.dislikes;
-            rollback.userVote = oldVote;
-            votesMap.set(heroId, rollback);
-            updateHeroUI(heroId, rollback);
+            current.likes = newLikes;
+            current.dislikes = newDislikes;
+            current.userVote = oldVote;
+            votesMap.set(heroId, current);
+            updateHeroUI(heroId, current);
             showToast(`${newVoteType ? '点赞' : '点踩'}失败，请重试`, true);
             return false;
         } finally {
@@ -707,11 +789,12 @@
 
     function render() {
         let filtered = [...allHeroes];
+        // 评级筛选：使用动态评级
         if (currentRankFilter !== 'all') {
             filtered = filtered.filter(hero => {
                 const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
-                const dynamicTier = computeDynamicRating(stats.likes, stats.dislikes);
-                return dynamicTier === currentRankFilter;
+                const currentRating = getCurrentRating(hero, stats);
+                return currentRating === currentRankFilter;
             });
         }
         if (currentStatusFilter !== 'all') {
@@ -746,16 +829,17 @@
             } else {
                 laneHeroes.forEach(hero => {
                     const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0, userVote: null };
-                    const dynamicTier = computeDynamicRating(stats.likes, stats.dislikes);
-                    const tierToShow = dynamicTier || hero.tier;
-                    const rankClass = tierToShow === 'S' ? 'rank-S' : (tierToShow === 'A' ? 'rank-A' : (tierToShow === 'B' ? 'rank-B' : (tierToShow === 'C' ? 'rank-C' : '')));
-                    const rankHtml = tierToShow ? `<div class="rank-corner ${rankClass}">${tierToShow}</div>` : '';
+                    const currentTier = getCurrentRating(hero, stats);
+                    const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ? 'rank-B' : 'rank-C'));
+                    const rankHtml = `<div class="rank-corner ${rankClass}">${currentTier}</div>`;
                     let statusHtml = '';
                     if (hero.status === 'new') statusHtml = `<div class="status-badge-sm status-new">NEW</div>`;
                     else if (hero.status === 'will') statusHtml = `<div class="status-badge-sm status-will">WILL</div>`;
                     const willClass = hero.status === 'will' ? 'will-hero' : '';
                     const imgUrl = `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
                     const fallbackIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
+                    const likeActiveClass = stats.userVote === true ? 'active-vote' : '';
+                    const dislikeActiveClass = stats.userVote === false ? 'active-vote' : '';
                     html += `<div class="hero-card ${willClass}" data-hero-id="${hero.id}" data-hero-zh="${hero.zh}">
                                 <div class="hero-img">
                                     <img src="${imgUrl}" alt="${hero.zh}" loading="lazy" onerror="this.src='${fallbackIcon}'">
@@ -763,8 +847,8 @@
                                     <div class="status-corner">${statusHtml}</div>
                                 </div>
                                 <div class="vote-buttons">
-                                    <div class="vote-btn like" data-id="${hero.id}" data-type="like">👍 ${stats.likes}</div>
-                                    <div class="vote-btn dislike" data-id="${hero.id}" data-type="dislike">👎 ${stats.dislikes}</div>
+                                    <div class="vote-btn like ${likeActiveClass}" data-id="${hero.id}" data-type="like">👍 ${stats.likes}</div>
+                                    <div class="vote-btn dislike ${dislikeActiveClass}" data-id="${hero.id}" data-type="dislike">👎 ${stats.dislikes}</div>
                                 </div>
                             </div>`;
                 });
@@ -773,7 +857,6 @@
         }
         document.getElementById('positionTable').innerHTML = html;
 
-        // 绑定投票按钮事件
         document.querySelectorAll('.vote-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
@@ -783,12 +866,10 @@
                 await submitVote(heroId, newVoteType);
             });
         });
-        // 头像点击彩蛋
         document.querySelectorAll('.hero-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 if (e.target.closest('.vote-btn')) return;
-                const heroName = card.getAttribute('data-hero-zh');
-                const msgs = [`${heroName}：今日对线强度在线！`, `${heroName} 版本支援效率↑`, `OS认证，${heroName} 团战发挥稳定`];
+                const msgs = [`请发送一段剪辑视频`, `没什么好抱怨的`, `每个人都会得到慷慨的补偿`, `很快你会知道，一切的等待都是有意义的`, `如果你认为这很难，我认为你不适合我的平台`, `请不要频繁重复提问没有意义的问题`, `事情并没有那么简单`, `当然`, `我会在2080年发送给你`, `你至少检查一下后再提问`, `很快`];
                 showToast(msgs[Math.floor(Math.random() * msgs.length)]);
             });
         });
@@ -840,7 +921,7 @@
             searchKeyword = e.target.value;
             render();
         });
-        document.getElementById('moreBtn').addEventListener('click', () => showToast('🚀 更多内容即将推出：英雄连招模拟器、BP建议'));
+        document.getElementById('moreBtn').addEventListener('click', () => showToast('很快你会知道，一切的等待都是有意义的'));
     })();
 </script>
 </body>
