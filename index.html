@@ -442,6 +442,57 @@
 </div>
 
 <script>
+
+    // 阻止开发者工具打开（仅增加阻力，非绝对安全）
+(function() {
+    // 1. 阻止右键菜单
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    // 2. 阻止 F12、Ctrl+Shift+I、Ctrl+Shift+J、Ctrl+U 等快捷键
+    document.addEventListener('keydown', function(e) {
+        // F12
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+I (Windows/Linux) 或 Cmd+Option+I (Mac)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.keyCode === 73)) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+J (打开控制台)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.keyCode === 74)) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+U (查看源代码)
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.keyCode === 85)) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+C (元素选择)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.keyCode === 67)) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
+
+    // 方法二：通过 debugger 语句干扰（无法真正阻止，但会让控制台不断进入断点）
+    setInterval(function() {
+        var before = new Date().getTime();
+        debugger;
+        var after = new Date().getTime();
+        if (after - before > 100) {
+            // 有可能打开了控制台，执行干扰操作
+            document.body.innerHTML = '';
+        }
+    }, 2000);
+})();
+
     let heroes = [];
     let currentRank = 'all';
     let currentStatus = 'all';
