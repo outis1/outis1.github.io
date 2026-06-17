@@ -199,6 +199,7 @@
             width: 66px;
             height: 66px;
             display: block;
+            stroke: #ffffff;  /* 确保自定义 SVG 的 stroke 为白色 */
         }
         .lane-svg svg path, .lane-svg svg g { fill: #ffffff; stroke: none; }
         .lane-svg svg g[opacity="0.2"] { opacity: 0.35; fill: #fff9c4; }
@@ -455,12 +456,15 @@
 
     const RANK_ORDER = ['S', 'A', 'B', 'C'];
     const DEFAULT_RANK = 'B';
+
+    // ========== 分路配置：新增 "其他" 分类 ==========
     const LANES = [
         { key: "top", label: "上路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z"></path><path d="m5 21 4-4h8V9l4-4v16z" opacity="0.2"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
         { key: "jungle", label: "打野", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M5.14 2c1.58 1.21 5.58 5.023 6.976 9.953s0 10.047 0 10.047c-2.749-3.164-5.893-5.2-6.18-5.382l-.02-.013C5.45 13.814 3 8.79 3 8.79c3.536.867 4.93 4.279 4.93 4.279C7.558 8.698 5.14 2 5.14 2m14.976 5.907s-1.243 2.471-1.814 4.604c-.235.878-.285 2.2-.29 3.058v.282c.003.347.01.568.01.568s-1.738 2.397-3.38 3.678a27.5 27.5 0 0 0-.208-5.334c.928-2.023 2.846-5.454 5.682-6.856m-2.124-5.331s-2.325 3.052-2.836 6.029c-.11.636-.201 1.194-.284 1.695-.379.584-.73 1.166-1.05 1.733-.033-.125-.06-.25-.095-.375a21 21 0 0 0-1.16-3.08c.053-.146.103-.29.17-.438 0 0 1.814-3.78 5.255-5.564"></path></svg>` },
         { key: "mid", label: "中路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m15 3-4 4H7v4l-4 4V3zM9 21l4-4h4v-4l4-4v12z" opacity="0.2"></path><path d="M18 3h3v3L6 21H3v-3z"></path></g></svg>` },
         { key: "bot", label: "下路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z" opacity="0.2"></path><path d="m5 21 4-4h8V9l4-4v16z"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
-        { key: "support", label: "辅助", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M12.833 10.833 14.5 17.53v.804L12.833 20h-1.666L9.5 18.333v-.804l1.667-6.696zM7 7.5 9.5 10l-1.667 4.167-2.5-2.5L6.167 10h-2.5L2 7.5zm15 0L20.333 10h-2.5l.834 1.667-2.5 2.5L14.5 10 17 7.5zM13.743 5l.757.833v.834l-1.667 2.5h-1.666L9.5 6.667v-.834L10.257 5z"></path></svg>` }
+        { key: "support", label: "辅助", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M12.833 10.833 14.5 17.53v.804L12.833 20h-1.666L9.5 18.333v-.804l1.667-6.696zM7 7.5 9.5 10l-1.667 4.167-2.5-2.5L6.167 10h-2.5L2 7.5zm15 0L20.333 10h-2.5l.834 1.667-2.5 2.5L14.5 10 17 7.5zM13.743 5l.757.833v.834l-1.667 2.5h-1.666L9.5 6.667v-.834L10.257 5z"></path></svg>` },
+        { key: "other", label: "其他", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>` }
     ];
 
     function showToast(msg, isError = false) {
@@ -525,10 +529,18 @@
             const kw = searchKeyword.trim().toLowerCase();
             filtered = filtered.filter(h => h.zh.toLowerCase().includes(kw) || h.en.toLowerCase().includes(kw));
         }
-        const groups = { top: [], jungle: [], mid: [], bot: [], support: [] };
+        // 分组：加入 "other"
+        const groups = { top: [], jungle: [], mid: [], bot: [], support: [], other: [] };
         filtered.forEach(hero => {
             const lanes = hero.lane.split(',').map(l => l.trim());
-            lanes.forEach(lane => { if (groups[lane]) groups[lane].push(hero); });
+            lanes.forEach(lane => {
+                // 如果 lane 不在 groups 中，则归入 "other"
+                if (groups[lane]) {
+                    groups[lane].push(hero);
+                } else {
+                    groups.other.push(hero);
+                }
+            });
         });
         for (let lane in groups) {
             const normal = groups[lane].filter(h => h.status !== 'will');
@@ -546,9 +558,11 @@
         for (let lane of LANES) {
             html += `<div class="position-row">
                         <div class="row-icon">
-                            <div class="lane-svg">${lane.iconSvg}</div>
-                            <div class="lane-count" id="lane-count-${lane.key}">0 位英雄</div>
-                        </div>
+                            <div class="lane-svg">${lane.iconSvg}</div>`;
+            if (lane.key !== 'other') {
+                html += `<div class="lane-count" id="lane-count-${lane.key}">0 位英雄</div>`;
+            }
+            html += `</div>
                         <div class="row-heroes">
                             <div class="heroes-grid" id="grid-${lane.key}"></div>
                         </div>
@@ -565,7 +579,8 @@
         if (hero.status === 'new') statusHtml = `<div class="status-badge-sm status-new">NEW</div>`;
         else if (hero.status === 'will') statusHtml = `<div class="status-badge-sm status-will">WILL</div>`;
         const willClass = hero.status === 'will' ? 'will-hero' : '';
-        const imgUrl = `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
+        // 使用自定义头像（如果存在）
+        const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
         const fallbackIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
         const likeActive = stats.userVote === true ? 'active-vote' : '';
         const dislikeActive = stats.userVote === false ? 'active-vote' : '';
@@ -796,7 +811,8 @@
 
     async function fetchSupabaseData() {
         try {
-            const { data: heroesData, error: heroesError } = await supabaseClient.from('heroes').select('id, en, zh, lane, tier, status');
+            // 增加 avatar_url 字段
+            const { data: heroesData, error: heroesError } = await supabaseClient.from('heroes').select('id, en, zh, lane, tier, status, avatar_url');
             if (heroesError) throw heroesError;
             const { data: votesData, error: votesError } = await supabaseClient.from('votes').select('hero_id, vote_type, user_fingerprint');
             if (votesError) throw votesError;
@@ -916,5 +932,458 @@
         document.getElementById('heroStatsText').innerHTML = `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于2026.6.15`;
     })();
 </script>
+
+<style>
+    #adminFab {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+        background: rgba(30, 41, 59, 0.85);
+        backdrop-filter: blur(8px);
+        border: 1px solid #3b6eff;
+        border-radius: 60px;
+        padding: 12px 20px;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+        display: none;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+    #adminFab:hover {
+        background: rgba(59, 110, 255, 0.9);
+        transform: scale(1.05);
+        border-color: #fff;
+    }
+    #adminFab .icon { font-size: 1.2rem; }
+
+    .admin-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(6px);
+        z-index: 10001;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1.2rem;
+    }
+    .admin-modal.open { display: flex; }
+    .admin-modal-box {
+        background: #121826;
+        border-radius: 28px;
+        border: 1px solid #2c365e;
+        max-width: 460px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 1.8rem 1.5rem;
+        animation: slideUp 0.25s ease;
+    }
+    .admin-modal-box h2 {
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #eef2ff;
+    }
+    .admin-modal-box .close-admin {
+        margin-left: auto;
+        background: none;
+        border: none;
+        color: #8b9acf;
+        font-size: 1.6rem;
+        cursor: pointer;
+        line-height: 1;
+    }
+    .admin-modal-box .close-admin:hover { color: #fff; }
+    .admin-form-group {
+        margin-bottom: 1.2rem;
+    }
+    .admin-form-group label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #b9c7f0;
+    }
+    .admin-form-group input,
+    .admin-form-group select,
+    .admin-form-group textarea {
+        width: 100%;
+        padding: 10px 14px;
+        background: #111722;
+        border: 1px solid #2d385a;
+        border-radius: 12px;
+        color: #f0f4ff;
+        font-size: 0.9rem;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.15s;
+    }
+    .admin-form-group input:focus,
+    .admin-form-group select:focus { border-color: #3b6eff; }
+    .admin-form-group .hint {
+        font-size: 0.7rem;
+        color: #6e7fa5;
+        margin-top: 4px;
+    }
+
+    .avatar-preview {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 6px;
+    }
+    .avatar-preview img {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #1b2338;
+        border: 1px solid #2d385a;
+    }
+    .avatar-preview .file-input-wrapper {
+        flex: 1;
+    }
+    .avatar-preview .file-input-wrapper input[type="file"] {
+        padding: 6px 0;
+        font-size: 0.8rem;
+        color: #b9c7f0;
+        background: transparent;
+        border: none;
+    }
+    .avatar-preview .clear-avatar {
+        background: #991b1b;
+        border: none;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.7rem;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .avatar-preview .clear-avatar:hover { background: #b91c1c; }
+
+    .admin-submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: #3b6eff;
+        border: none;
+        border-radius: 16px;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.15s;
+        margin-top: 0.5rem;
+    }
+    .admin-submit-btn:hover { background: #2a5ae0; }
+    .admin-submit-btn:disabled {
+        background: #2d385a;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    .admin-status-msg {
+        margin-top: 0.8rem;
+        font-size: 0.85rem;
+        text-align: center;
+        padding: 6px;
+        border-radius: 8px;
+        display: none;
+    }
+    .admin-status-msg.success {
+        background: #166534;
+        color: #eef2ff;
+        display: block;
+    }
+    .admin-status-msg.error {
+        background: #991b1b;
+        color: #fff;
+        display: block;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(30px) scale(0.96); opacity: 0; }
+        to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @media (max-width: 600px) {
+        .admin-modal-box { padding: 1.2rem; }
+        #adminFab { bottom: 16px; right: 16px; padding: 10px 16px; font-size: 0.8rem; }
+        .avatar-preview { flex-wrap: wrap; }
+    }
+</style>
+
+<div id="adminFab"><span class="icon">⚙️</span> 管理</div>
+<div class="admin-modal" id="adminModal">
+    <div class="admin-modal-box">
+        <div style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+            <h2 style="margin:0;">➕ 添加英雄</h2>
+            <button class="close-admin" id="closeAdminBtn">✕</button>
+        </div>
+        <form id="adminForm">
+            <div class="admin-form-group">
+                <label for="adminEn">英文名 <span style="color:#ef4444;">*</span></label>
+                <input type="text" id="adminEn" placeholder="如: Garen, DrMundo" required>
+                <div class="hint">必须与官方名称完全一致，大小写敏感（仅当不使用自定义头像时）</div>
+            </div>
+            <div class="admin-form-group">
+                <label for="adminZh">中文名 <span style="color:#ef4444;">*</span></label>
+                <input type="text" id="adminZh" placeholder="如: 盖伦, 蒙多医生" required>
+            </div>
+            <div class="admin-form-group">
+                <label for="adminLane">分路</label>
+                <input type="text" id="adminLane" placeholder="如: top / top,mid / other" value="top">
+                <div class="hint">可选值：top, jungle, mid, bot, support, other，多路用逗号分隔</div>
+            </div>
+            <div class="admin-form-group">
+                <label for="adminTier">初始评级</label>
+                <select id="adminTier">
+                    <option value="">留空（默认B）</option>
+                    <option value="S">S 优秀</option>
+                    <option value="A">A 良好</option>
+                    <option value="B">B 一般</option>
+                    <option value="C">C 差劲</option>
+                </select>
+            </div>
+            <div class="admin-form-group">
+                <label for="adminStatus">状态</label>
+                <select id="adminStatus">
+                    <option value="normal">普通</option>
+                    <option value="new">NEW 新增</option>
+                    <option value="will">WILL 即将推出</option>
+                </select>
+            </div>
+            <div class="admin-form-group">
+                <label>自定义头像</label>
+                <div class="avatar-preview">
+                    <img id="avatarPreview" src="" alt="头像预览" style="display:none;">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="avatarFileInput" accept="image/*">
+                        <div class="hint">支持 PNG / JPG，建议 200x200 以上</div>
+                    </div>
+                    <button type="button" class="clear-avatar" id="clearAvatarBtn">移除</button>
+                </div>
+            </div>
+            <button type="submit" class="admin-submit-btn" id="adminSubmitBtn">添加英雄</button>
+            <div class="admin-status-msg" id="adminStatusMsg"></div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const secretCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight'];
+        let inputIndex = 0;
+        const fab = document.getElementById('adminFab');
+        let secretTriggered = false;
+
+        document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            if (e.key === secretCode[inputIndex]) {
+                inputIndex++;
+                if (inputIndex === secretCode.length) {
+                    secretTriggered = true;
+                    inputIndex = 0;
+                    fab.style.display = 'flex';
+                    fab.style.transform = 'scale(1.2)';
+                    setTimeout(() => fab.style.transform = 'scale(1)', 150);
+                    const toast = document.createElement('div');
+                    toast.style.cssText = `
+                        position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+                        background: #1e293b; color: #fbbf24; padding: 8px 20px;
+                        border-radius: 40px; font-size: 0.9rem; font-weight: 600;
+                        z-index: 9998; border: 1px solid #fbbf24;
+                        animation: fadeIn 0.3s ease;
+                    `;
+                    toast.textContent = '🔓 管理模式已解锁';
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 2000);
+                }
+            } else {
+                inputIndex = 0;
+            }
+        });
+    })();
+
+    const adminModal = document.getElementById('adminModal');
+    const closeAdminBtn = document.getElementById('closeAdminBtn');
+    const adminForm = document.getElementById('adminForm');
+    const adminEn = document.getElementById('adminEn');
+    const adminZh = document.getElementById('adminZh');
+    const adminLane = document.getElementById('adminLane');
+    const adminTier = document.getElementById('adminTier');
+    const adminStatus = document.getElementById('adminStatus');
+    const adminSubmitBtn = document.getElementById('adminSubmitBtn');
+    const adminStatusMsg = document.getElementById('adminStatusMsg');
+    const avatarFileInput = document.getElementById('avatarFileInput');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const clearAvatarBtn = document.getElementById('clearAvatarBtn');
+
+    let selectedAvatarFile = null;
+
+    document.getElementById('adminFab').addEventListener('click', function() {
+        adminModal.classList.add('open');
+        adminStatusMsg.className = 'admin-status-msg';
+        adminStatusMsg.textContent = '';
+        avatarPreview.style.display = 'none';
+        avatarPreview.src = '';
+        selectedAvatarFile = null;
+        avatarFileInput.value = '';
+        setTimeout(() => adminEn.focus(), 100);
+    });
+
+    function closeAdminPanel() {
+        adminModal.classList.remove('open');
+        adminStatusMsg.className = 'admin-status-msg';
+        adminStatusMsg.textContent = '';
+        avatarPreview.style.display = 'none';
+        avatarPreview.src = '';
+        selectedAvatarFile = null;
+        avatarFileInput.value = '';
+    }
+    closeAdminBtn.addEventListener('click', closeAdminPanel);
+    adminModal.addEventListener('click', function(e) {
+        if (e.target === adminModal) closeAdminPanel();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && adminModal.classList.contains('open')) {
+            closeAdminPanel();
+        }
+    });
+
+    avatarFileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (!file.type.startsWith('image/')) {
+                alert('请选择图片文件');
+                avatarFileInput.value = '';
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                alert('图片大小不能超过 2MB');
+                avatarFileInput.value = '';
+                return;
+            }
+            selectedAvatarFile = file;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                avatarPreview.src = ev.target.result;
+                avatarPreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            selectedAvatarFile = null;
+            avatarPreview.style.display = 'none';
+            avatarPreview.src = '';
+        }
+    });
+
+    clearAvatarBtn.addEventListener('click', function() {
+        avatarFileInput.value = '';
+        selectedAvatarFile = null;
+        avatarPreview.style.display = 'none';
+        avatarPreview.src = '';
+    });
+
+    async function uploadAvatar(file) {
+        const fileName = `${Date.now()}_${file.name}`;
+        const { data, error } = await supabaseClient.storage
+            .from('avatars')
+            .upload(fileName, file, {
+                cacheControl: '3600',
+                upsert: false
+            });
+        if (error) throw error;
+        const { data: urlData } = supabaseClient.storage
+            .from('avatars')
+            .getPublicUrl(fileName);
+        return urlData.publicUrl;
+    }
+
+    adminForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const en = adminEn.value.trim();
+        const zh = adminZh.value.trim();
+        const lane = adminLane.value.trim() || 'top';
+        const tier = adminTier.value || '';
+        const status = adminStatus.value || 'normal';
+
+        if (!en || !zh) {
+            adminStatusMsg.textContent = '⚠️ 英文名和中文名不能为空';
+            adminStatusMsg.className = 'admin-status-msg error';
+            return;
+        }
+
+        if (!supabaseClient || !isSupabaseAvailable) {
+            adminStatusMsg.textContent = '❌ 数据库未连接，请检查网络';
+            adminStatusMsg.className = 'admin-status-msg error';
+            return;
+        }
+
+        adminSubmitBtn.disabled = true;
+        adminSubmitBtn.textContent = '上传中...';
+
+        try {
+            let avatarUrl = null;
+            if (selectedAvatarFile) {
+                adminSubmitBtn.textContent = '上传头像...';
+                avatarUrl = await uploadAvatar(selectedAvatarFile);
+            }
+
+            adminSubmitBtn.textContent = '添加英雄...';
+            const { data, error } = await supabaseClient
+                .from('heroes')
+                .insert([{ en, zh, lane, tier, status, avatar_url: avatarUrl }])
+                .select();
+
+            if (error) throw error;
+
+            adminStatusMsg.textContent = '✅ 英雄添加成功！刷新列表中...';
+            adminStatusMsg.className = 'admin-status-msg success';
+            adminSubmitBtn.textContent = '已添加';
+
+            adminEn.value = '';
+            adminZh.value = '';
+            adminLane.value = 'top';
+            adminTier.value = '';
+            adminStatus.value = 'normal';
+            avatarFileInput.value = '';
+            selectedAvatarFile = null;
+            avatarPreview.style.display = 'none';
+            avatarPreview.src = '';
+
+            await loadHeroesData();
+            if (typeof updateAllLanesWithAnimation === 'function') {
+                await updateAllLanesWithAnimation();
+            } else if (typeof render === 'function') {
+                render();
+            } else {
+                location.reload();
+            }
+
+            adminSubmitBtn.disabled = false;
+            adminSubmitBtn.textContent = '添加英雄';
+
+            setTimeout(() => {
+                closeAdminPanel();
+            }, 1200);
+
+        } catch (err) {
+            console.error('添加英雄失败', err);
+            adminStatusMsg.textContent = '❌ 添加失败：' + err.message;
+            adminStatusMsg.className = 'admin-status-msg error';
+            adminSubmitBtn.disabled = false;
+            adminSubmitBtn.textContent = '添加英雄';
+        }
+    });
+</script>
+
 </body>
 </html>
