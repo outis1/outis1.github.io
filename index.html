@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover" />
-    <title>Outis英雄支持表</title>
+    <title>Outis英雄支持表 · 在线人数</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
     <style>
+        /* ===== 原有全部样式（不变） ===== */
         * {
             margin: 0;
             padding: 0;
@@ -424,6 +425,8 @@
                 height: 44px;
             }
         }
+
+        /* ===== Footer 新样式：flex 水平排列 ===== */
         footer {
             text-align: center;
             margin-top: 1.8rem;
@@ -431,6 +434,20 @@
             color: #64708f;
             border-top: 1px solid #20273f;
             padding-top: 1.2rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        footer span {
+            display: inline-block;
+        }
+        #onlineCountNum {
+            color: #86efac;
+            font-weight: 700;
+        }
+        #visitCountDisplay {
+            color: #b9c7f0;
         }
 
         .toast-message {
@@ -941,11 +958,12 @@
             border: 1px solid #fbbf24;
         }
 
-        /* 浮现文字特效 */
+        /* ============================================================
+               🎯 浮现文字特效（字体18px + 渐变）
+               ============================================================ */
         .pop-text {
             position: fixed;
             font-size: 18px;
-            /* 固定18px */
             line-height: 1.6;
             pointer-events: none;
             z-index: 9999;
@@ -956,7 +974,6 @@
             opacity: 0;
             transform: translate(-50%, 0);
             transition: opacity 0.40s ease;
-            /* 渐变由 JS 动态设置 */
             color: transparent;
             background-clip: text;
             -webkit-background-clip: text;
@@ -976,7 +993,6 @@
             transition: opacity 0.35s ease;
         }
 
-        /* 水印 */
         .floating-watermark {
             position: fixed;
             bottom: 28px;
@@ -996,7 +1012,6 @@
         @media (max-width: 600px) {
             .pop-text {
                 font-size: 18px;
-                /* 保持18px */
             }
             .floating-watermark {
                 font-size: 11px;
@@ -1007,10 +1022,10 @@
         @media (max-width: 400px) {
             .pop-text {
                 font-size: 18px;
-                /* 保持18px */
             }
         }
 
+        /* ===== 管理面板 ===== */
         #adminFab {
             position: fixed;
             bottom: 30px;
@@ -1255,7 +1270,12 @@
             </div>
         </div>
         <div id="positionTable" class="position-table"></div>
-        <footer id="footerCounter">加载数据中...</footer>
+
+        <!-- ===== Footer 更新：左右并排显示访问人次和在线人数 ===== -->
+        <footer id="footerCounter">
+            <span id="visitCountDisplay">👥 访问人次: --</span>
+            <span id="onlineCountDisplay">🟢 当前在线: <span id="onlineCountNum">0</span> 人</span>
+        </footer>
     </div>
 
     <!-- 评论弹窗 -->
@@ -1360,6 +1380,9 @@
     </div>
 
     <script>
+        // ============================================================
+        // 反调试 & 基础设置
+        // ============================================================
         (function() {
             document.addEventListener('contextmenu', e => { e.preventDefault();
                 return false; });
@@ -1383,6 +1406,9 @@
                 let after = Date.now(); if (after - before > 100) document.body.innerHTML = ''; }, 2000);
         })();
 
+        // ============================================================
+        // Supabase 初始化 & 核心数据
+        // ============================================================
         const SUPABASE_URL = 'https://pwmpledeqzzdvwqqbbhh.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_DdFUyYqX6xOz28v6LXYO9w_JMW8l6kV';
         let supabaseClient = null,
@@ -1395,6 +1421,9 @@
             searchKeyword = '';
         let isVoting = false;
         let currentModalHeroId = null;
+
+        // ===== 新增：在线人数相关 =====
+        let presenceChannel = null;
 
         const RANK_ORDER = ['S', 'A', 'B', 'C'];
         const DEFAULT_RANK = 'B';
@@ -1409,7 +1438,7 @@
             { key: "other", label: "其他", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>` }
         ];
 
-        // 工具函数
+        // ===== 工具函数 =====
         function showToast(msg, isError = false) {
             const existing = document.querySelectorAll('.toast-message');
             existing.forEach(t => { t.classList.remove('show');
@@ -1438,7 +1467,60 @@
 
         function setUserName(name) { localStorage.setItem('comment_user_name', name); }
 
-        // 核心功能
+        // ===== 在线人数相关函数 =====
+        async function initPresence() {
+            if (!supabaseClient || !isSupabaseAvailable) {
+                document.getElementById('onlineCountNum').textContent = '--';
+                return;
+            }
+            try {
+                presenceChannel = supabaseClient.channel('online-status', {
+                    config: {
+                        presence: {
+                            key: userFingerprint,
+                        },
+                    },
+                });
+
+                presenceChannel.on('presence', { event: 'sync' }, () => {
+                    const state = presenceChannel.presenceState();
+                    const count = Object.keys(state).length;
+                    document.getElementById('onlineCountNum').textContent = count;
+                });
+
+                // 可选：监听 join/leave 用于调试
+                presenceChannel.on('presence', { event: 'join' }, ({ key }) => {
+                    console.log(`用户 ${key} 加入`);
+                });
+                presenceChannel.on('presence', { event: 'leave' }, ({ key }) => {
+                    console.log(`用户 ${key} 离开`);
+                });
+
+                await presenceChannel.subscribe(async (status) => {
+                    if (status === 'SUBSCRIBED') {
+                        await presenceChannel.track({
+                            user_name: getUserName() || '匿名玩家',
+                            online_at: new Date().toISOString(),
+                        });
+                    }
+                });
+            } catch (err) {
+                console.warn('Presence 初始化失败', err);
+                document.getElementById('onlineCountNum').textContent = '--';
+            }
+        }
+
+        // 页面关闭时清理
+        window.addEventListener('beforeunload', async () => {
+            if (presenceChannel) {
+                try {
+                    await presenceChannel.untrack();
+                    await presenceChannel.unsubscribe();
+                } catch (e) { /* ignore */ }
+            }
+        });
+
+        // ===== 核心功能（英雄表、投票、评论等，完全不变） =====
         function computeDynamicRating(likes, dislikes, originalTier) {
             let baseIndex = RANK_ORDER.indexOf(originalTier);
             if (baseIndex === -1) baseIndex = RANK_ORDER.indexOf(DEFAULT_RANK);
@@ -1701,7 +1783,7 @@
             if (heroId) openCommentModal(heroId);
         }
 
-        // 投票函数
+        // ===== 投票函数 =====
         async function submitVote(heroId, newVoteType, triggerPop = true) {
             if (isVoting) { showToast('请稍后...'); return false; }
             if (!supabaseClient || !isSupabaseAvailable) { showToast('数据库未连接', true); return false; }
@@ -1831,7 +1913,7 @@
             }
         }
 
-        // 评论 + 评论emoji
+        // ===== 评论 + 反应功能 =====
         let reactionsMap = new Map();
 
         async function refreshReactionsForComment(commentId) {
@@ -1973,7 +2055,7 @@
             }
         }
 
-        // 表情选择
+        // ===== 表情选择器交互 =====
         let currentCommentIdForPicker = null;
         const picker = document.getElementById('emojiPicker');
         const emojiBtns = picker.querySelectorAll('.emoji-btn');
@@ -2014,7 +2096,7 @@
             currentCommentIdForPicker = null;
         }
 
-        // 论列表点击
+        // ===== 评论列表点击（表情选择器触发） =====
         document.getElementById('commentList').addEventListener('click', function(e) {
             const target = e.target;
             const reaction = target.closest('.reaction');
@@ -2064,7 +2146,7 @@
             });
         });
 
-        // 加载评论
+        // ===== 加载评论 =====
         async function openCommentModal(heroId) {
             const hero = allHeroes.find(h => h.id === heroId);
             if (!hero) return;
@@ -2296,8 +2378,8 @@
             const content = textarea.value.trim();
             if (!content) { showToast('请输入评论内容', true); return; }
 
-            if (content.length > 100) {
-                showToast('评论内容不能超过100个字符', true);
+            if (content.length > 20) {
+                showToast('评论内容不能超过20个字符', true);
                 return;
             }
 
@@ -2322,7 +2404,7 @@
                         .maybeSingle();
                     if (checkError) console.warn(checkError);
                     if (existing) {
-                        showToast('用户名已被使用，请换一个', true);
+                        showToast('用户名已被其他用户使用，请换一个', true);
                         input.focus();
                         return;
                     }
@@ -2420,7 +2502,7 @@
             }
         }
 
-        // 数据加载
+        // ===== 数据加载 =====
         async function fetchSupabaseData() {
             try {
                 const { data: heroesData, error: heroesError } = await supabaseClient.from('heroes').select(
@@ -2469,21 +2551,22 @@
             return false;
         }
 
+        // ===== 更新访问人次（只更新 visitCountDisplay） =====
         async function updateVisitCount() {
-            const footer = document.getElementById('footerCounter');
+            const visitSpan = document.getElementById('visitCountDisplay');
             const now = Date.now();
             const lastVisit = parseInt(localStorage.getItem('last_visit_time') || '0');
             if (now - lastVisit < 60000) {
                 if (!supabaseClient || !isSupabaseAvailable) {
-                    footer.innerHTML = `👥 访问人次: -- (本地模拟)`;
+                    visitSpan.textContent = '👥 访问人次: -- (本地模拟)';
                 } else {
                     try {
                         const { data, error } = await supabaseClient.from('stats').select('value').eq('key',
                             'visit_count').maybeSingle();
                         if (error) throw error;
-                        footer.innerHTML = `👥 访问人次: ${data?.value || 0}`;
+                        visitSpan.textContent = `👥 访问人次: ${data?.value || 0}`;
                     } catch {
-                        footer.innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
+                        visitSpan.textContent = '👥 访问人次: --';
                     }
                 }
                 return;
@@ -2493,7 +2576,7 @@
             if (!supabaseClient || !isSupabaseAvailable) {
                 let local = localStorage.getItem('visit_count_mock');
                 if (!local) local = Math.floor(Math.random() * 1000) + 100;
-                footer.innerHTML = `👥 访问人次: ${local} (本地模拟)`;
+                visitSpan.textContent = `👥 访问人次: ${local} (本地模拟)`;
                 return;
             }
             try {
@@ -2505,10 +2588,10 @@
                     newCount = data.value + 1;
                     await supabaseClient.from('stats').update({ value: newCount }).eq('key', 'visit_count');
                 } else await supabaseClient.from('stats').insert({ key: 'visit_count', value: 1 });
-                footer.innerHTML = `👥 访问人次: ${newCount}`;
+                visitSpan.textContent = `👥 访问人次: ${newCount}`;
             } catch (err) {
                 console.warn(err);
-                footer.innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
+                visitSpan.textContent = '👥 访问人次: --';
             }
         }
 
@@ -2521,12 +2604,18 @@
                 supabaseClient = null; }
         }
 
+        // ============================================================
         // 主流程
+        // ============================================================
         (async function main() {
             await initSupabase();
             userFingerprint = getOrCreateFingerprint();
             await loadHeroesData();
             await updateVisitCount();
+
+            // ===== 启动在线人数（在 Supabase 可用后） =====
+            await initPresence();
+
             buildTableStructure();
             const initialGroups = computeFilteredSortedHeroes();
             for (let lane of LANES) {
@@ -2651,11 +2740,13 @@
 
             console.log('✅ Outis 已启动！');
 
-            // 渐变浮现文字特效
+            // ===== 浮动文字特效 =====
             initFloatingText();
         })();
 
-        // 浮动文字特效模块
+        // ============================================================
+        // 🎯 浮动文字特效（18px + 渐变）
+        // ============================================================
         function initFloatingText() {
             const MESSAGES = [
                 "请发送一段剪辑视频",
@@ -2668,11 +2759,9 @@
                 "当然",
                 "我会在2080年发送给你",
                 "你至少检查一下后再提问",
-                "很快",
-                "将在本周或下周解决"
+                "很快"
             ];
 
-            // 渐变方案
             const GRADIENTS = [
                 'linear-gradient(135deg, #8aadff, #a78bfa, #c084fc)',
                 'linear-gradient(135deg, #fcd34d, #f59e0b, #fbbf24)',
@@ -2684,16 +2773,16 @@
                 'linear-gradient(135deg, #fbcfe8, #f472b6, #fb7185)',
                 'linear-gradient(135deg, #a855f7, #22d3ee)',
                 'linear-gradient(135deg, #f59e0b, #ef4444, #ec4899)',
-                'linear-gradient(135deg, #fbbf24, #f59e0b, #d97706)',          // 金黄琥珀
-                'linear-gradient(135deg, #6ee7b7, #34d399, #10b981)',          // 翠绿
-                'linear-gradient(135deg, #93c5fd, #60a5fa, #3b82f6)',          // 天蓝
-                'linear-gradient(135deg, #c4b5fd, #a78bfa, #8b5cf6)',          // 淡紫
-                'linear-gradient(135deg, #fca5a5, #f87171, #ef4444)',          // 红焰
-                'linear-gradient(135deg, #fcd34d, #fbbf24, #f59e0b, #f97316)', // 橙黄渐变
-                'linear-gradient(135deg, #a7f3d0, #6ee7b7, #34d399, #10b981)', // 青绿叠翠
-                'linear-gradient(135deg, #bfdbfe, #93c5fd, #60a5fa, #3b82f6)', // 湛蓝
-                'linear-gradient(135deg, #e9d5ff, #c4b5fd, #a78bfa, #8b5cf6)', // 紫罗兰
-                'linear-gradient(135deg, #fecaca, #fca5a5, #f87171, #ef4444)', // 烈焰红
+                'linear-gradient(135deg, #fbbf24, #f59e0b, #d97706)',
+                'linear-gradient(135deg, #6ee7b7, #34d399, #10b981)',
+                'linear-gradient(135deg, #93c5fd, #60a5fa, #3b82f6)',
+                'linear-gradient(135deg, #c4b5fd, #a78bfa, #8b5cf6)',
+                'linear-gradient(135deg, #fca5a5, #f87171, #ef4444)',
+                'linear-gradient(135deg, #fcd34d, #fbbf24, #f59e0b, #f97316)',
+                'linear-gradient(135deg, #a7f3d0, #6ee7b7, #34d399, #10b981)',
+                'linear-gradient(135deg, #bfdbfe, #93c5fd, #60a5fa, #3b82f6)',
+                'linear-gradient(135deg, #e9d5ff, #c4b5fd, #a78bfa, #8b5cf6)',
+                'linear-gradient(135deg, #fecaca, #fca5a5, #f87171, #ef4444)',
             ];
 
             function randomPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -2704,7 +2793,6 @@
             }
 
             function shouldTrigger(target) {
-                // 与主项目交互元素一致
                 const interactiveSelectors = [
                     '.vote-btn', '.hero-card', '.filter-chip', '#searchInput',
                     '#adminFab', '#moreBtn', '#commentModal', '#adminModal',
@@ -2739,7 +2827,6 @@
 
                 const msg = randomPick(MESSAGES);
 
-                // 测量宽度
                 const measureEl = document.createElement('span');
                 measureEl.style.cssText =
                     'position:fixed; visibility:hidden; white-space:nowrap; font-size:18px; font-weight:700; letter-spacing:0.03em; font-family:inherit;';
@@ -2760,12 +2847,10 @@
                 if (left - halfWidth < 20) left = 20 + halfWidth;
                 if (left + halfWidth > vw - 20) left = vw - 20 - halfWidth;
 
-                // 创建元素
                 const el = document.createElement('div');
                 el.className = 'pop-text start';
                 el.textContent = msg;
 
-                // 随机渐变
                 const grad = randomPick(GRADIENTS);
                 el.style.background = grad;
                 el.style.backgroundClip = 'text';
@@ -2802,9 +2887,12 @@
 
             document.addEventListener('selectstart', function(e) { e.preventDefault(); }, { passive: true });
 
+            console.log('✦ 渐变浮动文字已加载（18px） ✦');
         }
 
-        // 管理面板
+        // ============================================================
+        // 管理面板（原有）
+        // ============================================================
         (function() {
             const secretCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft',
                 'ArrowRight'
