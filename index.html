@@ -90,6 +90,7 @@
             align-items: center;
             gap: 5px;
             transition: all 0.2s ease;
+            text-decoration: none;
         }
         .action-btn.primary {
             background: #2a3e70;
@@ -99,6 +100,11 @@
             background: #345493;
             transform: translateY(-1px);
             box-shadow: 0 2px 6px rgba(90, 130, 255, 0.3);
+        }
+        .action-btn:hover {
+            transform: translateY(-1px);
+            background: #2a365a;
+            border-color: #5a82ff;
         }
         .filter-area {
             display: flex;
@@ -1238,6 +1244,11 @@
                         <div class="feature">🎯 精确意识与监测</div>
                     </div>
                     <div class="action-bar">
+                        <!-- 新增下载按钮（左侧） -->
+                        <a class="action-btn" href="https://wwbnz.lanzn.com/ipA2V3sgkxta" target="_blank" rel="noopener noreferrer">
+                            🔗 文件下载密码1234
+                        </a>
+                        <!-- 原有“正在推进更多内容”按钮 -->
                         <button class="action-btn primary" id="moreBtn">📈 正在推进更多内容</button>
                     </div>
                 </div>
@@ -1271,7 +1282,7 @@
         </div>
         <div id="positionTable" class="position-table"></div>
 
-        <!-- ===== Footer 更新：左右并排显示访问人次和在线人数 ===== -->
+        <!-- ===== Footer ===== -->
         <footer id="footerCounter">
             <span id="visitCountDisplay">👥 访问人次: --</span>
             <span id="onlineCountDisplay">🟢 当前在线: <span id="onlineCountNum">0</span> 人</span>
@@ -1381,7 +1392,7 @@
 
     <script>
         // ============================================================
-        // 反调试 & 基础设置
+        // 反调试 & 基础设置（不变）
         // ============================================================
         (function() {
             document.addEventListener('contextmenu', e => { e.preventDefault();
@@ -1488,7 +1499,6 @@
                     document.getElementById('onlineCountNum').textContent = count;
                 });
 
-                // 可选：监听 join/leave 用于调试
                 presenceChannel.on('presence', { event: 'join' }, ({ key }) => {
                     console.log(`用户 ${key} 加入`);
                 });
@@ -1510,7 +1520,6 @@
             }
         }
 
-        // 页面关闭时清理
         window.addEventListener('beforeunload', async () => {
             if (presenceChannel) {
                 try {
@@ -2551,7 +2560,7 @@
             return false;
         }
 
-        // ===== 更新访问人次（只更新 visitCountDisplay） =====
+        // ===== 更新访问人次 =====
         async function updateVisitCount() {
             const visitSpan = document.getElementById('visitCountDisplay');
             const now = Date.now();
@@ -2612,8 +2621,6 @@
             userFingerprint = getOrCreateFingerprint();
             await loadHeroesData();
             await updateVisitCount();
-
-            // ===== 启动在线人数（在 Supabase 可用后） =====
             await initPresence();
 
             buildTableStructure();
