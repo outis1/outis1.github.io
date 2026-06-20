@@ -1754,8 +1754,8 @@
         const content = textarea.value.trim();
         if (!content) { showToast('请输入评论内容', true); return; }
 
-        if (content.length > 20) {
-            showToast('评论内容不能超过20个字符', true);
+        if (content.length > 100) {
+            showToast('评论内容不能超过100个字符', true);
             return;
         }
 
