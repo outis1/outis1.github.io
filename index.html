@@ -1,20 +1,30 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover" />
     <title>Outis英雄支持表</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             background: #0b0e18;
             font-family: system-ui, -apple-system, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
             color: #eef2ff;
             padding: 1.2rem 1rem;
         }
-        .container { max-width: 1500px; margin: 0 auto; }
-        .main-header { margin-bottom: 1rem; }
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+        .main-header {
+            margin-bottom: 1rem;
+        }
         .title {
             font-size: 1.7rem;
             font-weight: 800;
@@ -87,7 +97,7 @@
         .action-btn.primary:hover {
             background: #345493;
             transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(90,130,255,0.3);
+            box-shadow: 0 2px 6px rgba(90, 130, 255, 0.3);
         }
         .filter-area {
             display: flex;
@@ -162,12 +172,24 @@
             height: 8px;
             border-radius: 50%;
         }
-        .dot-s { background-color: #fbbf24; }
-        .dot-a { background-color: #a855f7; }
-        .dot-b { background-color: #3b82f6; }
-        .dot-c { background-color: #9ca3af; }
-        .dot-new { background-color: #f87171; }
-        .dot-will { background-color: #86efac; }
+        .dot-s {
+            background-color: #fbbf24;
+        }
+        .dot-a {
+            background-color: #a855f7;
+        }
+        .dot-b {
+            background-color: #3b82f6;
+        }
+        .dot-c {
+            background-color: #9ca3af;
+        }
+        .dot-new {
+            background-color: #f87171;
+        }
+        .dot-will {
+            background-color: #86efac;
+        }
 
         .position-table {
             display: flex;
@@ -182,7 +204,9 @@
             display: flex;
             border-bottom: 1px solid #1f2742;
         }
-        .position-row:last-child { border-bottom: none; }
+        .position-row:last-child {
+            border-bottom: none;
+        }
         .row-icon {
             width: 130px;
             flex-shrink: 0;
@@ -200,17 +224,26 @@
             height: 66px;
             display: block;
         }
-        .lane-svg svg path, .lane-svg svg g { fill: #ffffff; stroke: none; }
-        .lane-svg svg g[opacity="0.2"] { opacity: 0.35; fill: #fff9c4; }
+        .lane-svg svg path,
+        .lane-svg svg g {
+            fill: #ffffff;
+            stroke: none;
+        }
+        .lane-svg svg g[opacity="0.2"] {
+            opacity: 0.35;
+            fill: #fff9c4;
+        }
         .lane-count {
             font-size: 0.75rem;
             font-weight: 600;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             padding: 2px 8px;
             border-radius: 30px;
             color: #fff5e0;
         }
-        .lane-count.hidden { display: none; }
+        .lane-count.hidden {
+            display: none;
+        }
         .row-heroes {
             flex: 1;
             background: #0c1020;
@@ -264,17 +297,26 @@
             bottom: 5px;
             left: 5px;
             z-index: 3;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             padding: 2px 7px;
             border-radius: 18px;
             font-size: 0.7rem;
             font-weight: 800;
             color: white;
         }
-        .rank-S { background: #fbbf24; color: #1f1a0a; }
-        .rank-A { background: #a855f7; }
-        .rank-B { background: #3b82f6; }
-        .rank-C { background: #9ca3af; }
+        .rank-S {
+            background: #fbbf24;
+            color: #1f1a0a;
+        }
+        .rank-A {
+            background: #a855f7;
+        }
+        .rank-B {
+            background: #3b82f6;
+        }
+        .rank-C {
+            background: #9ca3af;
+        }
         .status-corner {
             position: absolute;
             top: 5px;
@@ -288,10 +330,16 @@
             font-weight: 800;
             padding: 2px 6px;
             border-radius: 16px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
         }
-        .status-new { background: #f87171; color: white; }
-        .status-will { background: #86efac; color: #1f3a1f; }
+        .status-new {
+            background: #f87171;
+            color: white;
+        }
+        .status-will {
+            background: #86efac;
+            color: #1f3a1f;
+        }
 
         .vote-buttons {
             display: flex;
@@ -313,18 +361,26 @@
             border-radius: 40px;
             cursor: pointer;
             transition: all 0.1s ease;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             color: #fff;
             border: 1px solid transparent;
         }
-        .vote-btn.like { background: #166534; }
-        .vote-btn.like:hover { background: #15803d; }
-        .vote-btn.dislike { background: #991b1b; }
-        .vote-btn.dislike:hover { background: #b91c1c; }
+        .vote-btn.like {
+            background: #166534;
+        }
+        .vote-btn.like:hover {
+            background: #15803d;
+        }
+        .vote-btn.dislike {
+            background: #991b1b;
+        }
+        .vote-btn.dislike:hover {
+            background: #b91c1c;
+        }
         .vote-btn.active-vote {
             border: 2px solid #fbbf24;
             background: #2d5a2d;
-            box-shadow: 0 0 6px rgba(251,191,36,0.5);
+            box-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
         }
         .vote-btn.dislike.active-vote {
             border: 2px solid #fbbf24;
@@ -338,16 +394,35 @@
             width: 100%;
         }
         @media (max-width: 800px) {
-            .row-icon { width: 100px; }
-            .lane-svg svg { width: 52px; height: 52px; }
-            .hero-card { width: 90px; }
-            .filter-area { flex-direction: column; align-items: stretch; }
-            .search-box { width: 100%; }
+            .row-icon {
+                width: 100px;
+            }
+            .lane-svg svg {
+                width: 52px;
+                height: 52px;
+            }
+            .hero-card {
+                width: 90px;
+            }
+            .filter-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-box {
+                width: 100%;
+            }
         }
         @media (max-width: 600px) {
-            .hero-card { width: 80px; }
-            .row-icon { width: 85px; }
-            .lane-svg svg { width: 44px; height: 44px; }
+            .hero-card {
+                width: 80px;
+            }
+            .row-icon {
+                width: 85px;
+            }
+            .lane-svg svg {
+                width: 44px;
+                height: 44px;
+            }
         }
         footer {
             text-align: center;
@@ -370,15 +445,21 @@
             font-size: 0.9rem;
             font-weight: 500;
             z-index: 10010;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             border: 1px solid #475569;
             opacity: 0;
             transition: opacity 0.2s ease, transform 0.25s ease;
             pointer-events: none;
             white-space: nowrap;
         }
-        .toast-message.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .toast-message.hide { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        .toast-message.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-message.hide {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
 
         .comment-modal-overlay {
             position: fixed;
@@ -393,7 +474,9 @@
             padding: 1.2rem;
             animation: fadeIn 0.25s ease;
         }
-        .comment-modal-overlay.open { display: flex; }
+        .comment-modal-overlay.open {
+            display: flex;
+        }
         .comment-modal-box {
             background: #121826;
             border-radius: 28px;
@@ -437,7 +520,9 @@
             overflow: hidden;
         }
         .comment-modal-header .hero-avatar-small img {
-            width: 100%; height: 100%; object-fit: cover;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .comment-modal-header .hero-name {
             font-weight: 700;
@@ -453,7 +538,9 @@
             margin-left: auto;
             justify-content: flex-end;
         }
-        .comment-modal-header .user-area .user-label { font-weight: 500; }
+        .comment-modal-header .user-area .user-label {
+            font-weight: 500;
+        }
         .comment-modal-header .user-area .user-name-display {
             font-weight: 600;
             color: #eef2ff;
@@ -463,7 +550,9 @@
             cursor: pointer;
             border: 1px solid transparent;
         }
-        .comment-modal-header .user-area .user-name-display:hover { border-color: #3b6eff; }
+        .comment-modal-header .user-area .user-name-display:hover {
+            border-color: #3b6eff;
+        }
         .comment-modal-header .user-area .user-name-input {
             background: #111722;
             border: 1px solid #2d385a;
@@ -474,7 +563,9 @@
             outline: none;
             width: 120px;
         }
-        .comment-modal-header .user-area .user-name-input:focus { border-color: #3b6eff; }
+        .comment-modal-header .user-area .user-name-input:focus {
+            border-color: #3b6eff;
+        }
         .comment-modal-header .close-btn {
             background: none;
             border: none;
@@ -485,7 +576,9 @@
             line-height: 1;
             transition: color 0.15s;
         }
-        .comment-modal-header .close-btn:hover { color: #fff; }
+        .comment-modal-header .close-btn:hover {
+            color: #fff;
+        }
 
         .comment-list {
             flex: 1;
@@ -521,7 +614,8 @@
             margin-bottom: 8px;
         }
         .comment-item .user-avatar {
-            width: 34px; height: 34px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: #2a365a;
             display: flex;
@@ -607,13 +701,27 @@
             animation: reactionPopOut 0.2s cubic-bezier(0.4, 0, 0.6, 1) forwards;
         }
         @keyframes reactionPop {
-            0% { transform: scale(0.5); opacity: 0; }
-            80% { transform: scale(1.15); }
-            100% { transform: scale(1); opacity: 1; }
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            80% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
         @keyframes reactionPopOut {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0.5); opacity: 0; }
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
         }
 
         .comment-modal-footer {
@@ -632,7 +740,7 @@
             gap: 6px;
         }
         .comment-modal-footer .input-row .vote-btns .vote-btn-small {
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid #2d385a;
             border-radius: 30px;
             padding: 6px 12px;
@@ -656,9 +764,15 @@
             animation: btnPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         @keyframes btnPop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
         .comment-modal-footer .input-row textarea {
             flex: 1;
@@ -676,8 +790,12 @@
             max-height: 120px;
             line-height: 1.5;
         }
-        .comment-modal-footer .input-row textarea:focus { border-color: #5d7eff; }
-        .comment-modal-footer .input-row textarea::placeholder { color: #5f6c8a; }
+        .comment-modal-footer .input-row textarea:focus {
+            border-color: #5d7eff;
+        }
+        .comment-modal-footer .input-row textarea::placeholder {
+            color: #5f6c8a;
+        }
         .comment-modal-footer .input-row .submit-btn {
             background: #3b6eff;
             border: none;
@@ -695,7 +813,9 @@
             justify-content: center;
             flex-shrink: 0;
         }
-        .comment-modal-footer .input-row .submit-btn:hover { background: #2a5ae0; }
+        .comment-modal-footer .input-row .submit-btn:hover {
+            background: #2a5ae0;
+        }
         .comment-modal-footer .input-row .submit-btn:disabled {
             background: #2d385a;
             cursor: not-allowed;
@@ -703,29 +823,66 @@
         }
 
         @media (max-width: 600px) {
-            .comment-modal-box { max-width: 100%; border-radius: 20px; height: 95vh; max-height: 95vh; font-size: 0.95rem; }
-            .comment-modal-footer .input-row { flex-wrap: wrap; }
-            .comment-modal-footer .input-row .vote-btns { flex: 1; }
-            .comment-modal-footer .input-row textarea { flex: 1 1 100%; min-height: 44px; }
-            .comment-modal-footer .input-row .submit-btn { flex: 1; }
-            .comment-list { padding: 0.8rem; }
-            .comment-item .comment-content { padding-left: 0; }
-            .comment-item .reactions { padding-left: 0; }
+            .comment-modal-box {
+                max-width: 100%;
+                border-radius: 20px;
+                height: 95vh;
+                max-height: 95vh;
+                font-size: 0.95rem;
+            }
+            .comment-modal-footer .input-row {
+                flex-wrap: wrap;
+            }
+            .comment-modal-footer .input-row .vote-btns {
+                flex: 1;
+            }
+            .comment-modal-footer .input-row textarea {
+                flex: 1 1 100%;
+                min-height: 44px;
+            }
+            .comment-modal-footer .input-row .submit-btn {
+                flex: 1;
+            }
+            .comment-list {
+                padding: 0.8rem;
+            }
+            .comment-item .comment-content {
+                padding-left: 0;
+            }
+            .comment-item .reactions {
+                padding-left: 0;
+            }
         }
-        .comment-list::-webkit-scrollbar { width: 4px; }
-        .comment-list::-webkit-scrollbar-track { background: transparent; }
-        .comment-list::-webkit-scrollbar-thumb { background: #2d385a; border-radius: 10px; }
+        .comment-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .comment-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .comment-list::-webkit-scrollbar-thumb {
+            background: #2d385a;
+            border-radius: 10px;
+        }
 
         @keyframes slideUp {
-            from { transform: translateY(30px) scale(0.96); opacity: 0; }
-            to { transform: translateY(0) scale(1); opacity: 1; }
+            from {
+                transform: translateY(30px) scale(0.96);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
         }
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
 
-        /* 表情选择器 */
         .emoji-picker {
             position: fixed;
             background: #121826;
@@ -735,7 +892,7 @@
             display: none;
             gap: 6px;
             z-index: 10020;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px);
             transform-origin: bottom left;
         }
@@ -747,12 +904,24 @@
             animation: emojiPopOut 0.15s cubic-bezier(0.4, 0, 0.6, 1) forwards;
         }
         @keyframes emojiPop {
-            0% { opacity: 0; transform: scale(0.8) translateY(10px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
         @keyframes emojiPopOut {
-            0% { opacity: 1; transform: scale(1) translateY(0); }
-            100% { opacity: 0; transform: scale(0.8) translateY(10px); }
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.8) translateY(10px);
+            }
         }
         .emoji-picker .emoji-btn {
             background: transparent;
@@ -771,1741 +940,2044 @@
             background: #2d3a5e;
             border: 1px solid #fbbf24;
         }
+
+        /* 浮现文字特效 */
+        .pop-text {
+            position: fixed;
+            font-size: 18px;
+            /* 固定18px */
+            line-height: 1.6;
+            pointer-events: none;
+            z-index: 9999;
+            letter-spacing: 0.03em;
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translate(-50%, 0);
+            transition: opacity 0.40s ease;
+            /* 渐变由 JS 动态设置 */
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+        }
+        .pop-text.start {
+            transform: translate(-50%, 40px);
+            opacity: 0;
+            transition: none;
+        }
+        .pop-text.fade-in {
+            transform: translate(-50%, 0);
+            opacity: 1;
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.40s ease;
+        }
+        .pop-text.fade-out {
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        /* 水印 */
+        .floating-watermark {
+            position: fixed;
+            bottom: 28px;
+            left: 32px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.08);
+            letter-spacing: 0.06em;
+            font-weight: 300;
+            pointer-events: none;
+            z-index: 0;
+            font-family: "Georgia", "Times New Roman", serif;
+        }
+        .floating-watermark span {
+            display: inline-block;
+            opacity: 0.5;
+        }
+        @media (max-width: 600px) {
+            .pop-text {
+                font-size: 18px;
+                /* 保持18px */
+            }
+            .floating-watermark {
+                font-size: 11px;
+                bottom: 18px;
+                left: 20px;
+            }
+        }
+        @media (max-width: 400px) {
+            .pop-text {
+                font-size: 18px;
+                /* 保持18px */
+            }
+        }
+
+        #adminFab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid #3b6eff;
+            border-radius: 60px;
+            padding: 12px 20px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        #adminFab:hover {
+            background: rgba(59, 110, 255, 0.9);
+            transform: scale(1.05);
+            border-color: #fff;
+        }
+        #adminFab .icon {
+            font-size: 1.2rem;
+        }
+        .admin-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 10001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem;
+        }
+        .admin-modal.open {
+            display: flex;
+        }
+        .admin-modal-box {
+            background: #121826;
+            border-radius: 28px;
+            border: 1px solid #2c365e;
+            max-width: 460px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.8rem 1.5rem;
+            animation: slideUp 0.25s ease;
+        }
+        .admin-modal-box h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #eef2ff;
+        }
+        .admin-modal-box .close-admin {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #8b9acf;
+            font-size: 1.6rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .admin-modal-box .close-admin:hover {
+            color: #fff;
+        }
+        .admin-form-group {
+            margin-bottom: 1.2rem;
+        }
+        .admin-form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #b9c7f0;
+        }
+        .admin-form-group input,
+        .admin-form-group select,
+        .admin-form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: #111722;
+            border: 1px solid #2d385a;
+            border-radius: 12px;
+            color: #f0f4ff;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .admin-form-group input:focus,
+        .admin-form-group select:focus {
+            border-color: #3b6eff;
+        }
+        .admin-form-group .hint {
+            font-size: 0.7rem;
+            color: #6e7fa5;
+            margin-top: 4px;
+        }
+        .avatar-preview {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 6px;
+        }
+        .avatar-preview img {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #1b2338;
+            border: 1px solid #2d385a;
+        }
+        .avatar-preview .file-input-wrapper {
+            flex: 1;
+        }
+        .avatar-preview .file-input-wrapper input[type="file"] {
+            padding: 6px 0;
+            font-size: 0.8rem;
+            color: #b9c7f0;
+            background: transparent;
+            border: none;
+        }
+        .avatar-preview .clear-avatar {
+            background: #991b1b;
+            border: none;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .avatar-preview .clear-avatar:hover {
+            background: #b91c1c;
+        }
+        .admin-submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #3b6eff;
+            border: none;
+            border-radius: 16px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 0.5rem;
+        }
+        .admin-submit-btn:hover {
+            background: #2a5ae0;
+        }
+        .admin-submit-btn:disabled {
+            background: #2d385a;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .admin-status-msg {
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 6px;
+            border-radius: 8px;
+            display: none;
+        }
+        .admin-status-msg.success {
+            background: #166534;
+            color: #eef2ff;
+            display: block;
+        }
+        .admin-status-msg.error {
+            background: #991b1b;
+            color: #fff;
+            display: block;
+        }
+        @media (max-width: 600px) {
+            .admin-modal-box {
+                padding: 1.2rem;
+            }
+            #adminFab {
+                bottom: 16px;
+                right: 16px;
+                padding: 10px 16px;
+                font-size: 0.8rem;
+            }
+            .avatar-preview {
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="main-header">
-        <div class="title">⚔️ Outis 英雄支持表（CN）</div>
-        <div class="info-line">
-            <div class="stats-text" id="heroStatsText">加载中...</div>
-            <div class="right-group">
-                <div class="feature-row">
-                    <div class="feature">⚙️ 强大的Core架构</div>
-                    <div class="feature">💨 高性能走砍躲避</div>
-                    <div class="feature">🎯 精确意识与监测</div>
+    <div class="container">
+        <div class="main-header">
+            <div class="title">⚔️ Outis 英雄支持表（CN）</div>
+            <div class="info-line">
+                <div class="stats-text" id="heroStatsText">加载中...</div>
+                <div class="right-group">
+                    <div class="feature-row">
+                        <div class="feature">⚙️ 强大的Core架构</div>
+                        <div class="feature">💨 高性能走砍躲避</div>
+                        <div class="feature">🎯 精确意识与监测</div>
+                    </div>
+                    <div class="action-bar">
+                        <button class="action-btn primary" id="moreBtn">📈 正在推进更多内容</button>
+                    </div>
                 </div>
-                <div class="action-bar">
-                    <button class="action-btn primary" id="moreBtn">📈 正在推进更多内容</button>
+            </div>
+        </div>
+        <div class="filter-area">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="searchInput" placeholder="搜索英雄名称" autocomplete="off">
+            </div>
+            <div class="filter-group">
+                <div class="filter-cat">
+                    <span class="filter-label">评级</span>
+                    <div class="filter-options" id="rankFilterGroup">
+                        <span data-rank="all" class="filter-chip active">全部</span>
+                        <span data-rank="S" class="filter-chip"><span class="dot dot-s"></span>S 优秀</span>
+                        <span data-rank="A" class="filter-chip"><span class="dot dot-a"></span>A 良好</span>
+                        <span data-rank="B" class="filter-chip"><span class="dot dot-b"></span>B 一般</span>
+                        <span data-rank="C" class="filter-chip"><span class="dot dot-c"></span>C 差劲</span>
+                    </div>
+                </div>
+                <div class="filter-cat">
+                    <span class="filter-label">状态</span>
+                    <div class="filter-options" id="statusFilterGroup">
+                        <span data-status="all" class="filter-chip active">全部</span>
+                        <span data-status="new" class="filter-chip"><span class="dot dot-new"></span>NEW 新增</span>
+                        <span data-status="will" class="filter-chip"><span class="dot dot-will"></span>WILL 即将推出</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="positionTable" class="position-table"></div>
+        <footer id="footerCounter">加载数据中...</footer>
+    </div>
+
+    <!-- 评论弹窗 -->
+    <div class="comment-modal-overlay" id="commentModal">
+        <div class="comment-modal-box">
+            <div class="comment-modal-header">
+                <div class="hero-info">
+                    <div class="hero-avatar-small" id="commentHeroAvatar">🎴</div>
+                    <div class="hero-name" id="commentHeroName">亚托克斯</div>
+                </div>
+                <div class="user-area" id="userArea">
+                    <span class="user-label">当前用户名</span>
+                    <span class="user-name-display" id="userNameDisplay">未命名</span>
+                    <input class="user-name-input" id="userNameInput" type="text" placeholder="输入用户名" style="display:none;">
+                </div>
+                <button class="close-btn" id="closeCommentBtn">✕</button>
+            </div>
+            <div class="comment-list" id="commentList">
+                <div class="empty-state"><span style="font-size:2rem;display:block;">💭</span>加载中...</div>
+            </div>
+            <div class="comment-modal-footer">
+                <div class="input-row">
+                    <div class="vote-btns">
+                        <button class="vote-btn-small" id="commentLikeBtn" data-type="like">👍 <span id="commentLikeCount">0</span></button>
+                        <button class="vote-btn-small" id="commentDislikeBtn" data-type="dislike">👎 <span id="commentDislikeCount">0</span></button>
+                    </div>
+                    <textarea id="commentInput" placeholder="写点看法…" rows="1"></textarea>
+                    <button class="submit-btn" id="submitCommentBtn">发送</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="filter-area">
-        <div class="search-box">
-            <span>🔍</span>
-            <input type="text" id="searchInput" placeholder="搜索英雄名称" autocomplete="off">
-        </div>
-        <div class="filter-group">
-            <div class="filter-cat">
-                <span class="filter-label">评级</span>
-                <div class="filter-options" id="rankFilterGroup">
-                    <span data-rank="all" class="filter-chip active">全部</span>
-                    <span data-rank="S" class="filter-chip"><span class="dot dot-s"></span>S 优秀</span>
-                    <span data-rank="A" class="filter-chip"><span class="dot dot-a"></span>A 良好</span>
-                    <span data-rank="B" class="filter-chip"><span class="dot dot-b"></span>B 一般</span>
-                    <span data-rank="C" class="filter-chip"><span class="dot dot-c"></span>C 差劲</span>
-                </div>
-            </div>
-            <div class="filter-cat">
-                <span class="filter-label">状态</span>
-                <div class="filter-options" id="statusFilterGroup">
-                    <span data-status="all" class="filter-chip active">全部</span>
-                    <span data-status="new" class="filter-chip"><span class="dot dot-new"></span>NEW 新增</span>
-                    <span data-status="will" class="filter-chip"><span class="dot dot-will"></span>WILL 即将推出</span>
-                </div>
-            </div>
-        </div>
+
+    <!-- 表情选择器 -->
+    <div class="emoji-picker" id="emojiPicker">
+        <button class="emoji-btn" data-emoji="❤️">❤️</button>
+        <button class="emoji-btn" data-emoji="👏">👏</button>
+        <button class="emoji-btn" data-emoji="👎">👎</button>
+        <button class="emoji-btn" data-emoji="🤡">🤡</button>
+        <button class="emoji-btn" data-emoji="🤣">🤣</button>
     </div>
-    <div id="positionTable" class="position-table"></div>
-    <footer id="footerCounter">加载数据中...</footer>
-</div>
 
-<!-- 评论弹窗 -->
-<div class="comment-modal-overlay" id="commentModal">
-    <div class="comment-modal-box">
-        <div class="comment-modal-header">
-            <div class="hero-info">
-                <div class="hero-avatar-small" id="commentHeroAvatar">🎴</div>
-                <div class="hero-name" id="commentHeroName">亚托克斯</div>
+    <!-- 水印 -->
+    <div class="floating-watermark"><span>✦</span>&nbsp; click anywhere</div>
+
+    <!-- 管理面板 -->
+    <div id="adminFab"><span class="icon">⚙️</span> 管理</div>
+    <div class="admin-modal" id="adminModal">
+        <div class="admin-modal-box">
+            <div style="display: flex; align-items: center; margin-bottom: 1.2rem;">
+                <h2 style="margin:0;">➕ 添加英雄</h2>
+                <button class="close-admin" id="closeAdminBtn">✕</button>
             </div>
-            <div class="user-area" id="userArea">
-                <span class="user-label">当前用户名</span>
-                <span class="user-name-display" id="userNameDisplay">未命名</span>
-                <input class="user-name-input" id="userNameInput" type="text" placeholder="输入用户名" style="display:none;">
-            </div>
-            <button class="close-btn" id="closeCommentBtn">✕</button>
-        </div>
-        <div class="comment-list" id="commentList">
-            <div class="empty-state"><span style="font-size:2rem;display:block;">💭</span>加载中...</div>
-        </div>
-        <div class="comment-modal-footer">
-            <div class="input-row">
-                <div class="vote-btns">
-                    <button class="vote-btn-small" id="commentLikeBtn" data-type="like">👍 <span id="commentLikeCount">0</span></button>
-                    <button class="vote-btn-small" id="commentDislikeBtn" data-type="dislike">👎 <span id="commentDislikeCount">0</span></button>
+            <form id="adminForm">
+                <div class="admin-form-group">
+                    <label for="adminEn">英文名 <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="adminEn" placeholder="如: Garen, DrMundo" required>
+                    <div class="hint">必须与官方名称完全一致，大小写敏感（仅当不使用自定义头像时）</div>
                 </div>
-                <textarea id="commentInput" placeholder="写点看法…" rows="1"></textarea>
-                <button class="submit-btn" id="submitCommentBtn">发送</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 表情选择器 -->
-<div class="emoji-picker" id="emojiPicker">
-    <button class="emoji-btn" data-emoji="❤️">❤️</button>
-    <button class="emoji-btn" data-emoji="👏">👏</button>
-    <button class="emoji-btn" data-emoji="👎">👎</button>
-    <button class="emoji-btn" data-emoji="🤡">🤡</button>
-    <button class="emoji-btn" data-emoji="🤣">🤣</button>
-</div>
-
-<script>
-    (function() {
-        document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
-        document.addEventListener('keydown', e => {
-            if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.keyCode === 73)) { e.preventDefault(); return false; }
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.keyCode === 74)) { e.preventDefault(); return false; }
-            if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.keyCode === 85)) { e.preventDefault(); return false; }
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.keyCode === 67)) { e.preventDefault(); return false; }
-        });
-        setInterval(() => { let before = Date.now(); debugger; let after = Date.now(); if (after - before > 100) document.body.innerHTML = ''; }, 2000);
-    })();
-
-    const SUPABASE_URL = 'https://pwmpledeqzzdvwqqbbhh.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_DdFUyYqX6xOz28v6LXYO9w_JMW8l6kV';
-    let supabaseClient = null, isSupabaseAvailable = false;
-    let allHeroes = [], votesMap = new Map();
-    let userFingerprint = '';
-    let currentRankFilter = 'all', currentStatusFilter = 'all', searchKeyword = '';
-    let isVoting = false;
-    let currentModalHeroId = null;
-
-    const RANK_ORDER = ['S', 'A', 'B', 'C'];
-    const DEFAULT_RANK = 'B';
-    const EMOJI_ORDER = ['❤️', '👏', '👎', '🤡', '🤣'];
-
-    const LANES = [
-        { key: "top", label: "上路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z"></path><path d="m5 21 4-4h8V9l4-4v16z" opacity="0.2"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
-        { key: "jungle", label: "打野", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M5.14 2c1.58 1.21 5.58 5.023 6.976 9.953s0 10.047 0 10.047c-2.749-3.164-5.893-5.2-6.18-5.382l-.02-.013C5.45 13.814 3 8.79 3 8.79c3.536.867 4.93 4.279 4.93 4.279C7.558 8.698 5.14 2 5.14 2m14.976 5.907s-1.243 2.471-1.814 4.604c-.235.878-.285 2.2-.29 3.058v.282c.003.347.01.568.01.568s-1.738 2.397-3.38 3.678a27.5 27.5 0 0 0-.208-5.334c.928-2.023 2.846-5.454 5.682-6.856m-2.124-5.331s-2.325 3.052-2.836 6.029c-.11.636-.201 1.194-.284 1.695-.379.584-.73 1.166-1.05 1.733-.033-.125-.06-.25-.095-.375a21 21 0 0 0-1.16-3.08c.053-.146.103-.29.17-.438 0 0 1.814-3.78 5.255-5.564"></path></svg>` },
-        { key: "mid", label: "中路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m15 3-4 4H7v4l-4 4V3zM9 21l4-4h4v-4l4-4v12z" opacity="0.2"></path><path d="M18 3h3v3L6 21H3v-3z"></path></g></svg>` },
-        { key: "bot", label: "下路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z" opacity="0.2"></path><path d="m5 21 4-4h8V9l4-4v16z"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
-        { key: "support", label: "辅助", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M12.833 10.833 14.5 17.53v.804L12.833 20h-1.666L9.5 18.333v-.804l1.667-6.696zM7 7.5 9.5 10l-1.667 4.167-2.5-2.5L6.167 10h-2.5L2 7.5zm15 0L20.333 10h-2.5l.834 1.667-2.5 2.5L14.5 10 17 7.5zM13.743 5l.757.833v.834l-1.667 2.5h-1.666L9.5 6.667v-.834L10.257 5z"></path></svg>` },
-        { key: "other", label: "其他", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>` }
-    ];
-
-    // 工具函数
-    function showToast(msg, isError = false) {
-        const existing = document.querySelectorAll('.toast-message');
-        existing.forEach(t => { t.classList.remove('show'); t.classList.add('hide'); setTimeout(() => t.remove(), 300); });
-        const toast = document.createElement('div');
-        toast.className = 'toast-message';
-        toast.textContent = msg;
-        toast.style.backgroundColor = isError ? '#b91c1c' : '#1e293b';
-        document.body.appendChild(toast);
-        void toast.offsetWidth;
-        toast.classList.add('show');
-        setTimeout(() => { toast.classList.remove('show'); toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2300);
-    }
-
-    function getOrCreateFingerprint() {
-        let fp = localStorage.getItem('vote_fingerprint');
-        if (!fp) { fp = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36) + Date.now(); localStorage.setItem('vote_fingerprint', fp); }
-        return fp;
-    }
-
-    function getUserName() { return localStorage.getItem('comment_user_name') || null; }
-    function setUserName(name) { localStorage.setItem('comment_user_name', name); }
-
-    // 核心功能函数
-    function computeDynamicRating(likes, dislikes, originalTier) {
-        let baseIndex = RANK_ORDER.indexOf(originalTier);
-        if (baseIndex === -1) baseIndex = RANK_ORDER.indexOf(DEFAULT_RANK);
-        if (likes === 0 && dislikes === 0) return RANK_ORDER[baseIndex];
-        if (likes > 0 && dislikes === 0) return RANK_ORDER[Math.max(baseIndex - likes, 0)];
-        if (dislikes > 0 && likes === 0) return RANK_ORDER[Math.min(baseIndex + dislikes, RANK_ORDER.length - 1)];
-        if (likes > dislikes * 2) return 'S';
-        if (likes > dislikes) return 'A';
-        if (Math.abs(likes - dislikes) <= Math.max(1, Math.min(likes, dislikes) * 0.2)) return 'B';
-        if (dislikes > likes * 1.2) return 'C';
-        return 'B';
-    }
-
-    function getCurrentRating(hero, stats) {
-        return computeDynamicRating(stats.likes, stats.dislikes, hero.tier);
-    }
-
-    function compareHeroes(a, b) {
-        const aStats = votesMap.get(a.id) || { likes: 0, dislikes: 0 };
-        const bStats = votesMap.get(b.id) || { likes: 0, dislikes: 0 };
-        if (aStats.likes !== bStats.likes) return bStats.likes - aStats.likes;
-        const aRating = getCurrentRating(a, aStats);
-        const bRating = getCurrentRating(b, bStats);
-        const order = { S: 4, A: 3, B: 2, C: 1 };
-        if (order[aRating] !== order[bRating]) return (order[bRating] || 0) - (order[aRating] || 0);
-        return aStats.dislikes - bStats.dislikes;
-    }
-
-    function computeFilteredSortedHeroes() {
-        let filtered = [...allHeroes];
-        if (currentRankFilter !== 'all') {
-            filtered = filtered.filter(hero => {
-                const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
-                return getCurrentRating(hero, stats) === currentRankFilter;
-            });
-        }
-        if (currentStatusFilter !== 'all') {
-            filtered = filtered.filter(hero => hero.status === currentStatusFilter);
-        }
-        if (searchKeyword.trim() !== '') {
-            const kw = searchKeyword.trim().toLowerCase();
-            filtered = filtered.filter(h => h.zh.toLowerCase().includes(kw) || h.en.toLowerCase().includes(kw));
-        }
-        const groups = { top: [], jungle: [], mid: [], bot: [], support: [], other: [] };
-        filtered.forEach(hero => {
-            const lanes = hero.lane.split(',').map(l => l.trim());
-            lanes.forEach(lane => {
-                if (groups[lane]) groups[lane].push(hero);
-                else groups.other.push(hero);
-            });
-        });
-        for (let lane in groups) {
-            const normal = groups[lane].filter(h => h.status !== 'will');
-            const will = groups[lane].filter(h => h.status === 'will');
-            normal.sort(compareHeroes);
-            will.sort(compareHeroes);
-            groups[lane] = [...normal, ...will];
-        }
-        return groups;
-    }
-
-    function buildTableStructure() {
-        const container = document.getElementById('positionTable');
-        let html = '';
-        for (let lane of LANES) {
-            html += `<div class="position-row">
-                        <div class="row-icon">
-                            <div class="lane-svg">${lane.iconSvg}</div>
-                            <div class="lane-count ${lane.key === 'other' ? 'hidden' : ''}" id="lane-count-${lane.key}">0 位英雄</div>
+                <div class="admin-form-group">
+                    <label for="adminZh">中文名 <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="adminZh" placeholder="如: 盖伦, 蒙多医生" required>
+                </div>
+                <div class="admin-form-group">
+                    <label for="adminLane">分路</label>
+                    <input type="text" id="adminLane" placeholder="如: top / top,mid / other" value="top">
+                    <div class="hint">可选值：top, jungle, mid, bot, support, other，多路用逗号分隔</div>
+                </div>
+                <div class="admin-form-group">
+                    <label for="adminTier">初始评级</label>
+                    <select id="adminTier">
+                        <option value="">留空（默认B）</option>
+                        <option value="S">S 优秀</option>
+                        <option value="A">A 良好</option>
+                        <option value="B">B 一般</option>
+                        <option value="C">C 差劲</option>
+                    </select>
+                </div>
+                <div class="admin-form-group">
+                    <label for="adminStatus">状态</label>
+                    <select id="adminStatus">
+                        <option value="normal">普通</option>
+                        <option value="new">NEW 新增</option>
+                        <option value="will">WILL 即将推出</option>
+                    </select>
+                </div>
+                <div class="admin-form-group">
+                    <label>自定义头像</label>
+                    <div class="avatar-preview">
+                        <img id="avatarPreview" src="" alt="头像预览" style="display:none;">
+                        <div class="file-input-wrapper">
+                            <input type="file" id="avatarFileInput" accept="image/*">
+                            <div class="hint">支持 PNG / JPG，建议 200x200 以上</div>
                         </div>
-                        <div class="row-heroes">
-                            <div class="heroes-grid" id="grid-${lane.key}"></div>
-                        </div>
-                    </div>`;
+                        <button type="button" class="clear-avatar" id="clearAvatarBtn">移除</button>
+                    </div>
+                </div>
+                <button type="submit" class="admin-submit-btn" id="adminSubmitBtn">添加英雄</button>
+                <div class="admin-status-msg" id="adminStatusMsg"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            document.addEventListener('contextmenu', e => { e.preventDefault();
+                return false; });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault();
+                    return false; }
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.keyCode === 73)) { e
+                        .preventDefault();
+                    return false; }
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.keyCode === 74)) { e
+                        .preventDefault();
+                    return false; }
+                if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.keyCode === 85)) { e.preventDefault();
+                    return false; }
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.keyCode === 67)) { e
+                        .preventDefault();
+                    return false; }
+            });
+            setInterval(() => { let before = Date.now();
+                debugger;
+                let after = Date.now(); if (after - before > 100) document.body.innerHTML = ''; }, 2000);
+        })();
+
+        const SUPABASE_URL = 'https://pwmpledeqzzdvwqqbbhh.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_DdFUyYqX6xOz28v6LXYO9w_JMW8l6kV';
+        let supabaseClient = null,
+            isSupabaseAvailable = false;
+        let allHeroes = [],
+            votesMap = new Map();
+        let userFingerprint = '';
+        let currentRankFilter = 'all',
+            currentStatusFilter = 'all',
+            searchKeyword = '';
+        let isVoting = false;
+        let currentModalHeroId = null;
+
+        const RANK_ORDER = ['S', 'A', 'B', 'C'];
+        const DEFAULT_RANK = 'B';
+        const EMOJI_ORDER = ['❤️', '👏', '👎', '🤡', '🤣'];
+
+        const LANES = [
+            { key: "top", label: "上路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z"></path><path d="m5 21 4-4h8V9l4-4v16z" opacity="0.2"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
+            { key: "jungle", label: "打野", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M5.14 2c1.58 1.21 5.58 5.023 6.976 9.953s0 10.047 0 10.047c-2.749-3.164-5.893-5.2-6.18-5.382l-.02-.013C5.45 13.814 3 8.79 3 8.79c3.536.867 4.93 4.279 4.93 4.279C7.558 8.698 5.14 2 5.14 2m14.976 5.907s-1.243 2.471-1.814 4.604c-.235.878-.285 2.2-.29 3.058v.282c.003.347.01.568.01.568s-1.738 2.397-3.38 3.678a27.5 27.5 0 0 0-.208-5.334c.928-2.023 2.846-5.454 5.682-6.856m-2.124-5.331s-2.325 3.052-2.836 6.029c-.11.636-.201 1.194-.284 1.695-.379.584-.73 1.166-1.05 1.733-.033-.125-.06-.25-.095-.375a21 21 0 0 0-1.16-3.08c.053-.146.103-.29.17-.438 0 0 1.814-3.78 5.255-5.564"></path></svg>` },
+            { key: "mid", label: "中路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m15 3-4 4H7v4l-4 4V3zM9 21l4-4h4v-4l4-4v12z" opacity="0.2"></path><path d="M18 3h3v3L6 21H3v-3z"></path></g></svg>` },
+            { key: "bot", label: "下路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z" opacity="0.2"></path><path d="m5 21 4-4h8V9l4-4v16z"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
+            { key: "support", label: "辅助", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M12.833 10.833 14.5 17.53v.804L12.833 20h-1.666L9.5 18.333v-.804l1.667-6.696zM7 7.5 9.5 10l-1.667 4.167-2.5-2.5L6.167 10h-2.5L2 7.5zm15 0L20.333 10h-2.5l.834 1.667-2.5 2.5L14.5 10 17 7.5zM13.743 5l.757.833v.834l-1.667 2.5h-1.666L9.5 6.667v-.834L10.257 5z"></path></svg>` },
+            { key: "other", label: "其他", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>` }
+        ];
+
+        // 工具函数
+        function showToast(msg, isError = false) {
+            const existing = document.querySelectorAll('.toast-message');
+            existing.forEach(t => { t.classList.remove('show');
+                t.classList.add('hide');
+                setTimeout(() => t.remove(), 300); });
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.textContent = msg;
+            toast.style.backgroundColor = isError ? '#b91c1c' : '#1e293b';
+            document.body.appendChild(toast);
+            void toast.offsetWidth;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300); }, 2300);
         }
-        container.innerHTML = html;
-    }
 
-    function createHeroCard(hero) {
-        const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0, userVote: null };
-        const currentTier = getCurrentRating(hero, stats);
-        const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ? 'rank-B' : 'rank-C'));
-        let statusHtml = '';
-        if (hero.status === 'new') statusHtml = `<div class="status-badge-sm status-new">NEW</div>`;
-        else if (hero.status === 'will') statusHtml = `<div class="status-badge-sm status-will">WILL</div>`;
-        const willClass = hero.status === 'will' ? 'will-hero' : '';
-        const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
-        const fallbackIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
-        const likeActive = stats.userVote === true ? 'active-vote' : '';
-        const dislikeActive = stats.userVote === false ? 'active-vote' : '';
-        const card = document.createElement('div');
-        card.className = `hero-card ${willClass}`;
-        card.setAttribute('data-id', hero.id);
-        card.setAttribute('data-hero-zh', hero.zh);
-        card.innerHTML = `
-            <div class="hero-img">
-                <img src="${imgUrl}" alt="${hero.zh}" loading="lazy" onerror="this.src='${fallbackIcon}'">
-                <div class="rank-corner ${rankClass}">${currentTier}</div>
-                <div class="status-corner">${statusHtml}</div>
-            </div>
-            <div class="vote-buttons">
-                <div class="vote-btn like ${likeActive}" data-id="${hero.id}" data-type="like">👍 ${stats.likes}</div>
-                <div class="vote-btn dislike ${dislikeActive}" data-id="${hero.id}" data-type="dislike">👎 ${stats.dislikes}</div>
-            </div>
-        `;
-        return card;
-    }
-
-    function updateCardContent(card, hero, stats) {
-        const likeBtn = card.querySelector('.vote-btn.like');
-        const dislikeBtn = card.querySelector('.vote-btn.dislike');
-        if (likeBtn) likeBtn.innerHTML = `👍 ${stats.likes}`;
-        if (dislikeBtn) dislikeBtn.innerHTML = `👎 ${stats.dislikes}`;
-        const rankDiv = card.querySelector('.rank-corner');
-        const currentTier = getCurrentRating(hero, stats);
-        if (currentTier) {
-            const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ? 'rank-B' : 'rank-C'));
-            if (rankDiv) {
-                rankDiv.textContent = currentTier;
-                rankDiv.className = `rank-corner ${rankClass}`;
-            } else {
-                const imgDiv = card.querySelector('.hero-img');
-                if (imgDiv) {
-                    const newRank = document.createElement('div');
-                    newRank.className = `rank-corner ${rankClass}`;
-                    newRank.textContent = currentTier;
-                    imgDiv.appendChild(newRank);
-                }
-            }
-        } else if (rankDiv) rankDiv.remove();
-        const likeBtn2 = card.querySelector('.vote-btn.like');
-        const dislikeBtn2 = card.querySelector('.vote-btn.dislike');
-        if (likeBtn2 && dislikeBtn2) {
-            likeBtn2.classList.remove('active-vote');
-            dislikeBtn2.classList.remove('active-vote');
-            if (stats.userVote === true) likeBtn2.classList.add('active-vote');
-            else if (stats.userVote === false) dislikeBtn2.classList.add('active-vote');
+        function getOrCreateFingerprint() {
+            let fp = localStorage.getItem('vote_fingerprint');
+            if (!fp) { fp = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36) + Date.now();
+                localStorage.setItem('vote_fingerprint', fp); }
+            return fp;
         }
-    }
 
-    // 动画更新函数
-    async function updateAllLanesWithAnimation() {
-        const groups = computeFilteredSortedHeroes();
-        for (let lane of LANES) {
-            const grid = document.getElementById(`grid-${lane.key}`);
-            if (!grid) continue;
-            const targetHeroes = groups[lane.key] || [];
-            const currentCards = Array.from(grid.children);
-            const currentIdSet = new Set(currentCards.map(c => parseInt(c.getAttribute('data-id'))));
-            const targetIdSet = new Set(targetHeroes.map(h => h.id));
+        function getUserName() { return localStorage.getItem('comment_user_name') || null; }
 
-            const cardsToRemove = currentCards.filter(c => !targetIdSet.has(parseInt(c.getAttribute('data-id'))));
-            if (cardsToRemove.length) {
-                await Promise.all(cardsToRemove.map(card => {
-                    return new Promise(resolve => {
-                        card.style.transition = 'opacity 0.12s ease, transform 0.12s ease';
-                        card.style.opacity = '0';
-                        card.style.transform = 'scale(0.8)';
-                        setTimeout(() => {
-                            if (card.parentNode) card.remove();
-                            resolve();
-                        }, 120);
-                    });
-                }));
+        function setUserName(name) { localStorage.setItem('comment_user_name', name); }
+
+        // 核心功能
+        function computeDynamicRating(likes, dislikes, originalTier) {
+            let baseIndex = RANK_ORDER.indexOf(originalTier);
+            if (baseIndex === -1) baseIndex = RANK_ORDER.indexOf(DEFAULT_RANK);
+            if (likes === 0 && dislikes === 0) return RANK_ORDER[baseIndex];
+            if (likes > 0 && dislikes === 0) return RANK_ORDER[Math.max(baseIndex - likes, 0)];
+            if (dislikes > 0 && likes === 0) return RANK_ORDER[Math.min(baseIndex + dislikes, RANK_ORDER.length - 1)];
+            if (likes > dislikes * 2) return 'S';
+            if (likes > dislikes) return 'A';
+            if (Math.abs(likes - dislikes) <= Math.max(1, Math.min(likes, dislikes) * 0.2)) return 'B';
+            if (dislikes > likes * 1.2) return 'C';
+            return 'B';
+        }
+
+        function getCurrentRating(hero, stats) {
+            return computeDynamicRating(stats.likes, stats.dislikes, hero.tier);
+        }
+
+        function compareHeroes(a, b) {
+            const aStats = votesMap.get(a.id) || { likes: 0, dislikes: 0 };
+            const bStats = votesMap.get(b.id) || { likes: 0, dislikes: 0 };
+            if (aStats.likes !== bStats.likes) return bStats.likes - aStats.likes;
+            const aRating = getCurrentRating(a, aStats);
+            const bRating = getCurrentRating(b, bStats);
+            const order = { S: 4, A: 3, B: 2, C: 1 };
+            if (order[aRating] !== order[bRating]) return (order[bRating] || 0) - (order[aRating] || 0);
+            return aStats.dislikes - bStats.dislikes;
+        }
+
+        function computeFilteredSortedHeroes() {
+            let filtered = [...allHeroes];
+            if (currentRankFilter !== 'all') {
+                filtered = filtered.filter(hero => {
+                    const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0 };
+                    return getCurrentRating(hero, stats) === currentRankFilter;
+                });
             }
-
-            const remainingCards = Array.from(grid.children);
-            const remainingIdSet = new Set(remainingCards.map(c => parseInt(c.getAttribute('data-id'))));
-            const cardsToAdd = targetHeroes.filter(h => !remainingIdSet.has(h.id));
-            cardsToAdd.forEach(hero => {
-                const card = createHeroCard(hero);
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.9)';
-                card.style.transition = 'none';
-                grid.appendChild(card);
-            });
-
-            const allCurrentCards = Array.from(grid.children);
-            const oldPositions = new Map();
-            allCurrentCards.forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const parentRect = grid.getBoundingClientRect();
-                oldPositions.set(card, { top: rect.top - parentRect.top, left: rect.left - parentRect.left });
-            });
-
-            const cardMap = new Map();
-            allCurrentCards.forEach(card => {
-                const id = parseInt(card.getAttribute('data-id'));
-                cardMap.set(id, card);
-            });
-            const fragment = document.createDocumentFragment();
-            targetHeroes.forEach(hero => {
-                const card = cardMap.get(hero.id);
-                if (card) fragment.appendChild(card);
-            });
-            grid.appendChild(fragment);
-
-            const reorderedCards = Array.from(grid.children);
-            const newPositions = new Map();
-            reorderedCards.forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const parentRect = grid.getBoundingClientRect();
-                newPositions.set(card, { top: rect.top - parentRect.top, left: rect.left - parentRect.left });
-            });
-
-            reorderedCards.forEach(card => {
-                const oldPos = oldPositions.get(card);
-                const newPos = newPositions.get(card);
-                if (oldPos && newPos) {
-                    const dx = oldPos.left - newPos.left;
-                    const dy = oldPos.top - newPos.top;
-                    if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) card.style.transform = `translate(${dx}px, ${dy}px)`;
-                    else card.style.transform = '';
-                } else {
-                    card.style.transform = '';
-                }
-                card.style.transition = 'none';
-            });
-
-            grid.offsetHeight;
-            requestAnimationFrame(() => {
-                reorderedCards.forEach(card => {
-                    card.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.25s ease';
-                    card.style.transform = '';
-                    card.style.opacity = '1';
+            if (currentStatusFilter !== 'all') {
+                filtered = filtered.filter(hero => hero.status === currentStatusFilter);
+            }
+            if (searchKeyword.trim() !== '') {
+                const kw = searchKeyword.trim().toLowerCase();
+                filtered = filtered.filter(h => h.zh.toLowerCase().includes(kw) || h.en.toLowerCase().includes(kw));
+            }
+            const groups = { top: [], jungle: [], mid: [], bot: [], support: [], other: [] };
+            filtered.forEach(hero => {
+                const lanes = hero.lane.split(',').map(l => l.trim());
+                lanes.forEach(lane => {
+                    if (groups[lane]) groups[lane].push(hero);
+                    else groups.other.push(hero);
                 });
             });
+            for (let lane in groups) {
+                const normal = groups[lane].filter(h => h.status !== 'will');
+                const will = groups[lane].filter(h => h.status === 'will');
+                normal.sort(compareHeroes);
+                will.sort(compareHeroes);
+                groups[lane] = [...normal, ...will];
+            }
+            return groups;
+        }
 
-            targetHeroes.forEach(hero => {
-                const card = Array.from(grid.children).find(c => parseInt(c.getAttribute('data-id')) === hero.id);
-                if (card) updateCardContent(card, hero, votesMap.get(hero.id));
+        function buildTableStructure() {
+            const container = document.getElementById('positionTable');
+            let html = '';
+            for (let lane of LANES) {
+                html += `<div class="position-row">
+                                <div class="row-icon">
+                                    <div class="lane-svg">${lane.iconSvg}</div>
+                                    <div class="lane-count ${lane.key === 'other' ? 'hidden' : ''}" id="lane-count-${lane.key}">0 位英雄</div>
+                                </div>
+                                <div class="row-heroes">
+                                    <div class="heroes-grid" id="grid-${lane.key}"></div>
+                                </div>
+                            </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function createHeroCard(hero) {
+            const stats = votesMap.get(hero.id) || { likes: 0, dislikes: 0, userVote: null };
+            const currentTier = getCurrentRating(hero, stats);
+            const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ?
+                'rank-B' : 'rank-C'));
+            let statusHtml = '';
+            if (hero.status === 'new') statusHtml = `<div class="status-badge-sm status-new">NEW</div>`;
+            else if (hero.status === 'will') statusHtml = `<div class="status-badge-sm status-will">WILL</div>`;
+            const willClass = hero.status === 'will' ? 'will-hero' : '';
+            const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
+            const fallbackIcon =
+                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
+            const likeActive = stats.userVote === true ? 'active-vote' : '';
+            const dislikeActive = stats.userVote === false ? 'active-vote' : '';
+            const card = document.createElement('div');
+            card.className = `hero-card ${willClass}`;
+            card.setAttribute('data-id', hero.id);
+            card.setAttribute('data-hero-zh', hero.zh);
+            card.innerHTML = `
+                        <div class="hero-img">
+                            <img src="${imgUrl}" alt="${hero.zh}" loading="lazy" onerror="this.src='${fallbackIcon}'">
+                            <div class="rank-corner ${rankClass}">${currentTier}</div>
+                            <div class="status-corner">${statusHtml}</div>
+                        </div>
+                        <div class="vote-buttons">
+                            <div class="vote-btn like ${likeActive}" data-id="${hero.id}" data-type="like">👍 ${stats.likes}</div>
+                            <div class="vote-btn dislike ${dislikeActive}" data-id="${hero.id}" data-type="dislike">👎 ${stats.dislikes}</div>
+                        </div>
+                    `;
+            return card;
+        }
+
+        function updateCardContent(card, hero, stats) {
+            const likeBtn = card.querySelector('.vote-btn.like');
+            const dislikeBtn = card.querySelector('.vote-btn.dislike');
+            if (likeBtn) likeBtn.innerHTML = `👍 ${stats.likes}`;
+            if (dislikeBtn) dislikeBtn.innerHTML = `👎 ${stats.dislikes}`;
+            const rankDiv = card.querySelector('.rank-corner');
+            const currentTier = getCurrentRating(hero, stats);
+            if (currentTier) {
+                const rankClass = currentTier === 'S' ? 'rank-S' : (currentTier === 'A' ? 'rank-A' : (currentTier === 'B' ?
+                    'rank-B' : 'rank-C'));
+                if (rankDiv) {
+                    rankDiv.textContent = currentTier;
+                    rankDiv.className = `rank-corner ${rankClass}`;
+                } else {
+                    const imgDiv = card.querySelector('.hero-img');
+                    if (imgDiv) {
+                        const newRank = document.createElement('div');
+                        newRank.className = `rank-corner ${rankClass}`;
+                        newRank.textContent = currentTier;
+                        imgDiv.appendChild(newRank);
+                    }
+                }
+            } else if (rankDiv) rankDiv.remove();
+            const likeBtn2 = card.querySelector('.vote-btn.like');
+            const dislikeBtn2 = card.querySelector('.vote-btn.dislike');
+            if (likeBtn2 && dislikeBtn2) {
+                likeBtn2.classList.remove('active-vote');
+                dislikeBtn2.classList.remove('active-vote');
+                if (stats.userVote === true) likeBtn2.classList.add('active-vote');
+                else if (stats.userVote === false) dislikeBtn2.classList.add('active-vote');
+            }
+        }
+
+        async function updateAllLanesWithAnimation() {
+            const groups = computeFilteredSortedHeroes();
+            for (let lane of LANES) {
+                const grid = document.getElementById(`grid-${lane.key}`);
+                if (!grid) continue;
+                const targetHeroes = groups[lane.key] || [];
+                const currentCards = Array.from(grid.children);
+                const currentIdSet = new Set(currentCards.map(c => parseInt(c.getAttribute('data-id'))));
+                const targetIdSet = new Set(targetHeroes.map(h => h.id));
+
+                const cardsToRemove = currentCards.filter(c => !targetIdSet.has(parseInt(c.getAttribute('data-id'))));
+                if (cardsToRemove.length) {
+                    await Promise.all(cardsToRemove.map(card => {
+                        return new Promise(resolve => {
+                            card.style.transition = 'opacity 0.12s ease, transform 0.12s ease';
+                            card.style.opacity = '0';
+                            card.style.transform = 'scale(0.8)';
+                            setTimeout(() => {
+                                if (card.parentNode) card.remove();
+                                resolve();
+                            }, 120);
+                        });
+                    }));
+                }
+
+                const remainingCards = Array.from(grid.children);
+                const remainingIdSet = new Set(remainingCards.map(c => parseInt(c.getAttribute('data-id'))));
+                const cardsToAdd = targetHeroes.filter(h => !remainingIdSet.has(h.id));
+                cardsToAdd.forEach(hero => {
+                    const card = createHeroCard(hero);
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.9)';
+                    card.style.transition = 'none';
+                    grid.appendChild(card);
+                });
+
+                const allCurrentCards = Array.from(grid.children);
+                const oldPositions = new Map();
+                allCurrentCards.forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    const parentRect = grid.getBoundingClientRect();
+                    oldPositions.set(card, { top: rect.top - parentRect.top, left: rect.left - parentRect.left });
+                });
+
+                const cardMap = new Map();
+                allCurrentCards.forEach(card => {
+                    const id = parseInt(card.getAttribute('data-id'));
+                    cardMap.set(id, card);
+                });
+                const fragment = document.createDocumentFragment();
+                targetHeroes.forEach(hero => {
+                    const card = cardMap.get(hero.id);
+                    if (card) fragment.appendChild(card);
+                });
+                grid.appendChild(fragment);
+
+                const reorderedCards = Array.from(grid.children);
+                const newPositions = new Map();
+                reorderedCards.forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    const parentRect = grid.getBoundingClientRect();
+                    newPositions.set(card, { top: rect.top - parentRect.top, left: rect.left - parentRect.left });
+                });
+
+                reorderedCards.forEach(card => {
+                    const oldPos = oldPositions.get(card);
+                    const newPos = newPositions.get(card);
+                    if (oldPos && newPos) {
+                        const dx = oldPos.left - newPos.left;
+                        const dy = oldPos.top - newPos.top;
+                        if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) card.style.transform =
+                        `translate(${dx}px, ${dy}px)`;
+                        else card.style.transform = '';
+                    } else {
+                        card.style.transform = '';
+                    }
+                    card.style.transition = 'none';
+                });
+
+                grid.offsetHeight;
+                requestAnimationFrame(() => {
+                    reorderedCards.forEach(card => {
+                        card.style.transition =
+                            'transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.25s ease';
+                        card.style.transform = '';
+                        card.style.opacity = '1';
+                    });
+                });
+
+                targetHeroes.forEach(hero => {
+                    const card = Array.from(grid.children).find(c => parseInt(c.getAttribute('data-id')) === hero
+                        .id);
+                    if (card) updateCardContent(card, hero, votesMap.get(hero.id));
+                });
+            }
+
+            const uniqueHeroCount = allHeroes.length;
+            const newCount = allHeroes.filter(h => h.status === 'new').length;
+            const willCount = allHeroes.filter(h => h.status === 'will').length;
+            document.getElementById('heroStatsText').innerHTML =
+                `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于2026.6.15`;
+            const freshGroups = computeFilteredSortedHeroes();
+            for (let lane of LANES) {
+                const count = freshGroups[lane.key]?.length || 0;
+                const countSpan = document.getElementById(`lane-count-${lane.key}`);
+                if (countSpan) countSpan.innerText = `${count} 位英雄`;
+            }
+            document.querySelectorAll('.hero-card').forEach(card => {
+                card.removeEventListener('click', handleCardClick);
+                card.addEventListener('click', handleCardClick);
             });
         }
 
-        const uniqueHeroCount = allHeroes.length;
-        const newCount = allHeroes.filter(h => h.status === 'new').length;
-        const willCount = allHeroes.filter(h => h.status === 'will').length;
-        document.getElementById('heroStatsText').innerHTML = `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于2026.6.15`;
-        const freshGroups = computeFilteredSortedHeroes();
-        for (let lane of LANES) {
-            const count = freshGroups[lane.key]?.length || 0;
-            const countSpan = document.getElementById(`lane-count-${lane.key}`);
-            if (countSpan) countSpan.innerText = `${count} 位英雄`;
+        function handleCardClick(e) {
+            if (e.target.closest('.vote-btn')) return;
+            const heroId = parseInt(this.getAttribute('data-id'));
+            if (heroId) openCommentModal(heroId);
         }
-        document.querySelectorAll('.hero-card').forEach(card => {
-            card.removeEventListener('click', handleCardClick);
-            card.addEventListener('click', handleCardClick);
-        });
-    }
 
-    function handleCardClick(e) {
-        if (e.target.closest('.vote-btn')) return;
-        const heroId = parseInt(this.getAttribute('data-id'));
-        if (heroId) openCommentModal(heroId);
-    }
+        // 投票函数
+        async function submitVote(heroId, newVoteType, triggerPop = true) {
+            if (isVoting) { showToast('请稍后...'); return false; }
+            if (!supabaseClient || !isSupabaseAvailable) { showToast('数据库未连接', true); return false; }
 
-    // 投票函数
-    async function submitVote(heroId, newVoteType, triggerPop = true) {
-        if (isVoting) { showToast('请稍后...'); return false; }
-        if (!supabaseClient || !isSupabaseAvailable) { showToast('数据库未连接', true); return false; }
-
-        if (triggerPop) {
-            const likeBtn = document.getElementById('commentLikeBtn');
-            const dislikeBtn = document.getElementById('commentDislikeBtn');
-            const btn = newVoteType ? likeBtn : dislikeBtn;
-            if (btn) {
-                btn.classList.remove('pop');
-                void btn.offsetWidth;
-                btn.classList.add('pop');
-                setTimeout(() => btn.classList.remove('pop'), 300);
+            if (triggerPop) {
+                const likeBtn = document.getElementById('commentLikeBtn');
+                const dislikeBtn = document.getElementById('commentDislikeBtn');
+                const btn = newVoteType ? likeBtn : dislikeBtn;
+                if (btn) {
+                    btn.classList.remove('pop');
+                    void btn.offsetWidth;
+                    btn.classList.add('pop');
+                    setTimeout(() => btn.classList.remove('pop'), 300);
+                }
             }
-        }
 
-        const current = votesMap.get(heroId);
-        if (!current) return false;
-        const oldVote = current.userVote;
-        let actionText = '', newLikes = current.likes, newDislikes = current.dislikes, newUserVote = oldVote;
-        if (oldVote === null) {
-            if (newVoteType) { newLikes++; actionText = '点赞成功 👍'; } else { newDislikes++; actionText = '点踩成功 👎'; }
-            newUserVote = newVoteType;
-        } else if (oldVote === newVoteType) {
-            if (newVoteType) { newLikes--; actionText = '已取消点赞'; } else { newDislikes--; actionText = '已取消点踩'; }
-            newUserVote = null;
-        } else {
-            if (newVoteType) { newLikes++; newDislikes--; actionText = '点赞成功 👍'; } else { newLikes--; newDislikes++; actionText = '点踩成功 👎'; }
-            newUserVote = newVoteType;
-        }
-        current.likes = newLikes; current.dislikes = newDislikes; current.userVote = newUserVote;
-        votesMap.set(heroId, current);
-        const card = document.querySelector(`.hero-card[data-id="${heroId}"]`);
-        if (card) updateCardContent(card, allHeroes.find(h => h.id === heroId), current);
-        if (currentModalHeroId === heroId) {
-            document.getElementById('commentLikeCount').textContent = newLikes;
-            document.getElementById('commentDislikeCount').textContent = newDislikes;
-            updateCommentVoteButtons(newUserVote);
-        }
-        showToast(actionText);
-        isVoting = true;
-        try {
+            const current = votesMap.get(heroId);
+            if (!current) return false;
+            const oldVote = current.userVote;
+            let actionText = '',
+                newLikes = current.likes,
+                newDislikes = current.dislikes,
+                newUserVote = oldVote;
             if (oldVote === null) {
-                await supabaseClient.from('votes').insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
+                if (newVoteType) { newLikes++;
+                    actionText = '点赞成功 👍'; } else { newDislikes++;
+                    actionText = '点踩成功 👎'; }
+                newUserVote = newVoteType;
             } else if (oldVote === newVoteType) {
-                await supabaseClient.from('votes').delete().eq('hero_id', heroId).eq('user_fingerprint', userFingerprint);
+                if (newVoteType) { newLikes--;
+                    actionText = '已取消点赞'; } else { newDislikes--;
+                    actionText = '已取消点踩'; }
+                newUserVote = null;
             } else {
-                await supabaseClient.from('votes').delete().eq('hero_id', heroId).eq('user_fingerprint', userFingerprint);
-                await supabaseClient.from('votes').insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
+                if (newVoteType) { newLikes++;
+                    newDislikes--;
+                    actionText = '点赞成功 👍'; } else { newLikes--;
+                    newDislikes++;
+                    actionText = '点踩成功 👎'; }
+                newUserVote = newVoteType;
             }
-            if (currentModalHeroId === heroId) {
-                updateCommentIndicators(heroId);
-            }
-            updateAllLanesWithAnimation().catch(console.warn);
-        } catch (err) {
-            console.error('评价失败', err);
-            current.likes = newLikes; current.dislikes = newDislikes; current.userVote = oldVote;
+            current.likes = newLikes;
+            current.dislikes = newDislikes;
+            current.userVote = newUserVote;
             votesMap.set(heroId, current);
+            const card = document.querySelector(`.hero-card[data-id="${heroId}"]`);
             if (card) updateCardContent(card, allHeroes.find(h => h.id === heroId), current);
             if (currentModalHeroId === heroId) {
-                document.getElementById('commentLikeCount').textContent = current.likes;
-                document.getElementById('commentDislikeCount').textContent = current.dislikes;
-                updateCommentVoteButtons(oldVote);
+                document.getElementById('commentLikeCount').textContent = newLikes;
+                document.getElementById('commentDislikeCount').textContent = newDislikes;
+                updateCommentVoteButtons(newUserVote);
             }
-            showToast(`${newVoteType ? '点赞' : '点踩'}失败，请重试`, true);
-        } finally { isVoting = false; }
-    }
+            showToast(actionText);
+            isVoting = true;
+            try {
+                if (oldVote === null) {
+                    await supabaseClient.from('votes').insert({ hero_id: heroId, vote_type: newVoteType,
+                        user_fingerprint: userFingerprint });
+                } else if (oldVote === newVoteType) {
+                    await supabaseClient.from('votes').delete().eq('hero_id', heroId).eq('user_fingerprint',
+                        userFingerprint);
+                } else {
+                    await supabaseClient.from('votes').delete().eq('hero_id', heroId).eq('user_fingerprint',
+                        userFingerprint);
+                    await supabaseClient.from('votes').insert({ hero_id: heroId, vote_type: newVoteType,
+                        user_fingerprint: userFingerprint });
+                }
+                if (currentModalHeroId === heroId) {
+                    updateCommentIndicators(heroId);
+                }
+                updateAllLanesWithAnimation().catch(console.warn);
+            } catch (err) {
+                console.error('评价失败', err);
+                current.likes = newLikes;
+                current.dislikes = newDislikes;
+                current.userVote = oldVote;
+                votesMap.set(heroId, current);
+                if (card) updateCardContent(card, allHeroes.find(h => h.id === heroId), current);
+                if (currentModalHeroId === heroId) {
+                    document.getElementById('commentLikeCount').textContent = current.likes;
+                    document.getElementById('commentDislikeCount').textContent = current.dislikes;
+                    updateCommentVoteButtons(oldVote);
+                }
+                showToast(`${newVoteType ? '点赞' : '点踩'}失败，请重试`, true);
+            } finally { isVoting = false; }
+        }
 
-    async function updateCommentIndicators(heroId) {
-        try {
-            const { data: votesData } = await supabaseClient
-                .from('votes')
-                .select('user_fingerprint, vote_type')
-                .eq('hero_id', heroId);
-            const voteMap = new Map();
-            votesData?.forEach(v => voteMap.set(v.user_fingerprint, v.vote_type));
+        async function updateCommentIndicators(heroId) {
+            try {
+                const { data: votesData } = await supabaseClient
+                    .from('votes')
+                    .select('user_fingerprint, vote_type')
+                    .eq('hero_id', heroId);
+                const voteMap = new Map();
+                votesData?.forEach(v => voteMap.set(v.user_fingerprint, v.vote_type));
 
-            document.querySelectorAll('.comment-item').forEach(item => {
-                const fingerprint = item.getAttribute('data-fingerprint');
-                if (fingerprint) {
-                    const voteType = voteMap.get(fingerprint);
-                    let indicator = voteType === true ? '👍' : (voteType === false ? '👎' : '');
-                    const indicatorSpan = item.querySelector('.vote-indicator');
-                    if (indicatorSpan) {
-                        const oldText = indicatorSpan.textContent;
-                        if (indicator) {
-                            indicatorSpan.textContent = indicator;
-                        } else {
-                            indicatorSpan.textContent = '';
+                document.querySelectorAll('.comment-item').forEach(item => {
+                    const fingerprint = item.getAttribute('data-fingerprint');
+                    if (fingerprint) {
+                        const voteType = voteMap.get(fingerprint);
+                        let indicator = voteType === true ? '👍' : (voteType === false ? '👎' : '');
+                        const indicatorSpan = item.querySelector('.vote-indicator');
+                        if (indicatorSpan) {
+                            const oldText = indicatorSpan.textContent;
+                            if (indicator) {
+                                indicatorSpan.textContent = indicator;
+                            } else {
+                                indicatorSpan.textContent = '';
+                            }
+                            if (oldText !== indicator) {
+                                indicatorSpan.classList.remove('pop');
+                                void indicatorSpan.offsetWidth;
+                                indicatorSpan.classList.add('pop');
+                                setTimeout(() => indicatorSpan.classList.remove('pop'), 300);
+                            }
                         }
-                        if (oldText !== indicator) {
-                            indicatorSpan.classList.remove('pop');
-                            void indicatorSpan.offsetWidth;
-                            indicatorSpan.classList.add('pop');
-                            setTimeout(() => indicatorSpan.classList.remove('pop'), 300);
+                        if (fingerprint === userFingerprint) {
+                            item.classList.remove('flash');
+                            void item.offsetWidth;
+                            item.classList.add('flash');
+                            setTimeout(() => item.classList.remove('flash'), 300);
                         }
                     }
-                    if (fingerprint === userFingerprint) {
-                        item.classList.remove('flash');
-                        void item.offsetWidth;
-                        item.classList.add('flash');
-                        setTimeout(() => item.classList.remove('flash'), 300);
+                });
+            } catch (err) {
+                console.warn('更新指示器失败', err);
+            }
+        }
+
+        // 评论 + 评论emoji
+        let reactionsMap = new Map();
+
+        async function refreshReactionsForComment(commentId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('reactions')
+                    .select('comment_id, user_fingerprint, emoji')
+                    .eq('comment_id', commentId);
+                if (error) throw error;
+                const entry = { counts: {}, users: {} };
+                data.forEach(r => {
+                    entry.counts[r.emoji] = (entry.counts[r.emoji] || 0) + 1;
+                    entry.users[r.user_fingerprint] = r.emoji;
+                });
+                reactionsMap.set(commentId, entry);
+                buildReactions(document.querySelector(`.comment-item[data-comment-id="${commentId}"]`), commentId);
+            } catch (err) {
+                console.warn('刷新反应失败', err);
+            }
+        }
+
+        function buildReactions(commentItem, commentId, changedEmoji = null) {
+            if (!commentItem) return;
+            const existing = commentItem.querySelector('.reactions');
+            if (existing) existing.remove();
+
+            const rData = reactionsMap.get(commentId);
+            if (!rData || Object.keys(rData.counts).length === 0) {
+                return;
+            }
+            const sortedEmojis = Object.keys(rData.counts).sort((a, b) => EMOJI_ORDER.indexOf(a) - EMOJI_ORDER.indexOf(b));
+            const userEmoji = getUserReactionForComment(commentId);
+            const div = document.createElement('div');
+            div.className = 'reactions';
+            sortedEmojis.forEach(emoji => {
+                const count = rData.counts[emoji];
+                const active = userEmoji === emoji ? 'active' : '';
+                const popClass = (changedEmoji && changedEmoji === emoji) ? 'pop' : '';
+                const span = document.createElement('span');
+                span.className = `reaction ${active} ${popClass}`;
+                span.setAttribute('data-comment', commentId);
+                span.setAttribute('data-emoji', emoji);
+                span.innerHTML = `<span class="emoji">${emoji}</span> <span class="count">${count}</span>`;
+                div.appendChild(span);
+            });
+            commentItem.appendChild(div);
+        }
+
+        function updateReactionDisplay(commentId, changedEmoji = null, isCancel = false) {
+            const commentItem = document.querySelector(`.comment-item[data-comment-id="${commentId}"]`);
+            if (!commentItem) return;
+
+            if (isCancel && changedEmoji) {
+                const existingReactions = commentItem.querySelector('.reactions');
+                if (existingReactions) {
+                    const targetSpan = existingReactions.querySelector(`.reaction[data-emoji="${changedEmoji}"]`);
+                    if (targetSpan) {
+                        targetSpan.classList.add('pop-out');
+                        setTimeout(() => {
+                            buildReactions(commentItem, commentId);
+                        }, 250);
+                        return;
                     }
                 }
-            });
-        } catch (err) {
-            console.warn('更新指示器失败', err);
-        }
-    }
-
-    // 评论 + 反应功能
-    let reactionsMap = new Map();
-
-    async function refreshReactionsForComment(commentId) {
-        try {
-            const { data, error } = await supabaseClient
-                .from('reactions')
-                .select('comment_id, user_fingerprint, emoji')
-                .eq('comment_id', commentId);
-            if (error) throw error;
-            const entry = { counts: {}, users: {} };
-            data.forEach(r => {
-                entry.counts[r.emoji] = (entry.counts[r.emoji] || 0) + 1;
-                entry.users[r.user_fingerprint] = r.emoji;
-            });
-            reactionsMap.set(commentId, entry);
-            buildReactions(document.querySelector(`.comment-item[data-comment-id="${commentId}"]`), commentId);
-        } catch (err) {
-            console.warn('刷新反应失败', err);
-        }
-    }
-
-    function buildReactions(commentItem, commentId, changedEmoji = null) {
-        if (!commentItem) return;
-        const existing = commentItem.querySelector('.reactions');
-        if (existing) existing.remove();
-
-        const rData = reactionsMap.get(commentId);
-        if (!rData || Object.keys(rData.counts).length === 0) {
-            return;
-        }
-        const sortedEmojis = Object.keys(rData.counts).sort((a, b) => EMOJI_ORDER.indexOf(a) - EMOJI_ORDER.indexOf(b));
-        const userEmoji = getUserReactionForComment(commentId);
-        const div = document.createElement('div');
-        div.className = 'reactions';
-        sortedEmojis.forEach(emoji => {
-            const count = rData.counts[emoji];
-            const active = userEmoji === emoji ? 'active' : '';
-            const popClass = (changedEmoji && changedEmoji === emoji) ? 'pop' : '';
-            const span = document.createElement('span');
-            span.className = `reaction ${active} ${popClass}`;
-            span.setAttribute('data-comment', commentId);
-            span.setAttribute('data-emoji', emoji);
-            span.innerHTML = `<span class="emoji">${emoji}</span> <span class="count">${count}</span>`;
-            div.appendChild(span);
-        });
-        commentItem.appendChild(div);
-    }
-
-    function updateReactionDisplay(commentId, changedEmoji = null, isCancel = false) {
-        const commentItem = document.querySelector(`.comment-item[data-comment-id="${commentId}"]`);
-        if (!commentItem) return;
-
-        if (isCancel && changedEmoji) {
-            const existingReactions = commentItem.querySelector('.reactions');
-            if (existingReactions) {
-                const targetSpan = existingReactions.querySelector(`.reaction[data-emoji="${changedEmoji}"]`);
-                if (targetSpan) {
-                    targetSpan.classList.add('pop-out');
-                    setTimeout(() => {
-                        buildReactions(commentItem, commentId);
-                    }, 250);
-                    return;
-                }
             }
+            buildReactions(commentItem, commentId, changedEmoji);
         }
-        buildReactions(commentItem, commentId, changedEmoji);
-    }
 
-    function getUserReactionForComment(commentId) {
-        const entry = reactionsMap.get(commentId);
-        if (!entry) return null;
-        for (const [emoji, users] of Object.entries(entry.users || {})) {
-            if (users === userFingerprint) return emoji;
-        }
-        return null;
-    }
-
-    async function handleReactionClick(commentId, emoji) {
-        // 立即关闭选择器（用户点击后立刻消失）
-        hideEmojiPicker();
-
-        if (!supabaseClient || !isSupabaseAvailable) {
-            showToast('数据库未连接', true);
-            return;
-        }
-        let entry = reactionsMap.get(commentId);
-        if (!entry) {
-            entry = { counts: {}, users: {} };
-            reactionsMap.set(commentId, entry);
-        }
-        const oldEmoji = entry.users[userFingerprint] || null;
-        let changedEmoji = null;
-        let isCancel = false;
-        if (oldEmoji === emoji) {
-            isCancel = true;
-            if (entry.counts[oldEmoji]) {
-                entry.counts[oldEmoji]--;
-                if (entry.counts[oldEmoji] <= 0) delete entry.counts[oldEmoji];
+        function getUserReactionForComment(commentId) {
+            const entry = reactionsMap.get(commentId);
+            if (!entry) return null;
+            for (const [emoji, users] of Object.entries(entry.users || {})) {
+                if (users === userFingerprint) return emoji;
             }
-            delete entry.users[userFingerprint];
-            changedEmoji = emoji;
-        } else {
-            if (oldEmoji) {
+            return null;
+        }
+
+        async function handleReactionClick(commentId, emoji) {
+            hideEmojiPicker();
+
+            if (!supabaseClient || !isSupabaseAvailable) {
+                showToast('数据库未连接', true);
+                return;
+            }
+            let entry = reactionsMap.get(commentId);
+            if (!entry) {
+                entry = { counts: {}, users: {} };
+                reactionsMap.set(commentId, entry);
+            }
+            const oldEmoji = entry.users[userFingerprint] || null;
+            let changedEmoji = null;
+            let isCancel = false;
+            if (oldEmoji === emoji) {
+                isCancel = true;
                 if (entry.counts[oldEmoji]) {
                     entry.counts[oldEmoji]--;
                     if (entry.counts[oldEmoji] <= 0) delete entry.counts[oldEmoji];
                 }
                 delete entry.users[userFingerprint];
-            }
-            entry.counts[emoji] = (entry.counts[emoji] || 0) + 1;
-            entry.users[userFingerprint] = emoji;
-            changedEmoji = emoji;
-        }
-
-        updateReactionDisplay(commentId, changedEmoji, isCancel);
-
-        try {
-            if (oldEmoji === emoji) {
-                await supabaseClient
-                    .from('reactions')
-                    .delete()
-                    .eq('comment_id', commentId)
-                    .eq('user_fingerprint', userFingerprint);
+                changedEmoji = emoji;
             } else {
-                await supabaseClient
-                    .from('reactions')
-                    .upsert({
-                        comment_id: commentId,
-                        user_fingerprint: userFingerprint,
-                        emoji: emoji,
-                        hero_id: currentModalHeroId
-                    }, {
-                        onConflict: 'comment_id, user_fingerprint'
-                    });
-            }
-        } catch (err) {
-            console.error('反应操作失败', err);
-            await refreshReactionsForComment(commentId);
-            showToast('操作失败，请重试', true);
-        }
-    }
-
-    // 表情选择器交互
-    let currentCommentIdForPicker = null;
-    const picker = document.getElementById('emojiPicker');
-    const emojiBtns = picker.querySelectorAll('.emoji-btn');
-
-    function showEmojiPicker(x, y, commentId) {
-        picker.style.display = 'flex';
-        picker.classList.remove('hide', 'show');
-        void picker.offsetWidth;
-
-        let left = x - 10;
-        let top = y - 10;
-        const pickerWidth = 280;
-        const pickerHeight = 50;
-        if (left + pickerWidth > window.innerWidth) left = window.innerWidth - pickerWidth - 10;
-        if (top + pickerHeight > window.innerHeight) top = window.innerHeight - pickerHeight - 10;
-        if (left < 10) left = 10;
-        if (top < 10) top = 10;
-
-        picker.style.left = left + 'px';
-        picker.style.top = top + 'px';
-        picker.classList.add('show');
-        currentCommentIdForPicker = commentId;
-
-        const userEmoji = getUserReactionForComment(commentId);
-        emojiBtns.forEach(btn => {
-            btn.classList.toggle('selected', btn.dataset.emoji === userEmoji);
-        });
-    }
-
-    function hideEmojiPicker() {
-        if (!picker.classList.contains('show')) return;
-        picker.classList.remove('show');
-        picker.classList.add('hide');
-        setTimeout(() => {
-            picker.classList.remove('hide');
-            picker.style.display = 'none';
-        }, 160);
-        currentCommentIdForPicker = null;
-    }
-
-    // 评论列表点击事件
-    document.getElementById('commentList').addEventListener('click', function(e) {
-        const target = e.target;
-        const reaction = target.closest('.reaction');
-        if (reaction) {
-            e.stopPropagation();
-            const commentId = parseInt(reaction.getAttribute('data-comment'));
-            const emoji = reaction.getAttribute('data-emoji');
-            if (commentId && emoji) {
-                handleReactionClick(commentId, emoji);
-            }
-            return;
-        }
-        const commentItem = target.closest('.comment-item');
-        if (commentItem) {
-            const commentId = parseInt(commentItem.getAttribute('data-comment-id'));
-            if (commentId) {
-                e.stopPropagation();
-                if (currentCommentIdForPicker === commentId && picker.classList.contains('show')) {
-                    hideEmojiPicker();
-                } else {
-                    if (picker.classList.contains('show')) {
-                        hideEmojiPicker();
+                if (oldEmoji) {
+                    if (entry.counts[oldEmoji]) {
+                        entry.counts[oldEmoji]--;
+                        if (entry.counts[oldEmoji] <= 0) delete entry.counts[oldEmoji];
                     }
-                    setTimeout(() => {
-                        picker.classList.remove('hide');
-                        showEmojiPicker(e.clientX, e.clientY, commentId);
-                    }, 20);
+                    delete entry.users[userFingerprint];
+                }
+                entry.counts[emoji] = (entry.counts[emoji] || 0) + 1;
+                entry.users[userFingerprint] = emoji;
+                changedEmoji = emoji;
+            }
+
+            updateReactionDisplay(commentId, changedEmoji, isCancel);
+
+            try {
+                if (oldEmoji === emoji) {
+                    await supabaseClient
+                        .from('reactions')
+                        .delete()
+                        .eq('comment_id', commentId)
+                        .eq('user_fingerprint', userFingerprint);
+                } else {
+                    await supabaseClient
+                        .from('reactions')
+                        .upsert({
+                            comment_id: commentId,
+                            user_fingerprint: userFingerprint,
+                            emoji: emoji,
+                            hero_id: currentModalHeroId
+                        }, {
+                            onConflict: 'comment_id, user_fingerprint'
+                        });
+                }
+            } catch (err) {
+                console.error('反应操作失败', err);
+                await refreshReactionsForComment(commentId);
+                showToast('操作失败，请重试', true);
+            }
+        }
+
+        // 表情选择
+        let currentCommentIdForPicker = null;
+        const picker = document.getElementById('emojiPicker');
+        const emojiBtns = picker.querySelectorAll('.emoji-btn');
+
+        function showEmojiPicker(x, y, commentId) {
+            picker.style.display = 'flex';
+            picker.classList.remove('hide', 'show');
+            void picker.offsetWidth;
+
+            let left = x - 10;
+            let top = y - 10;
+            const pickerWidth = 280;
+            const pickerHeight = 50;
+            if (left + pickerWidth > window.innerWidth) left = window.innerWidth - pickerWidth - 10;
+            if (top + pickerHeight > window.innerHeight) top = window.innerHeight - pickerHeight - 10;
+            if (left < 10) left = 10;
+            if (top < 10) top = 10;
+
+            picker.style.left = left + 'px';
+            picker.style.top = top + 'px';
+            picker.classList.add('show');
+            currentCommentIdForPicker = commentId;
+
+            const userEmoji = getUserReactionForComment(commentId);
+            emojiBtns.forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.emoji === userEmoji);
+            });
+        }
+
+        function hideEmojiPicker() {
+            if (!picker.classList.contains('show')) return;
+            picker.classList.remove('show');
+            picker.classList.add('hide');
+            setTimeout(() => {
+                picker.classList.remove('hide');
+                picker.style.display = 'none';
+            }, 160);
+            currentCommentIdForPicker = null;
+        }
+
+        // 论列表点击
+        document.getElementById('commentList').addEventListener('click', function(e) {
+            const target = e.target;
+            const reaction = target.closest('.reaction');
+            if (reaction) {
+                e.stopPropagation();
+                const commentId = parseInt(reaction.getAttribute('data-comment'));
+                const emoji = reaction.getAttribute('data-emoji');
+                if (commentId && emoji) {
+                    handleReactionClick(commentId, emoji);
+                }
+                return;
+            }
+            const commentItem = target.closest('.comment-item');
+            if (commentItem) {
+                const commentId = parseInt(commentItem.getAttribute('data-comment-id'));
+                if (commentId) {
+                    e.stopPropagation();
+                    if (currentCommentIdForPicker === commentId && picker.classList.contains('show')) {
+                        hideEmojiPicker();
+                    } else {
+                        if (picker.classList.contains('show')) {
+                            hideEmojiPicker();
+                        }
+                        setTimeout(() => {
+                            picker.classList.remove('hide');
+                            showEmojiPicker(e.clientX, e.clientY, commentId);
+                        }, 20);
+                    }
                 }
             }
-        }
-    });
+        });
 
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.emoji-picker') && !e.target.closest('.comment-item')) {
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.emoji-picker') && !e.target.closest('.comment-item')) {
+                if (picker.classList.contains('show')) {
+                    hideEmojiPicker();
+                }
+            }
+        });
+
+        emojiBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const emoji = this.dataset.emoji;
+                if (currentCommentIdForPicker !== null) {
+                    handleReactionClick(currentCommentIdForPicker, emoji);
+                }
+            });
+        });
+
+        // 加载评论
+        async function openCommentModal(heroId) {
+            const hero = allHeroes.find(h => h.id === heroId);
+            if (!hero) return;
+            currentModalHeroId = heroId;
+            const modal = document.getElementById('commentModal');
+            modal.setAttribute('data-hero-id', heroId);
+
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+
+            document.getElementById('commentHeroName').textContent = hero.zh;
+            const avatarContainer = document.getElementById('commentHeroAvatar');
+            const img = document.createElement('img');
+            const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
+            img.src = imgUrl;
+            img.alt = hero.zh;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.onerror = function() { this.style.display = 'none';
+                avatarContainer.textContent = hero.zh.charAt(0); };
+            avatarContainer.innerHTML = '';
+            avatarContainer.appendChild(img);
+
+            const display = document.getElementById('userNameDisplay');
+            const input = document.getElementById('userNameInput');
+            const userName = getUserName();
+            if (userName) {
+                display.textContent = userName;
+                display.style.display = 'inline';
+                input.style.display = 'none';
+            } else {
+                display.style.display = 'none';
+                input.style.display = 'inline';
+                input.value = '';
+                input.placeholder = '请输入用户名';
+                input.focus();
+            }
+
+            const textarea = document.getElementById('commentInput');
+            textarea.value = '';
+            textarea.placeholder = '加载中...';
+
+            const stats = votesMap.get(heroId) || { likes: 0, dislikes: 0 };
+            document.getElementById('commentLikeCount').textContent = stats.likes;
+            document.getElementById('commentDislikeCount').textContent = stats.dislikes;
+            const userVote = votesMap.get(heroId)?.userVote ?? null;
+            updateCommentVoteButtons(userVote);
+
+            const list = document.getElementById('commentList');
+            list.innerHTML = `<div class="empty-state"><span style="font-size:2rem;display:block;">⏳</span>加载评论...</div>`;
+            await loadComments(heroId);
+            const userComment = await getUserComment(heroId);
+            textarea.value = userComment?.content || '';
+            textarea.placeholder = '写点看法…';
+        }
+
+        function closeCommentModal() {
+            document.getElementById('commentModal').classList.remove('open');
+            document.body.style.overflow = '';
+            currentModalHeroId = null;
             if (picker.classList.contains('show')) {
                 hideEmojiPicker();
             }
         }
-    });
 
-    emojiBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const emoji = this.dataset.emoji;
-            if (currentCommentIdForPicker !== null) {
-                handleReactionClick(currentCommentIdForPicker, emoji);
+        async function loadComments(heroId) {
+            const list = document.getElementById('commentList');
+            if (!supabaseClient || !isSupabaseAvailable) {
+                list.innerHTML = '<div class="empty-state">💬 数据库未连接</div>';
+                return;
             }
-        });
-    });
+            try {
+                const { data: comments, error: cError } = await supabaseClient
+                    .from('comments')
+                    .select('*')
+                    .eq('hero_id', heroId)
+                    .order('created_at', { ascending: false });
+                if (cError) throw cError;
 
-    // 加载评论
-    async function openCommentModal(heroId) {
-        const hero = allHeroes.find(h => h.id === heroId);
-        if (!hero) return;
-        currentModalHeroId = heroId;
-        const modal = document.getElementById('commentModal');
-        modal.setAttribute('data-hero-id', heroId);
+                const { data: reactions, error: rError } = await supabaseClient
+                    .from('reactions')
+                    .select('comment_id, user_fingerprint, emoji')
+                    .eq('hero_id', heroId);
+                if (rError) throw rError;
 
-        modal.classList.add('open');
-        document.body.style.overflow = 'hidden';
+                const rMap = new Map();
+                reactions?.forEach(r => {
+                    if (!rMap.has(r.comment_id)) {
+                        rMap.set(r.comment_id, { counts: {}, users: {} });
+                    }
+                    const entry = rMap.get(r.comment_id);
+                    entry.counts[r.emoji] = (entry.counts[r.emoji] || 0) + 1;
+                    entry.users[r.user_fingerprint] = r.emoji;
+                });
+                reactionsMap = rMap;
 
-        document.getElementById('commentHeroName').textContent = hero.zh;
-        const avatarContainer = document.getElementById('commentHeroAvatar');
-        const img = document.createElement('img');
-        const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
-        img.src = imgUrl;
-        img.alt = hero.zh;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'cover';
-        img.onerror = function() { this.style.display = 'none';
-            avatarContainer.textContent = hero.zh.charAt(0); };
-        avatarContainer.innerHTML = '';
-        avatarContainer.appendChild(img);
+                if (!comments || comments.length === 0) {
+                    list.innerHTML =
+                        `<div class="empty-state"><span style="font-size:2rem;display:block;">💭</span>还没有评论，来说点什么吧</div>`;
+                    return;
+                }
 
-        const display = document.getElementById('userNameDisplay');
-        const input = document.getElementById('userNameInput');
-        const userName = getUserName();
-        if (userName) {
-            display.textContent = userName;
-            display.style.display = 'inline';
-            input.style.display = 'none';
-        } else {
-            display.style.display = 'none';
-            input.style.display = 'inline';
-            input.value = '';
-            input.placeholder = '请输入用户名';
-            input.focus();
+                const fingerprints = comments.map(c => c.user_fingerprint).filter(f => f);
+                let userMap = new Map();
+                if (fingerprints.length > 0) {
+                    const { data: profiles, error: pError } = await supabaseClient
+                        .from('user_profiles')
+                        .select('fingerprint, user_name')
+                        .in('fingerprint', fingerprints);
+                    if (!pError && profiles) {
+                        profiles.forEach(p => userMap.set(p.fingerprint, p.user_name));
+                    }
+                }
+
+                const { data: votesData } = await supabaseClient
+                    .from('votes')
+                    .select('user_fingerprint, vote_type')
+                    .eq('hero_id', heroId);
+                const voteMap = new Map();
+                votesData?.forEach(v => voteMap.set(v.user_fingerprint, v.vote_type));
+
+                const myComments = comments.filter(c => c.user_fingerprint === userFingerprint);
+                const otherComments = comments.filter(c => c.user_fingerprint !== userFingerprint);
+
+                otherComments.sort((a, b) => {
+                    const aReactions = reactionsMap.get(a.id) || { counts: {} };
+                    const bReactions = reactionsMap.get(b.id) || { counts: {} };
+                    const aTotal = Object.values(aReactions.counts).reduce((sum, n) => sum + n, 0);
+                    const bTotal = Object.values(bReactions.counts).reduce((sum, n) => sum + n, 0);
+                    if (aTotal !== bTotal) return bTotal - aTotal;
+                    return new Date(b.created_at) - new Date(a.created_at);
+                });
+
+                const sortedComments = [...myComments, ...otherComments];
+
+                let html = '';
+                sortedComments.forEach(comment => {
+                    const isMe = comment.user_fingerprint === userFingerprint;
+                    const voteType = voteMap.get(comment.user_fingerprint);
+                    let indicator = voteType === true ? '👍' : (voteType === false ? '👎' : '');
+                    const displayName = userMap.get(comment.user_fingerprint) || '匿名';
+                    const avatarChar = isMe ? '我' : displayName.charAt(0).toUpperCase();
+                    const timeStr = new Date(comment.created_at).toLocaleString('zh-CN', { hour12: false });
+                    const meClass = isMe ? 'me' : '';
+
+                    const isEdited = comment.updated_at && comment.updated_at !== comment.created_at;
+                    let timeDisplay = isEdited ? `修改于 ${new Date(comment.updated_at).toLocaleString('zh-CN', { hour12: false })}` :
+                        timeStr;
+
+                    const rData = reactionsMap.get(comment.id);
+                    let reactionHtml = '';
+                    if (rData && Object.keys(rData.counts).length > 0) {
+                        const sortedEmojis = Object.keys(rData.counts).sort((a, b) => EMOJI_ORDER.indexOf(a) - EMOJI_ORDER
+                            .indexOf(b));
+                        const userEmoji = getUserReactionForComment(comment.id);
+                        reactionHtml = `<div class="reactions">`;
+                        sortedEmojis.forEach(emoji => {
+                            const count = rData.counts[emoji];
+                            const active = userEmoji === emoji ? 'active' : '';
+                            reactionHtml += `<span class="reaction ${active}" data-comment="${comment.id}" data-emoji="${emoji}">
+                                            <span class="emoji">${emoji}</span> <span class="count">${count}</span>
+                                        </span>`;
+                        });
+                        reactionHtml += `</div>`;
+                    }
+
+                    html += `
+                                <div class="comment-item" data-fingerprint="${comment.user_fingerprint || ''}" data-comment-id="${comment.id}">
+                                    <div class="comment-top">
+                                        <div class="user-avatar ${meClass}">${avatarChar}</div>
+                                        <div class="user-name ${meClass}">${displayName}</div>
+                                        <div class="comment-time">${timeDisplay}</div>
+                                    </div>
+                                    <div class="comment-content">
+                                        ${indicator ? `<span class="vote-indicator">${indicator}</span>` : ''}
+                                        ${comment.content}
+                                    </div>
+                                    ${reactionHtml}
+                                </div>
+                            `;
+                });
+                list.innerHTML = html;
+
+                requestAnimationFrame(() => {
+                    document.querySelectorAll('.vote-indicator').forEach(el => {
+                        el.classList.remove('pop');
+                        void el.offsetWidth;
+                        el.classList.add('pop');
+                        setTimeout(() => el.classList.remove('pop'), 300);
+                    });
+                });
+
+            } catch (err) {
+                console.error(err);
+                list.innerHTML = '<div class="empty-state">❌ 加载评论失败</div>';
+            }
         }
 
-        const textarea = document.getElementById('commentInput');
-        textarea.value = '';
-        textarea.placeholder = '加载中...';
-
-        const stats = votesMap.get(heroId) || { likes: 0, dislikes: 0 };
-        document.getElementById('commentLikeCount').textContent = stats.likes;
-        document.getElementById('commentDislikeCount').textContent = stats.dislikes;
-        const userVote = votesMap.get(heroId)?.userVote ?? null;
-        updateCommentVoteButtons(userVote);
-
-        const list = document.getElementById('commentList');
-        list.innerHTML = `<div class="empty-state"><span style="font-size:2rem;display:block;">⏳</span>加载评论...</div>`;
-        await loadComments(heroId);
-        const userComment = await getUserComment(heroId);
-        textarea.value = userComment?.content || '';
-        textarea.placeholder = '写点看法…';
-    }
-
-    function closeCommentModal() {
-        document.getElementById('commentModal').classList.remove('open');
-        document.body.style.overflow = '';
-        currentModalHeroId = null;
-        if (picker.classList.contains('show')) {
-            hideEmojiPicker();
+        function updateCommentVoteButtons(userVote) {
+            const likeBtn = document.getElementById('commentLikeBtn');
+            const dislikeBtn = document.getElementById('commentDislikeBtn');
+            likeBtn.classList.remove('active-like');
+            dislikeBtn.classList.remove('active-dislike');
+            if (userVote === true) likeBtn.classList.add('active-like');
+            else if (userVote === false) dislikeBtn.classList.add('active-dislike');
         }
-    }
 
-    async function loadComments(heroId) {
-        const list = document.getElementById('commentList');
-        if (!supabaseClient || !isSupabaseAvailable) {
-            list.innerHTML = '<div class="empty-state">💬 数据库未连接</div>';
-            return;
-        }
-        try {
-            const { data: comments, error: cError } = await supabaseClient
+        async function getUserComment(heroId) {
+            if (!supabaseClient || !isSupabaseAvailable) return null;
+            const { data, error } = await supabaseClient
                 .from('comments')
                 .select('*')
                 .eq('hero_id', heroId)
-                .order('created_at', { ascending: false });
-            if (cError) throw cError;
+                .eq('user_fingerprint', userFingerprint)
+                .maybeSingle();
+            if (error) return null;
+            return data;
+        }
 
-            const { data: reactions, error: rError } = await supabaseClient
-                .from('reactions')
-                .select('comment_id, user_fingerprint, emoji')
-                .eq('hero_id', heroId);
-            if (rError) throw rError;
+        async function submitComment() {
+            const modal = document.getElementById('commentModal');
+            const heroId = parseInt(modal.getAttribute('data-hero-id'));
+            if (!heroId) {
+                showToast('无法获取英雄信息，请重试', true);
+                return;
+            }
+            const textarea = document.getElementById('commentInput');
+            const content = textarea.value.trim();
+            if (!content) { showToast('请输入评论内容', true); return; }
 
-            const rMap = new Map();
-            reactions?.forEach(r => {
-                if (!rMap.has(r.comment_id)) {
-                    rMap.set(r.comment_id, { counts: {}, users: {} });
-                }
-                const entry = rMap.get(r.comment_id);
-                entry.counts[r.emoji] = (entry.counts[r.emoji] || 0) + 1;
-                entry.users[r.user_fingerprint] = r.emoji;
-            });
-            reactionsMap = rMap;
-
-            if (!comments || comments.length === 0) {
-                list.innerHTML = `<div class="empty-state"><span style="font-size:2rem;display:block;">💭</span>还没有评论，来说点什么吧</div>`;
+            if (content.length > 100) {
+                showToast('评论内容不能超过100个字符', true);
                 return;
             }
 
-            const fingerprints = comments.map(c => c.user_fingerprint).filter(f => f);
-            let userMap = new Map();
-            if (fingerprints.length > 0) {
-                const { data: profiles, error: pError } = await supabaseClient
-                    .from('user_profiles')
-                    .select('fingerprint, user_name')
-                    .in('fingerprint', fingerprints);
-                if (!pError && profiles) {
-                    profiles.forEach(p => userMap.set(p.fingerprint, p.user_name));
-                }
-            }
-
-            const { data: votesData } = await supabaseClient
-                .from('votes')
-                .select('user_fingerprint, vote_type')
-                .eq('hero_id', heroId);
-            const voteMap = new Map();
-            votesData?.forEach(v => voteMap.set(v.user_fingerprint, v.vote_type));
-
-            // 分离用户自己的评论和其他评论
-            const myComments = comments.filter(c => c.user_fingerprint === userFingerprint);
-            const otherComments = comments.filter(c => c.user_fingerprint !== userFingerprint);
-
-            // 对其它评论排序：先按emoji评价总数降序，再按时间降序
-            otherComments.sort((a, b) => {
-                const aReactions = reactionsMap.get(a.id) || { counts: {} };
-                const bReactions = reactionsMap.get(b.id) || { counts: {} };
-                const aTotal = Object.values(aReactions.counts).reduce((sum, n) => sum + n, 0);
-                const bTotal = Object.values(bReactions.counts).reduce((sum, n) => sum + n, 0);
-                if (aTotal !== bTotal) return bTotal - aTotal;
-                return new Date(b.created_at) - new Date(a.created_at);
-            });
-
-            // 我的评论置顶，其余按上述顺序
-            const sortedComments = [...myComments, ...otherComments];
-
-            let html = '';
-            sortedComments.forEach(comment => {
-                const isMe = comment.user_fingerprint === userFingerprint;
-                const voteType = voteMap.get(comment.user_fingerprint);
-                let indicator = voteType === true ? '👍' : (voteType === false ? '👎' : '');
-                const displayName = userMap.get(comment.user_fingerprint) || '匿名';
-                const avatarChar = isMe ? '我' : displayName.charAt(0).toUpperCase();
-                const timeStr = new Date(comment.created_at).toLocaleString('zh-CN', { hour12: false });
-                const meClass = isMe ? 'me' : '';
-
-                const isEdited = comment.updated_at && comment.updated_at !== comment.created_at;
-                let timeDisplay = isEdited ? `修改于 ${new Date(comment.updated_at).toLocaleString('zh-CN', { hour12: false })}` : timeStr;
-
-                const rData = reactionsMap.get(comment.id);
-                let reactionHtml = '';
-                if (rData && Object.keys(rData.counts).length > 0) {
-                    const sortedEmojis = Object.keys(rData.counts).sort((a, b) => EMOJI_ORDER.indexOf(a) - EMOJI_ORDER.indexOf(b));
-                    const userEmoji = getUserReactionForComment(comment.id);
-                    reactionHtml = `<div class="reactions">`;
-                    sortedEmojis.forEach(emoji => {
-                        const count = rData.counts[emoji];
-                        const active = userEmoji === emoji ? 'active' : '';
-                        reactionHtml += `<span class="reaction ${active}" data-comment="${comment.id}" data-emoji="${emoji}">
-                            <span class="emoji">${emoji}</span> <span class="count">${count}</span>
-                        </span>`;
-                    });
-                    reactionHtml += `</div>`;
-                }
-
-                html += `
-                    <div class="comment-item" data-fingerprint="${comment.user_fingerprint || ''}" data-comment-id="${comment.id}">
-                        <div class="comment-top">
-                            <div class="user-avatar ${meClass}">${avatarChar}</div>
-                            <div class="user-name ${meClass}">${displayName}</div>
-                            <div class="comment-time">${timeDisplay}</div>
-                        </div>
-                        <div class="comment-content">
-                            ${indicator ? `<span class="vote-indicator">${indicator}</span>` : ''}
-                            ${comment.content}
-                        </div>
-                        ${reactionHtml}
-                    </div>
-                `;
-            });
-            list.innerHTML = html;
-
-            requestAnimationFrame(() => {
-                document.querySelectorAll('.vote-indicator').forEach(el => {
-                    el.classList.remove('pop');
-                    void el.offsetWidth;
-                    el.classList.add('pop');
-                    setTimeout(() => el.classList.remove('pop'), 300);
-                });
-            });
-
-        } catch (err) {
-            console.error(err);
-            list.innerHTML = '<div class="empty-state">❌ 加载评论失败</div>';
-        }
-    }
-
-    // 评论编辑/提交
-    function updateCommentVoteButtons(userVote) {
-        const likeBtn = document.getElementById('commentLikeBtn');
-        const dislikeBtn = document.getElementById('commentDislikeBtn');
-        likeBtn.classList.remove('active-like');
-        dislikeBtn.classList.remove('active-dislike');
-        if (userVote === true) likeBtn.classList.add('active-like');
-        else if (userVote === false) dislikeBtn.classList.add('active-dislike');
-    }
-
-    async function getUserComment(heroId) {
-        if (!supabaseClient || !isSupabaseAvailable) return null;
-        const { data, error } = await supabaseClient
-            .from('comments')
-            .select('*')
-            .eq('hero_id', heroId)
-            .eq('user_fingerprint', userFingerprint)
-            .maybeSingle();
-        if (error) return null;
-        return data;
-    }
-
-    async function submitComment() {
-        const modal = document.getElementById('commentModal');
-        const heroId = parseInt(modal.getAttribute('data-hero-id'));
-        if (!heroId) {
-            showToast('无法获取英雄信息，请重试', true);
-            return;
-        }
-        const textarea = document.getElementById('commentInput');
-        const content = textarea.value.trim();
-        if (!content) { showToast('请输入评论内容', true); return; }
-
-        if (content.length > 100) {
-            showToast('评论内容不能超过100个字符', true);
-            return;
-        }
-
-        const display = document.getElementById('userNameDisplay');
-        const input = document.getElementById('userNameInput');
-        let userName = display.textContent;
-        if (display.style.display === 'none') {
-            userName = input.value.trim();
-            if (!userName) { showToast('请先输入用户名', true); input.focus(); return; }
-            if (userName.length > 10) {
-                showToast('用户名不能超过10个字符', true);
-                input.focus();
-                return;
-            }
-            if (supabaseClient && isSupabaseAvailable) {
-                const { data: existing, error: checkError } = await supabaseClient
-                    .from('user_profiles')
-                    .select('fingerprint')
-                    .eq('user_name', userName)
-                    .neq('fingerprint', userFingerprint)
-                    .maybeSingle();
-                if (checkError) console.warn(checkError);
-                if (existing) {
-                    showToast('用户名已被其他用户使用，请换一个', true);
-                    input.focus();
-                    return;
-                }
-            }
-            setUserName(userName);
-            display.textContent = userName;
-            display.style.display = 'inline';
-            input.style.display = 'none';
-        }
-
-        try {
-            if (supabaseClient && isSupabaseAvailable) {
-                await supabaseClient
-                    .from('user_profiles')
-                    .upsert({ fingerprint: userFingerprint, user_name: userName }, { onConflict: 'fingerprint' });
-            }
-        } catch (err) { console.warn(err); }
-
-        const likeBtn = document.getElementById('commentLikeBtn');
-        const dislikeBtn = document.getElementById('commentDislikeBtn');
-        let voteType = null;
-        if (likeBtn.classList.contains('active-like')) voteType = true;
-        else if (dislikeBtn.classList.contains('active-dislike')) voteType = false;
-
-        const existing = await getUserComment(heroId);
-        if (!supabaseClient || !isSupabaseAvailable) { showToast('数据库未连接', true); return; }
-
-        if (existing) {
-            const rData = reactionsMap.get(existing.id) || { counts: {} };
-            const total = Object.values(rData.counts).reduce((sum, n) => sum + n, 0);
-            if (total > 5) {
-                showToast('当前不可修改', true);
-                return;
-            }
-        }
-
-        try {
-            if (existing) {
-                await supabaseClient.from('comments').update({ content }).eq('id', existing.id);
-                showToast('评论已更新');
-                const commentItem = document.querySelector(`.comment-item[data-fingerprint="${userFingerprint}"]`);
-                if (commentItem) {
-                    const contentDiv = commentItem.querySelector('.comment-content');
-                    if (contentDiv) {
-                        const indicatorSpan = contentDiv.querySelector('.vote-indicator');
-                        const textNode = contentDiv.lastChild;
-                        if (textNode) textNode.textContent = content;
-                        commentItem.classList.remove('flash');
-                        void commentItem.offsetWidth;
-                        commentItem.classList.add('flash');
-                        setTimeout(() => commentItem.classList.remove('flash'), 300);
-                        const timeSpan = commentItem.querySelector('.comment-time');
-                        if (timeSpan) {
-                            const now = new Date().toLocaleString('zh-CN', { hour12: false });
-                            timeSpan.textContent = `修改于 ${now}`;
-                        }
-                    }
-                }
-            } else {
-                await supabaseClient.from('comments').insert({
-                    hero_id: heroId,
-                    user_fingerprint: userFingerprint,
-                    content: content,
-                    vote_type: voteType
-                });
-                showToast('评论成功！');
-                await loadComments(heroId);
-            }
-            const currentVote = votesMap.get(heroId)?.userVote ?? null;
-            if (voteType !== currentVote) {
-                if (voteType !== null) {
-                    await submitVote(heroId, voteType);
-                } else if (currentVote !== null) {
-                    await submitVote(heroId, currentVote);
-                }
-            }
-        } catch (err) {
-            console.error(err);
-            showToast('操作失败：' + err.message, true);
-        }
-    }
-
-    async function handleCommentVoteClick(e) {
-        const btn = e.currentTarget;
-        const type = btn.getAttribute('data-type');
-        const heroId = currentModalHeroId;
-        if (!heroId) return;
-        const newVote = type === 'like' ? true : false;
-        const currentVote = votesMap.get(heroId)?.userVote ?? null;
-        const finalVote = (currentVote === newVote) ? null : newVote;
-        if (finalVote === null) {
-            await submitVote(heroId, currentVote, true);
-        } else {
-            await submitVote(heroId, finalVote, true);
-        }
-    }
-
-    // 数据加载
-    async function fetchSupabaseData() {
-        try {
-            const { data: heroesData, error: heroesError } = await supabaseClient.from('heroes').select('id, en, zh, lane, tier, status, avatar_url');
-            if (heroesError) throw heroesError;
-            const { data: votesData, error: votesError } = await supabaseClient.from('votes').select('hero_id, vote_type, user_fingerprint');
-            if (votesError) throw votesError;
-            const votesAgg = new Map();
-            heroesData.forEach(h => votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null }));
-            if (votesData) {
-                votesData.forEach(v => {
-                    const entry = votesAgg.get(v.hero_id);
-                    if (entry) {
-                        if (v.vote_type === true) entry.likes++;
-                        else entry.dislikes++;
-                        if (v.user_fingerprint === userFingerprint) entry.userVote = v.vote_type;
-                    }
-                });
-            }
-            return { heroes: heroesData, votesAgg };
-        } catch (err) { return null; }
-    }
-
-    async function loadLocalConfig() {
-        try {
-            const resp = await fetch('heroes-config.json');
-            const cfg = await resp.json();
-            const heroes = cfg.heroes.map((h, idx) => ({ id: idx + 1000, en: h.en, zh: h.zh, lane: h.lane, tier: h.tier || '', status: h.status }));
-            const votesAgg = new Map();
-            heroes.forEach(h => votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null }));
-            return { heroes, votesAgg };
-        } catch { return { heroes: [], votesAgg: new Map() }; }
-    }
-
-    async function loadHeroesData() {
-        if (supabaseClient && isSupabaseAvailable) {
-            const res = await fetchSupabaseData();
-            if (res) { allHeroes = res.heroes; votesMap = res.votesAgg; return true; }
-        }
-        const local = await loadLocalConfig();
-        allHeroes = local.heroes; votesMap = local.votesAgg;
-        return false;
-    }
-
-    async function updateVisitCount() {
-        const footer = document.getElementById('footerCounter');
-        const now = Date.now();
-        const lastVisit = parseInt(localStorage.getItem('last_visit_time') || '0');
-        if (now - lastVisit < 60000) {
-            if (!supabaseClient || !isSupabaseAvailable) {
-                footer.innerHTML = `👥 访问人次: -- (本地模拟)`;
-            } else {
-                try {
-                    const { data, error } = await supabaseClient.from('stats').select('value').eq('key', 'visit_count').maybeSingle();
-                    if (error) throw error;
-                    footer.innerHTML = `👥 访问人次: ${data?.value || 0}`;
-                } catch {
-                    footer.innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
-                }
-            }
-            return;
-        }
-        localStorage.setItem('last_visit_time', String(now));
-
-        if (!supabaseClient || !isSupabaseAvailable) {
-            let local = localStorage.getItem('visit_count_mock');
-            if (!local) local = Math.floor(Math.random() * 1000) + 100;
-            footer.innerHTML = `👥 访问人次: ${local} (本地模拟)`;
-            return;
-        }
-        try {
-            let { data, error } = await supabaseClient.from('stats').select('value').eq('key', 'visit_count').maybeSingle();
-            if (error && error.code !== 'PGRST116') throw error;
-            let newCount = 1;
-            if (data && data.value !== undefined) {
-                newCount = data.value + 1;
-                await supabaseClient.from('stats').update({ value: newCount }).eq('key', 'visit_count');
-            } else await supabaseClient.from('stats').insert({ key: 'visit_count', value: 1 });
-            footer.innerHTML = `👥 访问人次: ${newCount}`;
-        } catch (err) {
-            console.warn(err);
-            footer.innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
-        }
-    }
-
-    async function initSupabase() {
-        try {
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            await supabaseClient.from('heroes').select('id', { count: 'exact', head: true });
-            isSupabaseAvailable = true;
-        } catch { isSupabaseAvailable = false; supabaseClient = null; }
-    }
-
-    // 主流程
-    (async function main() {
-        await initSupabase();
-        userFingerprint = getOrCreateFingerprint();
-        await loadHeroesData();
-        await updateVisitCount();
-        buildTableStructure();
-        const initialGroups = computeFilteredSortedHeroes();
-        for (let lane of LANES) {
-            const grid = document.getElementById(`grid-${lane.key}`);
-            const laneHeroes = initialGroups[lane.key] || [];
-            laneHeroes.forEach(hero => {
-                const card = createHeroCard(hero);
-                grid.appendChild(card);
-            });
-            const countSpan = document.getElementById(`lane-count-${lane.key}`);
-            if (countSpan) countSpan.innerText = `${laneHeroes.length} 位英雄`;
-        }
-
-        document.querySelectorAll('.hero-card').forEach(card => {
-            card.addEventListener('click', handleCardClick);
-        });
-
-        document.getElementById('positionTable').addEventListener('click', async (e) => {
-            const btn = e.target.closest('.vote-btn');
-            if (!btn) return;
-            e.stopPropagation();
-            const heroId = parseInt(btn.getAttribute('data-id'));
-            const type = btn.getAttribute('data-type');
-            const newVoteType = type === 'like';
-            await submitVote(heroId, newVoteType, false);
-        });
-
-        document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(el => {
-            el.addEventListener('click', function() {
-                document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                currentRankFilter = this.getAttribute('data-rank');
-                updateAllLanesWithAnimation();
-            });
-        });
-        document.querySelectorAll('#statusFilterGroup .filter-chip').forEach(el => {
-            el.addEventListener('click', function() {
-                document.querySelectorAll('#statusFilterGroup .filter-chip').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                currentStatusFilter = this.getAttribute('data-status');
-                updateAllLanesWithAnimation();
-            });
-        });
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            searchKeyword = e.target.value;
-            updateAllLanesWithAnimation();
-        });
-        document.getElementById('moreBtn').addEventListener('click', () => showToast('很快你会知道，一切的等待都是有意义的'));
-
-        document.getElementById('closeCommentBtn').addEventListener('click', closeCommentModal);
-        document.getElementById('commentModal').addEventListener('click', function(e) {
-            if (e.target === this) closeCommentModal();
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeCommentModal();
-        });
-
-        document.getElementById('userNameDisplay').addEventListener('click', function() {
+            const display = document.getElementById('userNameDisplay');
             const input = document.getElementById('userNameInput');
-            const display = this;
-            display.style.display = 'none';
-            input.style.display = 'inline';
-            input.value = display.textContent;
-            input.focus();
-        });
-        document.getElementById('userNameInput').addEventListener('blur', async function() {
-            const val = this.value.trim();
-            if (val) {
-                if (val.length > 10) {
+            let userName = display.textContent;
+            if (display.style.display === 'none') {
+                userName = input.value.trim();
+                if (!userName) { showToast('请先输入用户名', true);
+                    input.focus(); return; }
+                if (userName.length > 10) {
                     showToast('用户名不能超过10个字符', true);
-                    this.focus();
+                    input.focus();
                     return;
                 }
                 if (supabaseClient && isSupabaseAvailable) {
                     const { data: existing, error: checkError } = await supabaseClient
                         .from('user_profiles')
                         .select('fingerprint')
-                        .eq('user_name', val)
+                        .eq('user_name', userName)
                         .neq('fingerprint', userFingerprint)
                         .maybeSingle();
                     if (checkError) console.warn(checkError);
                     if (existing) {
-                        showToast('用户名已被其他用户使用，请换一个', true);
-                        this.focus();
+                        showToast('用户名已被使用，请换一个', true);
+                        input.focus();
                         return;
                     }
                 }
-                setUserName(val);
-                const display = document.getElementById('userNameDisplay');
-                display.textContent = val;
+                setUserName(userName);
+                display.textContent = userName;
                 display.style.display = 'inline';
-                this.style.display = 'none';
+                input.style.display = 'none';
+            }
+
+            try {
                 if (supabaseClient && isSupabaseAvailable) {
-                    try {
-                        await supabaseClient
-                            .from('user_profiles')
-                            .upsert({ fingerprint: userFingerprint, user_name: val }, { onConflict: 'fingerprint' });
-                    } catch (err) { console.warn(err); }
+                    await supabaseClient
+                        .from('user_profiles')
+                        .upsert({ fingerprint: userFingerprint, user_name: userName }, { onConflict: 'fingerprint' });
+                }
+            } catch (err) { console.warn(err); }
+
+            const likeBtn = document.getElementById('commentLikeBtn');
+            const dislikeBtn = document.getElementById('commentDislikeBtn');
+            let voteType = null;
+            if (likeBtn.classList.contains('active-like')) voteType = true;
+            else if (dislikeBtn.classList.contains('active-dislike')) voteType = false;
+
+            const existing = await getUserComment(heroId);
+            if (!supabaseClient || !isSupabaseAvailable) { showToast('数据库未连接', true); return; }
+
+            if (existing) {
+                const rData = reactionsMap.get(existing.id) || { counts: {} };
+                const total = Object.values(rData.counts).reduce((sum, n) => sum + n, 0);
+                if (total > 5) {
+                    showToast('当前不可修改', true);
+                    return;
                 }
             }
-        });
-        document.getElementById('userNameInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') this.blur();
-        });
 
-        document.getElementById('commentLikeBtn').addEventListener('click', handleCommentVoteClick);
-        document.getElementById('commentDislikeBtn').addEventListener('click', handleCommentVoteClick);
-
-        document.getElementById('submitCommentBtn').addEventListener('click', submitComment);
-        document.getElementById('commentInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault();
-                submitComment(); }
-        });
-
-        const uniqueHeroCount = allHeroes.length;
-        const newCount = allHeroes.filter(h => h.status === 'new').length;
-        const willCount = allHeroes.filter(h => h.status === 'will').length;
-        document.getElementById('heroStatsText').innerHTML = `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于2026.6.15`;
-
-        console.log('✅ Outis 已启动！');
-    })();
-</script>
-
-<style>
-    #adminFab {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        z-index: 9999;
-        background: rgba(30, 41, 59, 0.85);
-        backdrop-filter: blur(8px);
-        border: 1px solid #3b6eff;
-        border-radius: 60px;
-        padding: 12px 20px;
-        color: #fff;
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-        display: none;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s ease;
-        user-select: none;
-    }
-    #adminFab:hover { background: rgba(59, 110, 255, 0.9);
-        transform: scale(1.05);
-        border-color: #fff; }
-    #adminFab .icon { font-size: 1.2rem; }
-    .admin-modal {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.7);
-        backdrop-filter: blur(6px);
-        z-index: 10001;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 1.2rem;
-    }
-    .admin-modal.open { display: flex; }
-    .admin-modal-box {
-        background: #121826;
-        border-radius: 28px;
-        border: 1px solid #2c365e;
-        max-width: 460px;
-        width: 100%;
-        max-height: 90vh;
-        overflow-y: auto;
-        padding: 1.8rem 1.5rem;
-        animation: slideUp 0.25s ease;
-    }
-    .admin-modal-box h2 {
-        font-size: 1.3rem;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #eef2ff;
-    }
-    .admin-modal-box .close-admin {
-        margin-left: auto;
-        background: none;
-        border: none;
-        color: #8b9acf;
-        font-size: 1.6rem;
-        cursor: pointer;
-        line-height: 1;
-    }
-    .admin-modal-box .close-admin:hover { color: #fff; }
-    .admin-form-group { margin-bottom: 1.2rem; }
-    .admin-form-group label {
-        display: block;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-bottom: 4px;
-        color: #b9c7f0;
-    }
-    .admin-form-group input,
-    .admin-form-group select,
-    .admin-form-group textarea {
-        width: 100%;
-        padding: 10px 14px;
-        background: #111722;
-        border: 1px solid #2d385a;
-        border-radius: 12px;
-        color: #f0f4ff;
-        font-size: 0.9rem;
-        font-family: inherit;
-        outline: none;
-        transition: border-color 0.15s;
-    }
-    .admin-form-group input:focus,
-    .admin-form-group select:focus { border-color: #3b6eff; }
-    .admin-form-group .hint {
-        font-size: 0.7rem;
-        color: #6e7fa5;
-        margin-top: 4px;
-    }
-    .avatar-preview {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-top: 6px;
-    }
-    .avatar-preview img {
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
-        object-fit: cover;
-        background: #1b2338;
-        border: 1px solid #2d385a;
-    }
-    .avatar-preview .file-input-wrapper { flex: 1; }
-    .avatar-preview .file-input-wrapper input[type="file"] {
-        padding: 6px 0;
-        font-size: 0.8rem;
-        color: #b9c7f0;
-        background: transparent;
-        border: none;
-    }
-    .avatar-preview .clear-avatar {
-        background: #991b1b;
-        border: none;
-        color: white;
-        padding: 4px 12px;
-        border-radius: 30px;
-        font-size: 0.7rem;
-        cursor: pointer;
-        white-space: nowrap;
-    }
-    .avatar-preview .clear-avatar:hover { background: #b91c1c; }
-    .admin-submit-btn {
-        width: 100%;
-        padding: 12px;
-        background: #3b6eff;
-        border: none;
-        border-radius: 16px;
-        color: #fff;
-        font-weight: 700;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background 0.15s;
-        margin-top: 0.5rem;
-    }
-    .admin-submit-btn:hover { background: #2a5ae0; }
-    .admin-submit-btn:disabled {
-        background: #2d385a;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-    .admin-status-msg {
-        margin-top: 0.8rem;
-        font-size: 0.85rem;
-        text-align: center;
-        padding: 6px;
-        border-radius: 8px;
-        display: none;
-    }
-    .admin-status-msg.success { background: #166534;
-        color: #eef2ff;
-        display: block; }
-    .admin-status-msg.error { background: #991b1b;
-        color: #fff;
-        display: block; }
-    @keyframes slideUp {
-        from { transform: translateY(30px) scale(0.96);
-            opacity: 0; }
-        to { transform: translateY(0) scale(1);
-            opacity: 1; }
-    }
-    @media (max-width: 600px) {
-        .admin-modal-box { padding: 1.2rem; }
-        #adminFab { bottom: 16px;
-            right: 16px;
-            padding: 10px 16px;
-            font-size: 0.8rem; }
-        .avatar-preview { flex-wrap: wrap; }
-    }
-</style>
-
-<div id="adminFab"><span class="icon">⚙️</span> 管理</div>
-
-<div class="admin-modal" id="adminModal">
-    <div class="admin-modal-box">
-        <div style="display: flex; align-items: center; margin-bottom: 1.2rem;">
-            <h2 style="margin:0;">➕ 添加英雄</h2>
-            <button class="close-admin" id="closeAdminBtn">✕</button>
-        </div>
-        <form id="adminForm">
-            <div class="admin-form-group">
-                <label for="adminEn">英文名 <span style="color:#ef4444;">*</span></label>
-                <input type="text" id="adminEn" placeholder="如: Garen, DrMundo" required>
-                <div class="hint">必须与官方名称完全一致，大小写敏感（仅当不使用自定义头像时）</div>
-            </div>
-            <div class="admin-form-group">
-                <label for="adminZh">中文名 <span style="color:#ef4444;">*</span></label>
-                <input type="text" id="adminZh" placeholder="如: 盖伦, 蒙多医生" required>
-            </div>
-            <div class="admin-form-group">
-                <label for="adminLane">分路</label>
-                <input type="text" id="adminLane" placeholder="如: top / top,mid / other" value="top">
-                <div class="hint">可选值：top, jungle, mid, bot, support, other，多路用逗号分隔</div>
-            </div>
-            <div class="admin-form-group">
-                <label for="adminTier">初始评级</label>
-                <select id="adminTier">
-                    <option value="">留空（默认B）</option>
-                    <option value="S">S 优秀</option>
-                    <option value="A">A 良好</option>
-                    <option value="B">B 一般</option>
-                    <option value="C">C 差劲</option>
-                </select>
-            </div>
-            <div class="admin-form-group">
-                <label for="adminStatus">状态</label>
-                <select id="adminStatus">
-                    <option value="normal">普通</option>
-                    <option value="new">NEW 新增</option>
-                    <option value="will">WILL 即将推出</option>
-                </select>
-            </div>
-            <div class="admin-form-group">
-                <label>自定义头像</label>
-                <div class="avatar-preview">
-                    <img id="avatarPreview" src="" alt="头像预览" style="display:none;">
-                    <div class="file-input-wrapper">
-                        <input type="file" id="avatarFileInput" accept="image/*">
-                        <div class="hint">支持 PNG / JPG，建议 200x200 以上</div>
-                    </div>
-                    <button type="button" class="clear-avatar" id="clearAvatarBtn">移除</button>
-                </div>
-            </div>
-            <button type="submit" class="admin-submit-btn" id="adminSubmitBtn">添加英雄</button>
-            <div class="admin-status-msg" id="adminStatusMsg"></div>
-        </form>
-    </div>
-</div>
-
-<script>
-    (function() {
-        const secretCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight'];
-        let inputIndex = 0;
-        const fab = document.getElementById('adminFab');
-        document.addEventListener('keydown', function(e) {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-            if (e.key === secretCode[inputIndex]) {
-                inputIndex++;
-                if (inputIndex === secretCode.length) {
-                    inputIndex = 0;
-                    fab.style.display = 'flex';
-                    fab.style.transform = 'scale(1.2)';
-                    setTimeout(() => fab.style.transform = 'scale(1)', 150);
-                    const toast = document.createElement('div');
-                    toast.style.cssText = `
-                        position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-                        background: #1e293b; color: #fbbf24; padding: 8px 20px;
-                        border-radius: 40px; font-size: 0.9rem; font-weight: 600;
-                        z-index: 9998; border: 1px solid #fbbf24;
-                        animation: fadeIn 0.3s ease;
-                    `;
-                    toast.textContent = '🔓 管理模式已解锁';
-                    document.body.appendChild(toast);
-                    setTimeout(() => toast.remove(), 2000);
+            try {
+                if (existing) {
+                    await supabaseClient.from('comments').update({ content }).eq('id', existing.id);
+                    showToast('评论已更新');
+                    const commentItem = document.querySelector(`.comment-item[data-fingerprint="${userFingerprint}"]`);
+                    if (commentItem) {
+                        const contentDiv = commentItem.querySelector('.comment-content');
+                        if (contentDiv) {
+                            const indicatorSpan = contentDiv.querySelector('.vote-indicator');
+                            const textNode = contentDiv.lastChild;
+                            if (textNode) textNode.textContent = content;
+                            commentItem.classList.remove('flash');
+                            void commentItem.offsetWidth;
+                            commentItem.classList.add('flash');
+                            setTimeout(() => commentItem.classList.remove('flash'), 300);
+                            const timeSpan = commentItem.querySelector('.comment-time');
+                            if (timeSpan) {
+                                const now = new Date().toLocaleString('zh-CN', { hour12: false });
+                                timeSpan.textContent = `修改于 ${now}`;
+                            }
+                        }
+                    }
+                } else {
+                    await supabaseClient.from('comments').insert({
+                        hero_id: heroId,
+                        user_fingerprint: userFingerprint,
+                        content: content,
+                        vote_type: voteType
+                    });
+                    showToast('评论成功！');
+                    await loadComments(heroId);
                 }
-            } else {
-                inputIndex = 0;
+                const currentVote = votesMap.get(heroId)?.userVote ?? null;
+                if (voteType !== currentVote) {
+                    if (voteType !== null) {
+                        await submitVote(heroId, voteType);
+                    } else if (currentVote !== null) {
+                        await submitVote(heroId, currentVote);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('操作失败：' + err.message, true);
             }
-        });
-    })();
-
-    const adminModal = document.getElementById('adminModal');
-    const closeAdminBtn = document.getElementById('closeAdminBtn');
-    const adminForm = document.getElementById('adminForm');
-    const adminEn = document.getElementById('adminEn');
-    const adminZh = document.getElementById('adminZh');
-    const adminLane = document.getElementById('adminLane');
-    const adminTier = document.getElementById('adminTier');
-    const adminStatus = document.getElementById('adminStatus');
-    const adminSubmitBtn = document.getElementById('adminSubmitBtn');
-    const adminStatusMsg = document.getElementById('adminStatusMsg');
-    const avatarFileInput = document.getElementById('avatarFileInput');
-    const avatarPreview = document.getElementById('avatarPreview');
-    const clearAvatarBtn = document.getElementById('clearAvatarBtn');
-    let selectedAvatarFile = null;
-
-    document.getElementById('adminFab').addEventListener('click', function() {
-        adminModal.classList.add('open');
-        adminStatusMsg.className = 'admin-status-msg';
-        adminStatusMsg.textContent = '';
-        avatarPreview.style.display = 'none';
-        avatarPreview.src = '';
-        selectedAvatarFile = null;
-        avatarFileInput.value = '';
-        setTimeout(() => adminEn.focus(), 100);
-    });
-
-    function closeAdminPanel() {
-        adminModal.classList.remove('open');
-        adminStatusMsg.className = 'admin-status-msg';
-        adminStatusMsg.textContent = '';
-        avatarPreview.style.display = 'none';
-        avatarPreview.src = '';
-        selectedAvatarFile = null;
-        avatarFileInput.value = '';
-    }
-    closeAdminBtn.addEventListener('click', closeAdminPanel);
-    adminModal.addEventListener('click', function(e) {
-        if (e.target === adminModal) closeAdminPanel();
-    });
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && adminModal.classList.contains('open')) {
-            closeAdminPanel();
         }
-    });
 
-    avatarFileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            if (!file.type.startsWith('image/')) { alert('请选择图片文件');
-                avatarFileInput.value = '';
-                return; }
-            if (file.size > 2 * 1024 * 1024) { alert('图片大小不能超过 2MB');
-                avatarFileInput.value = '';
-                return; }
-            selectedAvatarFile = file;
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                avatarPreview.src = ev.target.result;
-                avatarPreview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        } else {
-            selectedAvatarFile = null;
+        async function handleCommentVoteClick(e) {
+            const btn = e.currentTarget;
+            const type = btn.getAttribute('data-type');
+            const heroId = currentModalHeroId;
+            if (!heroId) return;
+            const newVote = type === 'like' ? true : false;
+            const currentVote = votesMap.get(heroId)?.userVote ?? null;
+            const finalVote = (currentVote === newVote) ? null : newVote;
+            if (finalVote === null) {
+                await submitVote(heroId, currentVote, true);
+            } else {
+                await submitVote(heroId, finalVote, true);
+            }
+        }
+
+        // 数据加载
+        async function fetchSupabaseData() {
+            try {
+                const { data: heroesData, error: heroesError } = await supabaseClient.from('heroes').select(
+                    'id, en, zh, lane, tier, status, avatar_url');
+                if (heroesError) throw heroesError;
+                const { data: votesData, error: votesError } = await supabaseClient.from('votes').select(
+                    'hero_id, vote_type, user_fingerprint');
+                if (votesError) throw votesError;
+                const votesAgg = new Map();
+                heroesData.forEach(h => votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null }));
+                if (votesData) {
+                    votesData.forEach(v => {
+                        const entry = votesAgg.get(v.hero_id);
+                        if (entry) {
+                            if (v.vote_type === true) entry.likes++;
+                            else entry.dislikes++;
+                            if (v.user_fingerprint === userFingerprint) entry.userVote = v.vote_type;
+                        }
+                    });
+                }
+                return { heroes: heroesData, votesAgg };
+            } catch (err) { return null; }
+        }
+
+        async function loadLocalConfig() {
+            try {
+                const resp = await fetch('heroes-config.json');
+                const cfg = await resp.json();
+                const heroes = cfg.heroes.map((h, idx) => ({ id: idx + 1000, en: h.en, zh: h.zh, lane: h.lane, tier: h
+                        .tier || '', status: h.status }));
+                const votesAgg = new Map();
+                heroes.forEach(h => votesAgg.set(h.id, { likes: 0, dislikes: 0, userVote: null }));
+                return { heroes, votesAgg };
+            } catch { return { heroes: [], votesAgg: new Map() }; }
+        }
+
+        async function loadHeroesData() {
+            if (supabaseClient && isSupabaseAvailable) {
+                const res = await fetchSupabaseData();
+                if (res) { allHeroes = res.heroes;
+                    votesMap = res.votesAgg; return true; }
+            }
+            const local = await loadLocalConfig();
+            allHeroes = local.heroes;
+            votesMap = local.votesAgg;
+            return false;
+        }
+
+        async function updateVisitCount() {
+            const footer = document.getElementById('footerCounter');
+            const now = Date.now();
+            const lastVisit = parseInt(localStorage.getItem('last_visit_time') || '0');
+            if (now - lastVisit < 60000) {
+                if (!supabaseClient || !isSupabaseAvailable) {
+                    footer.innerHTML = `👥 访问人次: -- (本地模拟)`;
+                } else {
+                    try {
+                        const { data, error } = await supabaseClient.from('stats').select('value').eq('key',
+                            'visit_count').maybeSingle();
+                        if (error) throw error;
+                        footer.innerHTML = `👥 访问人次: ${data?.value || 0}`;
+                    } catch {
+                        footer.innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
+                    }
+                }
+                return;
+            }
+            localStorage.setItem('last_visit_time', String(now));
+
+            if (!supabaseClient || !isSupabaseAvailable) {
+                let local = localStorage.getItem('visit_count_mock');
+                if (!local) local = Math.floor(Math.random() * 1000) + 100;
+                footer.innerHTML = `👥 访问人次: ${local} (本地模拟)`;
+                return;
+            }
+            try {
+                let { data, error } = await supabaseClient.from('stats').select('value').eq('key', 'visit_count')
+                    .maybeSingle();
+                if (error && error.code !== 'PGRST116') throw error;
+                let newCount = 1;
+                if (data && data.value !== undefined) {
+                    newCount = data.value + 1;
+                    await supabaseClient.from('stats').update({ value: newCount }).eq('key', 'visit_count');
+                } else await supabaseClient.from('stats').insert({ key: 'visit_count', value: 1 });
+                footer.innerHTML = `👥 访问人次: ${newCount}`;
+            } catch (err) {
+                console.warn(err);
+                footer.innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
+            }
+        }
+
+        async function initSupabase() {
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                await supabaseClient.from('heroes').select('id', { count: 'exact', head: true });
+                isSupabaseAvailable = true;
+            } catch { isSupabaseAvailable = false;
+                supabaseClient = null; }
+        }
+
+        // 主流程
+        (async function main() {
+            await initSupabase();
+            userFingerprint = getOrCreateFingerprint();
+            await loadHeroesData();
+            await updateVisitCount();
+            buildTableStructure();
+            const initialGroups = computeFilteredSortedHeroes();
+            for (let lane of LANES) {
+                const grid = document.getElementById(`grid-${lane.key}`);
+                const laneHeroes = initialGroups[lane.key] || [];
+                laneHeroes.forEach(hero => {
+                    const card = createHeroCard(hero);
+                    grid.appendChild(card);
+                });
+                const countSpan = document.getElementById(`lane-count-${lane.key}`);
+                if (countSpan) countSpan.innerText = `${laneHeroes.length} 位英雄`;
+            }
+
+            document.querySelectorAll('.hero-card').forEach(card => {
+                card.addEventListener('click', handleCardClick);
+            });
+
+            document.getElementById('positionTable').addEventListener('click', async (e) => {
+                const btn = e.target.closest('.vote-btn');
+                if (!btn) return;
+                e.stopPropagation();
+                const heroId = parseInt(btn.getAttribute('data-id'));
+                const type = btn.getAttribute('data-type');
+                const newVoteType = type === 'like';
+                await submitVote(heroId, newVoteType, false);
+            });
+
+            document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(el => {
+                el.addEventListener('click', function() {
+                    document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(c => c.classList.remove(
+                        'active'));
+                    this.classList.add('active');
+                    currentRankFilter = this.getAttribute('data-rank');
+                    updateAllLanesWithAnimation();
+                });
+            });
+            document.querySelectorAll('#statusFilterGroup .filter-chip').forEach(el => {
+                el.addEventListener('click', function() {
+                    document.querySelectorAll('#statusFilterGroup .filter-chip').forEach(c => c.classList
+                        .remove('active'));
+                    this.classList.add('active');
+                    currentStatusFilter = this.getAttribute('data-status');
+                    updateAllLanesWithAnimation();
+                });
+            });
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchKeyword = e.target.value;
+                updateAllLanesWithAnimation();
+            });
+            document.getElementById('moreBtn').addEventListener('click', () => showToast('很快你会知道，一切的等待都是有意义的'));
+
+            document.getElementById('closeCommentBtn').addEventListener('click', closeCommentModal);
+            document.getElementById('commentModal').addEventListener('click', function(e) {
+                if (e.target === this) closeCommentModal();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeCommentModal();
+            });
+
+            document.getElementById('userNameDisplay').addEventListener('click', function() {
+                const input = document.getElementById('userNameInput');
+                const display = this;
+                display.style.display = 'none';
+                input.style.display = 'inline';
+                input.value = display.textContent;
+                input.focus();
+            });
+            document.getElementById('userNameInput').addEventListener('blur', async function() {
+                const val = this.value.trim();
+                if (val) {
+                    if (val.length > 10) {
+                        showToast('用户名不能超过10个字符', true);
+                        this.focus();
+                        return;
+                    }
+                    if (supabaseClient && isSupabaseAvailable) {
+                        const { data: existing, error: checkError } = await supabaseClient
+                            .from('user_profiles')
+                            .select('fingerprint')
+                            .eq('user_name', val)
+                            .neq('fingerprint', userFingerprint)
+                            .maybeSingle();
+                        if (checkError) console.warn(checkError);
+                        if (existing) {
+                            showToast('用户名已被其他用户使用，请换一个', true);
+                            this.focus();
+                            return;
+                        }
+                    }
+                    setUserName(val);
+                    const display = document.getElementById('userNameDisplay');
+                    display.textContent = val;
+                    display.style.display = 'inline';
+                    this.style.display = 'none';
+                    if (supabaseClient && isSupabaseAvailable) {
+                        try {
+                            await supabaseClient
+                                .from('user_profiles')
+                                .upsert({ fingerprint: userFingerprint, user_name: val }, { onConflict: 'fingerprint' });
+                        } catch (err) { console.warn(err); }
+                    }
+                }
+            });
+            document.getElementById('userNameInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') this.blur();
+            });
+
+            document.getElementById('commentLikeBtn').addEventListener('click', handleCommentVoteClick);
+            document.getElementById('commentDislikeBtn').addEventListener('click', handleCommentVoteClick);
+
+            document.getElementById('submitCommentBtn').addEventListener('click', submitComment);
+            document.getElementById('commentInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault();
+                    submitComment(); }
+            });
+
+            const uniqueHeroCount = allHeroes.length;
+            const newCount = allHeroes.filter(h => h.status === 'new').length;
+            const willCount = allHeroes.filter(h => h.status === 'will').length;
+            document.getElementById('heroStatsText').innerHTML =
+                `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于2026.6.15`;
+
+            console.log('✅ Outis 已启动！');
+
+            // 渐变浮现文字特效
+            initFloatingText();
+        })();
+
+        // 浮动文字特效模块
+        function initFloatingText() {
+            const MESSAGES = [
+                "请发送一段剪辑视频",
+                "没什么好抱怨的",
+                "每个人都会得到慷慨的补偿",
+                "很快你会知道，一切的等待都是有意义的",
+                "如果你认为这很难，我认为你不适合我的平台",
+                "请不要频繁重复提问没有意义的问题",
+                "事情并没有那么简单",
+                "当然",
+                "我会在2080年发送给你",
+                "你至少检查一下后再提问",
+                "很快",
+                "将在本周或下周解决"
+            ];
+
+            // 渐变方案
+            const GRADIENTS = [
+                'linear-gradient(135deg, #8aadff, #a78bfa, #c084fc)',
+                'linear-gradient(135deg, #fcd34d, #f59e0b, #fbbf24)',
+                'linear-gradient(135deg, #34d399, #22d3ee, #60a5fa)',
+                'linear-gradient(135deg, #f472b6, #c084fc, #818cf8)',
+                'linear-gradient(135deg, #fb923c, #ef4444, #f97316)',
+                'linear-gradient(135deg, #fcd34d, #f472b6, #a78bfa, #22d3ee, #34d399)',
+                'linear-gradient(135deg, #2dd4bf, #3b82f6, #8b5cf6)',
+                'linear-gradient(135deg, #fbcfe8, #f472b6, #fb7185)',
+                'linear-gradient(135deg, #a855f7, #22d3ee)',
+                'linear-gradient(135deg, #f59e0b, #ef4444, #ec4899)',
+                'linear-gradient(135deg, #fbbf24, #f59e0b, #d97706)',          // 金黄琥珀
+                'linear-gradient(135deg, #6ee7b7, #34d399, #10b981)',          // 翠绿
+                'linear-gradient(135deg, #93c5fd, #60a5fa, #3b82f6)',          // 天蓝
+                'linear-gradient(135deg, #c4b5fd, #a78bfa, #8b5cf6)',          // 淡紫
+                'linear-gradient(135deg, #fca5a5, #f87171, #ef4444)',          // 红焰
+                'linear-gradient(135deg, #fcd34d, #fbbf24, #f59e0b, #f97316)', // 橙黄渐变
+                'linear-gradient(135deg, #a7f3d0, #6ee7b7, #34d399, #10b981)', // 青绿叠翠
+                'linear-gradient(135deg, #bfdbfe, #93c5fd, #60a5fa, #3b82f6)', // 湛蓝
+                'linear-gradient(135deg, #e9d5ff, #c4b5fd, #a78bfa, #8b5cf6)', // 紫罗兰
+                'linear-gradient(135deg, #fecaca, #fca5a5, #f87171, #ef4444)', // 烈焰红
+            ];
+
+            function randomPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+            function getClickPos(e) {
+                if (e.touches) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                return { x: e.clientX, y: e.clientY };
+            }
+
+            function shouldTrigger(target) {
+                // 与主项目交互元素一致
+                const interactiveSelectors = [
+                    '.vote-btn', '.hero-card', '.filter-chip', '#searchInput',
+                    '#adminFab', '#moreBtn', '#commentModal', '#adminModal',
+                    '#emojiPicker', '#userNameDisplay', '#userNameInput',
+                    '.comment-item', '.reaction', '.close-btn', '.submit-btn',
+                    'button', '.action-btn', '.vote-btn-small', '.emoji-btn',
+                    '.clear-avatar', '#avatarFileInput', '#adminSubmitBtn',
+                    '.pop-text', '.floating-watermark'
+                ];
+                for (let sel of interactiveSelectors) {
+                    if (target.closest(sel)) return false;
+                }
+                if (target.closest('#commentModal') || target.closest('#adminModal')) return false;
+                if (target.closest('#emojiPicker')) return false;
+                return true;
+            }
+
+            function handleFloatingText(e) {
+                const target = e.target;
+                if (!shouldTrigger(target)) return;
+
+                const pos = getClickPos(e);
+                let { x, y } = pos;
+                const OFFSET_Y = 30;
+                let targetY = y - OFFSET_Y;
+
+                const vh = window.innerHeight;
+                const vw = window.innerWidth;
+                const approxHeight = 40;
+                if (targetY < 20) targetY = 20;
+                if (targetY + approxHeight > vh - 20) targetY = vh - 20 - approxHeight;
+
+                const msg = randomPick(MESSAGES);
+
+                // 测量宽度
+                const measureEl = document.createElement('span');
+                measureEl.style.cssText =
+                    'position:fixed; visibility:hidden; white-space:nowrap; font-size:18px; font-weight:700; letter-spacing:0.03em; font-family:inherit;';
+                measureEl.textContent = msg;
+                document.body.appendChild(measureEl);
+                let textWidth = measureEl.offsetWidth;
+                document.body.removeChild(measureEl);
+
+                const maxWidth = vw - 40;
+                let finalFontSize = 18;
+                if (textWidth > maxWidth) {
+                    finalFontSize = Math.floor(18 * (maxWidth / textWidth) * 0.95);
+                    if (finalFontSize < 14) finalFontSize = 14;
+                }
+
+                let left = x;
+                const halfWidth = Math.min(textWidth, maxWidth) / 2;
+                if (left - halfWidth < 20) left = 20 + halfWidth;
+                if (left + halfWidth > vw - 20) left = vw - 20 - halfWidth;
+
+                // 创建元素
+                const el = document.createElement('div');
+                el.className = 'pop-text start';
+                el.textContent = msg;
+
+                // 随机渐变
+                const grad = randomPick(GRADIENTS);
+                el.style.background = grad;
+                el.style.backgroundClip = 'text';
+                el.style.webkitBackgroundClip = 'text';
+                el.style.color = 'transparent';
+
+                el.style.left = left + 'px';
+                el.style.top = targetY + 'px';
+                if (finalFontSize !== 18) {
+                    el.style.fontSize = finalFontSize + 'px';
+                }
+
+                document.body.appendChild(el);
+
+                requestAnimationFrame(() => {
+                    el.classList.remove('start');
+                    el.classList.add('fade-in');
+                });
+
+                const DISPLAY_DURATION = 2000 + Math.random() * 500;
+                setTimeout(() => {
+                    el.classList.remove('fade-in');
+                    el.classList.add('fade-out');
+                    setTimeout(() => {
+                        if (el.parentNode) el.remove();
+                    }, 400);
+                }, DISPLAY_DURATION);
+            }
+
+            document.addEventListener('click', handleFloatingText);
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length === 1) handleFloatingText(e);
+            }, { passive: true });
+
+            document.addEventListener('selectstart', function(e) { e.preventDefault(); }, { passive: true });
+
+        }
+
+        // 管理面板
+        (function() {
+            const secretCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft',
+                'ArrowRight'
+            ];
+            let inputIndex = 0;
+            const fab = document.getElementById('adminFab');
+            document.addEventListener('keydown', function(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName ===
+                    'SELECT') return;
+                if (e.key === secretCode[inputIndex]) {
+                    inputIndex++;
+                    if (inputIndex === secretCode.length) {
+                        inputIndex = 0;
+                        fab.style.display = 'flex';
+                        fab.style.transform = 'scale(1.2)';
+                        setTimeout(() => fab.style.transform = 'scale(1)', 150);
+                        const toast = document.createElement('div');
+                        toast.style.cssText = `
+                                position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+                                background: #1e293b; color: #fbbf24; padding: 8px 20px;
+                                border-radius: 40px; font-size: 0.9rem; font-weight: 600;
+                                z-index: 9998; border: 1px solid #fbbf24;
+                                animation: fadeIn 0.3s ease;
+                            `;
+                        toast.textContent = '🔓 管理模式已解锁';
+                        document.body.appendChild(toast);
+                        setTimeout(() => toast.remove(), 2000);
+                    }
+                } else {
+                    inputIndex = 0;
+                }
+            });
+        })();
+
+        const adminModal = document.getElementById('adminModal');
+        const closeAdminBtn = document.getElementById('closeAdminBtn');
+        const adminForm = document.getElementById('adminForm');
+        const adminEn = document.getElementById('adminEn');
+        const adminZh = document.getElementById('adminZh');
+        const adminLane = document.getElementById('adminLane');
+        const adminTier = document.getElementById('adminTier');
+        const adminStatus = document.getElementById('adminStatus');
+        const adminSubmitBtn = document.getElementById('adminSubmitBtn');
+        const adminStatusMsg = document.getElementById('adminStatusMsg');
+        const avatarFileInput = document.getElementById('avatarFileInput');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const clearAvatarBtn = document.getElementById('clearAvatarBtn');
+        let selectedAvatarFile = null;
+
+        document.getElementById('adminFab').addEventListener('click', function() {
+            adminModal.classList.add('open');
+            adminStatusMsg.className = 'admin-status-msg';
+            adminStatusMsg.textContent = '';
             avatarPreview.style.display = 'none';
             avatarPreview.src = '';
-        }
-    });
-    clearAvatarBtn.addEventListener('click', function() {
-        avatarFileInput.value = '';
-        selectedAvatarFile = null;
-        avatarPreview.style.display = 'none';
-        avatarPreview.src = '';
-    });
+            selectedAvatarFile = null;
+            avatarFileInput.value = '';
+            setTimeout(() => adminEn.focus(), 100);
+        });
 
-    async function uploadAvatar(file) {
-        const fileName = `${Date.now()}_${file.name}`;
-        const { data, error } = await supabaseClient.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: false });
-        if (error) throw error;
-        const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
-        return urlData.publicUrl;
-    }
-
-    adminForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const en = adminEn.value.trim();
-        const zh = adminZh.value.trim();
-        const lane = adminLane.value.trim() || 'top';
-        const tier = adminTier.value || '';
-        const status = adminStatus.value || 'normal';
-        if (!en || !zh) {
-            adminStatusMsg.textContent = '⚠️ 英文名和中文名不能为空';
-            adminStatusMsg.className = 'admin-status-msg error';
-            return;
+        function closeAdminPanel() {
+            adminModal.classList.remove('open');
+            adminStatusMsg.className = 'admin-status-msg';
+            adminStatusMsg.textContent = '';
+            avatarPreview.style.display = 'none';
+            avatarPreview.src = '';
+            selectedAvatarFile = null;
+            avatarFileInput.value = '';
         }
-        if (!supabaseClient || !isSupabaseAvailable) {
-            adminStatusMsg.textContent = '❌ 数据库未连接，请检查网络';
-            adminStatusMsg.className = 'admin-status-msg error';
-            return;
-        }
-        adminSubmitBtn.disabled = true;
-        adminSubmitBtn.textContent = '上传中...';
-        try {
-            let avatarUrl = null;
-            if (selectedAvatarFile) {
-                adminSubmitBtn.textContent = '上传头像...';
-                avatarUrl = await uploadAvatar(selectedAvatarFile);
+        closeAdminBtn.addEventListener('click', closeAdminPanel);
+        adminModal.addEventListener('click', function(e) {
+            if (e.target === adminModal) closeAdminPanel();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && adminModal.classList.contains('open')) {
+                closeAdminPanel();
             }
-            adminSubmitBtn.textContent = '添加英雄...';
-            const { data, error } = await supabaseClient
-                .from('heroes')
-                .insert([{ en, zh, lane, tier, status, avatar_url: avatarUrl }])
-                .select();
-            if (error) throw error;
-            adminStatusMsg.textContent = '✅ 英雄添加成功！刷新列表中...';
-            adminStatusMsg.className = 'admin-status-msg success';
-            adminSubmitBtn.textContent = '已添加';
-            adminEn.value = '';
-            adminZh.value = '';
-            adminLane.value = 'top';
-            adminTier.value = '';
-            adminStatus.value = 'normal';
+        });
+
+        avatarFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) { alert('请选择图片文件');
+                    avatarFileInput.value = '';
+                    return; }
+                if (file.size > 2 * 1024 * 1024) { alert('图片大小不能超过 2MB');
+                    avatarFileInput.value = '';
+                    return; }
+                selectedAvatarFile = file;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    avatarPreview.src = ev.target.result;
+                    avatarPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                selectedAvatarFile = null;
+                avatarPreview.style.display = 'none';
+                avatarPreview.src = '';
+            }
+        });
+        clearAvatarBtn.addEventListener('click', function() {
             avatarFileInput.value = '';
             selectedAvatarFile = null;
             avatarPreview.style.display = 'none';
             avatarPreview.src = '';
-            await loadHeroesData();
-            await updateAllLanesWithAnimation();
-            adminSubmitBtn.disabled = false;
-            adminSubmitBtn.textContent = '添加英雄';
-            setTimeout(() => closeAdminPanel(), 1200);
-        } catch (err) {
-            console.error('添加英雄失败', err);
-            adminStatusMsg.textContent = '❌ 添加失败：' + err.message;
-            adminStatusMsg.className = 'admin-status-msg error';
-            adminSubmitBtn.disabled = false;
-            adminSubmitBtn.textContent = '添加英雄';
-        }
-    });
-</script>
+        });
 
+        async function uploadAvatar(file) {
+            const fileName = `${Date.now()}_${file.name}`;
+            const { data, error } = await supabaseClient.storage.from('avatars').upload(fileName, file, { cacheControl: '3600',
+                upsert: false });
+            if (error) throw error;
+            const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
+            return urlData.publicUrl;
+        }
+
+        adminForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const en = adminEn.value.trim();
+            const zh = adminZh.value.trim();
+            const lane = adminLane.value.trim() || 'top';
+            const tier = adminTier.value || '';
+            const status = adminStatus.value || 'normal';
+            if (!en || !zh) {
+                adminStatusMsg.textContent = '⚠️ 英文名和中文名不能为空';
+                adminStatusMsg.className = 'admin-status-msg error';
+                return;
+            }
+            if (!supabaseClient || !isSupabaseAvailable) {
+                adminStatusMsg.textContent = '❌ 数据库未连接，请检查网络';
+                adminStatusMsg.className = 'admin-status-msg error';
+                return;
+            }
+            adminSubmitBtn.disabled = true;
+            adminSubmitBtn.textContent = '上传中...';
+            try {
+                let avatarUrl = null;
+                if (selectedAvatarFile) {
+                    adminSubmitBtn.textContent = '上传头像...';
+                    avatarUrl = await uploadAvatar(selectedAvatarFile);
+                }
+                adminSubmitBtn.textContent = '添加英雄...';
+                const { data, error } = await supabaseClient
+                    .from('heroes')
+                    .insert([{ en, zh, lane, tier, status, avatar_url: avatarUrl }])
+                    .select();
+                if (error) throw error;
+                adminStatusMsg.textContent = '✅ 英雄添加成功！刷新列表中...';
+                adminStatusMsg.className = 'admin-status-msg success';
+                adminSubmitBtn.textContent = '已添加';
+                adminEn.value = '';
+                adminZh.value = '';
+                adminLane.value = 'top';
+                adminTier.value = '';
+                adminStatus.value = 'normal';
+                avatarFileInput.value = '';
+                selectedAvatarFile = null;
+                avatarPreview.style.display = 'none';
+                avatarPreview.src = '';
+                await loadHeroesData();
+                await updateAllLanesWithAnimation();
+                adminSubmitBtn.disabled = false;
+                adminSubmitBtn.textContent = '添加英雄';
+                setTimeout(() => closeAdminPanel(), 1200);
+            } catch (err) {
+                console.error('添加英雄失败', err);
+                adminStatusMsg.textContent = '❌ 添加失败：' + err.message;
+                adminStatusMsg.className = 'admin-status-msg error';
+                adminSubmitBtn.disabled = false;
+                adminSubmitBtn.textContent = '添加英雄';
+            }
+        });
+    </script>
 </body>
 </html>
