@@ -199,7 +199,6 @@
             width: 66px;
             height: 66px;
             display: block;
-            stroke: #ffffff;  /* 确保自定义 SVG 的 stroke 为白色 */
         }
         .lane-svg svg path, .lane-svg svg g { fill: #ffffff; stroke: none; }
         .lane-svg svg g[opacity="0.2"] { opacity: 0.35; fill: #fff9c4; }
@@ -211,6 +210,7 @@
             border-radius: 30px;
             color: #fff5e0;
         }
+        .lane-count.hidden { display: none; }
         .row-heroes {
             flex: 1;
             background: #0c1020;
@@ -233,6 +233,7 @@
             position: relative;
             transition: background 0.08s linear;
             will-change: transform, opacity;
+            cursor: pointer;
         }
         .hero-card:hover {
             transform: translateY(-2px);
@@ -356,6 +357,7 @@
             border-top: 1px solid #20273f;
             padding-top: 1.2rem;
         }
+
         .toast-message {
             position: fixed;
             top: 52px;
@@ -367,7 +369,7 @@
             border-radius: 40px;
             font-size: 0.9rem;
             font-weight: 500;
-            z-index: 10000;
+            z-index: 10010;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             border: 1px solid #475569;
             opacity: 0;
@@ -375,13 +377,399 @@
             pointer-events: none;
             white-space: nowrap;
         }
-        .toast-message.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
+        .toast-message.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast-message.hide { opacity: 0; transform: translateX(-50%) translateY(20px); }
+
+        .comment-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 10002;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem;
+            animation: fadeIn 0.25s ease;
         }
-        .toast-message.hide {
-            opacity: 0;
-            transform: translateX(-50%) translateY(20px);
+        .comment-modal-overlay.open { display: flex; }
+        .comment-modal-box {
+            background: #121826;
+            border-radius: 28px;
+            border: 1px solid #2c365e;
+            max-width: 620px;
+            width: 100%;
+            height: 780px;
+            max-height: 95vh;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            overflow: hidden;
+            font-size: 1rem;
+        }
+        .comment-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 1.5rem 0.8rem 1.5rem;
+            border-bottom: 1px solid #1f2742;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .comment-modal-header .hero-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .comment-modal-header .hero-avatar-small {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #1b2338;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #a5bcff;
+            overflow: hidden;
+        }
+        .comment-modal-header .hero-avatar-small img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .comment-modal-header .hero-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .comment-modal-header .user-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #b9c7f0;
+            flex-wrap: wrap;
+            margin-left: auto;
+            justify-content: flex-end;
+        }
+        .comment-modal-header .user-area .user-label { font-weight: 500; }
+        .comment-modal-header .user-area .user-name-display {
+            font-weight: 600;
+            color: #eef2ff;
+            min-width: 70px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .comment-modal-header .user-area .user-name-display:hover { border-color: #3b6eff; }
+        .comment-modal-header .user-area .user-name-input {
+            background: #111722;
+            border: 1px solid #2d385a;
+            border-radius: 6px;
+            color: #f0f4ff;
+            font-size: 0.9rem;
+            padding: 2px 8px;
+            outline: none;
+            width: 120px;
+        }
+        .comment-modal-header .user-area .user-name-input:focus { border-color: #3b6eff; }
+        .comment-modal-header .close-btn {
+            background: none;
+            border: none;
+            color: #8b9acf;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            transition: color 0.15s;
+        }
+        .comment-modal-header .close-btn:hover { color: #fff; }
+
+        .comment-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-height: 0;
+        }
+        .comment-list .empty-state {
+            color: #6e7fa5;
+            text-align: center;
+            padding: 2rem 0;
+            font-size: 1rem;
+        }
+        .comment-item {
+            background: #0f1424;
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            border: 1px solid #1f2742;
+            transition: background 0.15s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .comment-item.flash {
+            background: #2a3a5a;
+        }
+        .comment-item .comment-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .comment-item .user-avatar {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: #2a365a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #b7c7f0;
+            flex-shrink: 0;
+        }
+        .comment-item .user-avatar.me {
+            background: #3b6eff;
+            color: #fff;
+        }
+        .comment-item .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #d0dcff;
+        }
+        .comment-item .user-name.me {
+            color: #fbbf24;
+        }
+        .comment-item .comment-time {
+            font-size: 0.8rem;
+            color: #6e7fa5;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+        .comment-item .comment-content {
+            font-size: 0.95rem;
+            color: #eef2ff;
+            line-height: 1.6;
+            padding-left: 44px;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .comment-item .comment-content .vote-indicator {
+            font-size: 1.2rem;
+            margin-right: 6px;
+            flex-shrink: 0;
+            display: inline-block;
+        }
+        .vote-indicator.pop {
+            animation: reactionPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .comment-item .reactions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            padding-left: 44px;
+        }
+        .comment-item .reactions .reaction {
+            background: #1f2742;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.1s, background 0.1s;
+        }
+        .comment-item .reactions .reaction .emoji {
+            font-size: 1.3rem;
+        }
+        .comment-item .reactions .reaction .count {
+            color: #b9c7f0;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .comment-item .reactions .reaction.active {
+            border-color: #fbbf24;
+            background: #2d3a5e;
+        }
+        .comment-item .reactions .reaction.pop {
+            animation: reactionPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .comment-item .reactions .reaction.pop-out {
+            animation: reactionPopOut 0.2s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+        }
+        @keyframes reactionPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.15); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes reactionPopOut {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.5); opacity: 0; }
+        }
+
+        .comment-modal-footer {
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
+            border-top: 1px solid #1f2742;
+            flex-shrink: 0;
+            background: #0f1424;
+        }
+        .comment-modal-footer .input-row {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+        .comment-modal-footer .input-row .vote-btns {
+            display: flex;
+            gap: 6px;
+        }
+        .comment-modal-footer .input-row .vote-btns .vote-btn-small {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #2d385a;
+            border-radius: 30px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: #eef2ff;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .comment-modal-footer .input-row .vote-btns .vote-btn-small.active-like {
+            background: #166534;
+            border-color: #166534;
+        }
+        .comment-modal-footer .input-row .vote-btns .vote-btn-small.active-dislike {
+            background: #991b1b;
+            border-color: #991b1b;
+        }
+        .comment-modal-footer .input-row .vote-btns .vote-btn-small.pop {
+            animation: btnPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes btnPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .comment-modal-footer .input-row textarea {
+            flex: 1;
+            background: #111722;
+            border: 1px solid #2d385a;
+            border-radius: 16px;
+            padding: 10px 16px;
+            color: #f0f4ff;
+            font-size: 0.95rem;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            transition: border-color 0.15s;
+            min-height: 50px;
+            max-height: 120px;
+            line-height: 1.5;
+        }
+        .comment-modal-footer .input-row textarea:focus { border-color: #5d7eff; }
+        .comment-modal-footer .input-row textarea::placeholder { color: #5f6c8a; }
+        .comment-modal-footer .input-row .submit-btn {
+            background: #3b6eff;
+            border: none;
+            border-radius: 16px;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: white;
+            cursor: pointer;
+            transition: background 0.15s;
+            white-space: nowrap;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .comment-modal-footer .input-row .submit-btn:hover { background: #2a5ae0; }
+        .comment-modal-footer .input-row .submit-btn:disabled {
+            background: #2d385a;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 600px) {
+            .comment-modal-box { max-width: 100%; border-radius: 20px; height: 95vh; max-height: 95vh; font-size: 0.95rem; }
+            .comment-modal-footer .input-row { flex-wrap: wrap; }
+            .comment-modal-footer .input-row .vote-btns { flex: 1; }
+            .comment-modal-footer .input-row textarea { flex: 1 1 100%; min-height: 44px; }
+            .comment-modal-footer .input-row .submit-btn { flex: 1; }
+            .comment-list { padding: 0.8rem; }
+            .comment-item .comment-content { padding-left: 0; }
+            .comment-item .reactions { padding-left: 0; }
+        }
+        .comment-list::-webkit-scrollbar { width: 4px; }
+        .comment-list::-webkit-scrollbar-track { background: transparent; }
+        .comment-list::-webkit-scrollbar-thumb { background: #2d385a; border-radius: 10px; }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px) scale(0.96); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 表情选择器 */
+        .emoji-picker {
+            position: fixed;
+            background: #121826;
+            border: 1px solid #2c365e;
+            border-radius: 40px;
+            padding: 6px 10px;
+            display: none;
+            gap: 6px;
+            z-index: 10020;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            transform-origin: bottom left;
+        }
+        .emoji-picker.show {
+            display: flex;
+            animation: emojiPop 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .emoji-picker.hide {
+            animation: emojiPopOut 0.15s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+        }
+        @keyframes emojiPop {
+            0% { opacity: 0; transform: scale(0.8) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes emojiPopOut {
+            0% { opacity: 1; transform: scale(1) translateY(0); }
+            100% { opacity: 0; transform: scale(0.8) translateY(10px); }
+        }
+        .emoji-picker .emoji-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 30px;
+            transition: background 0.1s, transform 0.1s;
+        }
+        .emoji-picker .emoji-btn:hover {
+            background: #1f2742;
+            transform: scale(1.1);
+        }
+        .emoji-picker .emoji-btn.selected {
+            background: #2d3a5e;
+            border: 1px solid #fbbf24;
         }
     </style>
 </head>
@@ -433,6 +821,46 @@
     <footer id="footerCounter">加载数据中...</footer>
 </div>
 
+<!-- 评论弹窗 -->
+<div class="comment-modal-overlay" id="commentModal">
+    <div class="comment-modal-box">
+        <div class="comment-modal-header">
+            <div class="hero-info">
+                <div class="hero-avatar-small" id="commentHeroAvatar">🎴</div>
+                <div class="hero-name" id="commentHeroName">亚托克斯</div>
+            </div>
+            <div class="user-area" id="userArea">
+                <span class="user-label">当前用户名</span>
+                <span class="user-name-display" id="userNameDisplay">未命名</span>
+                <input class="user-name-input" id="userNameInput" type="text" placeholder="输入用户名" style="display:none;">
+            </div>
+            <button class="close-btn" id="closeCommentBtn">✕</button>
+        </div>
+        <div class="comment-list" id="commentList">
+            <div class="empty-state"><span style="font-size:2rem;display:block;">💭</span>加载中...</div>
+        </div>
+        <div class="comment-modal-footer">
+            <div class="input-row">
+                <div class="vote-btns">
+                    <button class="vote-btn-small" id="commentLikeBtn" data-type="like">👍 <span id="commentLikeCount">0</span></button>
+                    <button class="vote-btn-small" id="commentDislikeBtn" data-type="dislike">👎 <span id="commentDislikeCount">0</span></button>
+                </div>
+                <textarea id="commentInput" placeholder="写点看法…" rows="1"></textarea>
+                <button class="submit-btn" id="submitCommentBtn">发送</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 表情选择器 -->
+<div class="emoji-picker" id="emojiPicker">
+    <button class="emoji-btn" data-emoji="❤️">❤️</button>
+    <button class="emoji-btn" data-emoji="👏">👏</button>
+    <button class="emoji-btn" data-emoji="👎">👎</button>
+    <button class="emoji-btn" data-emoji="🤡">🤡</button>
+    <button class="emoji-btn" data-emoji="🤣">🤣</button>
+</div>
+
 <script>
     (function() {
         document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
@@ -453,11 +881,12 @@
     let userFingerprint = '';
     let currentRankFilter = 'all', currentStatusFilter = 'all', searchKeyword = '';
     let isVoting = false;
+    let currentModalHeroId = null;
 
     const RANK_ORDER = ['S', 'A', 'B', 'C'];
     const DEFAULT_RANK = 'B';
+    const EMOJI_ORDER = ['❤️', '👏', '👎', '🤡', '🤣'];
 
-    // ========== 分路配置：新增 "其他" 分类 ==========
     const LANES = [
         { key: "top", label: "上路", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="nonzero"><path d="m19 3-4 4H7v8l-4 4V3z"></path><path d="m5 21 4-4h8V9l4-4v16z" opacity="0.2"></path><path d="M10 10h4v4h-4z" opacity="0.2"></path></g></svg>` },
         { key: "jungle", label: "打野", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="nonzero" d="M5.14 2c1.58 1.21 5.58 5.023 6.976 9.953s0 10.047 0 10.047c-2.749-3.164-5.893-5.2-6.18-5.382l-.02-.013C5.45 13.814 3 8.79 3 8.79c3.536.867 4.93 4.279 4.93 4.279C7.558 8.698 5.14 2 5.14 2m14.976 5.907s-1.243 2.471-1.814 4.604c-.235.878-.285 2.2-.29 3.058v.282c.003.347.01.568.01.568s-1.738 2.397-3.38 3.678a27.5 27.5 0 0 0-.208-5.334c.928-2.023 2.846-5.454 5.682-6.856m-2.124-5.331s-2.325 3.052-2.836 6.029c-.11.636-.201 1.194-.284 1.695-.379.584-.73 1.166-1.05 1.733-.033-.125-.06-.25-.095-.375a21 21 0 0 0-1.16-3.08c.053-.146.103-.29.17-.438 0 0 1.814-3.78 5.255-5.564"></path></svg>` },
@@ -467,6 +896,7 @@
         { key: "other", label: "其他", iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>` }
     ];
 
+    // 工具函数
     function showToast(msg, isError = false) {
         const existing = document.querySelectorAll('.toast-message');
         existing.forEach(t => { t.classList.remove('show'); t.classList.add('hide'); setTimeout(() => t.remove(), 300); });
@@ -486,6 +916,10 @@
         return fp;
     }
 
+    function getUserName() { return localStorage.getItem('comment_user_name') || null; }
+    function setUserName(name) { localStorage.setItem('comment_user_name', name); }
+
+    // 核心功能函数
     function computeDynamicRating(likes, dislikes, originalTier) {
         let baseIndex = RANK_ORDER.indexOf(originalTier);
         if (baseIndex === -1) baseIndex = RANK_ORDER.indexOf(DEFAULT_RANK);
@@ -529,17 +963,12 @@
             const kw = searchKeyword.trim().toLowerCase();
             filtered = filtered.filter(h => h.zh.toLowerCase().includes(kw) || h.en.toLowerCase().includes(kw));
         }
-        // 分组：加入 "other"
         const groups = { top: [], jungle: [], mid: [], bot: [], support: [], other: [] };
         filtered.forEach(hero => {
             const lanes = hero.lane.split(',').map(l => l.trim());
             lanes.forEach(lane => {
-                // 如果 lane 不在 groups 中，则归入 "other"
-                if (groups[lane]) {
-                    groups[lane].push(hero);
-                } else {
-                    groups.other.push(hero);
-                }
+                if (groups[lane]) groups[lane].push(hero);
+                else groups.other.push(hero);
             });
         });
         for (let lane in groups) {
@@ -558,11 +987,9 @@
         for (let lane of LANES) {
             html += `<div class="position-row">
                         <div class="row-icon">
-                            <div class="lane-svg">${lane.iconSvg}</div>`;
-            if (lane.key !== 'other') {
-                html += `<div class="lane-count" id="lane-count-${lane.key}">0 位英雄</div>`;
-            }
-            html += `</div>
+                            <div class="lane-svg">${lane.iconSvg}</div>
+                            <div class="lane-count ${lane.key === 'other' ? 'hidden' : ''}" id="lane-count-${lane.key}">0 位英雄</div>
+                        </div>
                         <div class="row-heroes">
                             <div class="heroes-grid" id="grid-${lane.key}"></div>
                         </div>
@@ -579,7 +1006,6 @@
         if (hero.status === 'new') statusHtml = `<div class="status-badge-sm status-new">NEW</div>`;
         else if (hero.status === 'will') statusHtml = `<div class="status-badge-sm status-will">WILL</div>`;
         const willClass = hero.status === 'will' ? 'will-hero' : '';
-        // 使用自定义头像（如果存在）
         const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
         const fallbackIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
         const likeActive = stats.userVote === true ? 'active-vote' : '';
@@ -634,6 +1060,7 @@
         }
     }
 
+    // 动画更新函数
     async function updateAllLanesWithAnimation() {
         const groups = computeFilteredSortedHeroes();
         for (let lane of LANES) {
@@ -644,7 +1071,6 @@
             const currentIdSet = new Set(currentCards.map(c => parseInt(c.getAttribute('data-id'))));
             const targetIdSet = new Set(targetHeroes.map(h => h.id));
 
-            // 删除不需要的卡片：同时淡出缩小，速度更快（0.12s）
             const cardsToRemove = currentCards.filter(c => !targetIdSet.has(parseInt(c.getAttribute('data-id'))));
             if (cardsToRemove.length) {
                 await Promise.all(cardsToRemove.map(card => {
@@ -660,11 +1086,8 @@
                 }));
             }
 
-            // 重新获取当前卡片（删除后）
             const remainingCards = Array.from(grid.children);
             const remainingIdSet = new Set(remainingCards.map(c => parseInt(c.getAttribute('data-id'))));
-            
-            // 新增卡片（先添加，透明缩小）
             const cardsToAdd = targetHeroes.filter(h => !remainingIdSet.has(h.id));
             cardsToAdd.forEach(hero => {
                 const card = createHeroCard(hero);
@@ -673,7 +1096,7 @@
                 card.style.transition = 'none';
                 grid.appendChild(card);
             });
-            
+
             const allCurrentCards = Array.from(grid.children);
             const oldPositions = new Map();
             allCurrentCards.forEach(card => {
@@ -681,8 +1104,7 @@
                 const parentRect = grid.getBoundingClientRect();
                 oldPositions.set(card, { top: rect.top - parentRect.top, left: rect.left - parentRect.left });
             });
-            
-            // 重排顺序
+
             const cardMap = new Map();
             allCurrentCards.forEach(card => {
                 const id = parseInt(card.getAttribute('data-id'));
@@ -694,7 +1116,7 @@
                 if (card) fragment.appendChild(card);
             });
             grid.appendChild(fragment);
-            
+
             const reorderedCards = Array.from(grid.children);
             const newPositions = new Map();
             reorderedCards.forEach(card => {
@@ -702,7 +1124,7 @@
                 const parentRect = grid.getBoundingClientRect();
                 newPositions.set(card, { top: rect.top - parentRect.top, left: rect.left - parentRect.left });
             });
-            
+
             reorderedCards.forEach(card => {
                 const oldPos = oldPositions.get(card);
                 const newPos = newPositions.get(card);
@@ -716,9 +1138,8 @@
                 }
                 card.style.transition = 'none';
             });
-            
+
             grid.offsetHeight;
-            
             requestAnimationFrame(() => {
                 reorderedCards.forEach(card => {
                     card.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.25s ease';
@@ -726,14 +1147,13 @@
                     card.style.opacity = '1';
                 });
             });
-            
+
             targetHeroes.forEach(hero => {
                 const card = Array.from(grid.children).find(c => parseInt(c.getAttribute('data-id')) === hero.id);
                 if (card) updateCardContent(card, hero, votesMap.get(hero.id));
             });
         }
-        
-        // 更新统计文本和分路计数
+
         const uniqueHeroCount = allHeroes.length;
         const newCount = allHeroes.filter(h => h.status === 'new').length;
         const willCount = allHeroes.filter(h => h.status === 'will').length;
@@ -744,30 +1164,35 @@
             const countSpan = document.getElementById(`lane-count-${lane.key}`);
             if (countSpan) countSpan.innerText = `${count} 位英雄`;
         }
-    }
-
-    function bindGlobalVoteEvents() {
-        document.getElementById('positionTable').addEventListener('click', async (e) => {
-            const btn = e.target.closest('.vote-btn');
-            if (!btn) return;
-            e.stopPropagation();
-            const heroId = parseInt(btn.getAttribute('data-id'));
-            const type = btn.getAttribute('data-type');
-            const newVoteType = type === 'like';
-            await submitVote(heroId, newVoteType);
-        });
-        document.getElementById('positionTable').addEventListener('click', (e) => {
-            const card = e.target.closest('.hero-card');
-            if (!card) return;
-            if (e.target.closest('.vote-btn')) return;
-            const msgs = [`请发送一段剪辑视频`, `没什么好抱怨的`, `每个人都会得到慷慨的补偿`, `很快你会知道，一切的等待都是有意义的`, `如果你认为这很难，我认为你不适合我的平台`, `请不要频繁重复提问没有意义的问题`, `事情并没有那么简单`, `当然`, `我会在2080年发送给你`, `你至少检查一下后再提问`, `很快`];
-            showToast(msgs[Math.floor(Math.random() * msgs.length)]);
+        document.querySelectorAll('.hero-card').forEach(card => {
+            card.removeEventListener('click', handleCardClick);
+            card.addEventListener('click', handleCardClick);
         });
     }
 
-    async function submitVote(heroId, newVoteType) {
+    function handleCardClick(e) {
+        if (e.target.closest('.vote-btn')) return;
+        const heroId = parseInt(this.getAttribute('data-id'));
+        if (heroId) openCommentModal(heroId);
+    }
+
+    // 投票函数
+    async function submitVote(heroId, newVoteType, triggerPop = true) {
         if (isVoting) { showToast('请稍后...'); return false; }
-        if (!supabaseClient || !isSupabaseAvailable) { showToast('数据库未连接，点赞点踩功能不可用', true); return false; }
+        if (!supabaseClient || !isSupabaseAvailable) { showToast('数据库未连接', true); return false; }
+
+        if (triggerPop) {
+            const likeBtn = document.getElementById('commentLikeBtn');
+            const dislikeBtn = document.getElementById('commentDislikeBtn');
+            const btn = newVoteType ? likeBtn : dislikeBtn;
+            if (btn) {
+                btn.classList.remove('pop');
+                void btn.offsetWidth;
+                btn.classList.add('pop');
+                setTimeout(() => btn.classList.remove('pop'), 300);
+            }
+        }
+
         const current = votesMap.get(heroId);
         if (!current) return false;
         const oldVote = current.userVote;
@@ -786,32 +1211,675 @@
         votesMap.set(heroId, current);
         const card = document.querySelector(`.hero-card[data-id="${heroId}"]`);
         if (card) updateCardContent(card, allHeroes.find(h => h.id === heroId), current);
+        if (currentModalHeroId === heroId) {
+            document.getElementById('commentLikeCount').textContent = newLikes;
+            document.getElementById('commentDislikeCount').textContent = newDislikes;
+            updateCommentVoteButtons(newUserVote);
+        }
         showToast(actionText);
         isVoting = true;
         try {
             if (oldVote === null) {
-                const { error } = await supabaseClient.from('votes').insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
-                if (error) throw error;
+                await supabaseClient.from('votes').insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
             } else if (oldVote === newVoteType) {
-                const { error } = await supabaseClient.from('votes').delete().eq('hero_id', heroId).eq('user_fingerprint', userFingerprint);
-                if (error) throw error;
+                await supabaseClient.from('votes').delete().eq('hero_id', heroId).eq('user_fingerprint', userFingerprint);
             } else {
                 await supabaseClient.from('votes').delete().eq('hero_id', heroId).eq('user_fingerprint', userFingerprint);
                 await supabaseClient.from('votes').insert({ hero_id: heroId, vote_type: newVoteType, user_fingerprint: userFingerprint });
             }
-            await updateAllLanesWithAnimation();
+            if (currentModalHeroId === heroId) {
+                updateCommentIndicators(heroId);
+            }
+            updateAllLanesWithAnimation().catch(console.warn);
         } catch (err) {
             console.error('评价失败', err);
             current.likes = newLikes; current.dislikes = newDislikes; current.userVote = oldVote;
             votesMap.set(heroId, current);
             if (card) updateCardContent(card, allHeroes.find(h => h.id === heroId), current);
+            if (currentModalHeroId === heroId) {
+                document.getElementById('commentLikeCount').textContent = current.likes;
+                document.getElementById('commentDislikeCount').textContent = current.dislikes;
+                updateCommentVoteButtons(oldVote);
+            }
             showToast(`${newVoteType ? '点赞' : '点踩'}失败，请重试`, true);
         } finally { isVoting = false; }
     }
 
+    async function updateCommentIndicators(heroId) {
+        try {
+            const { data: votesData } = await supabaseClient
+                .from('votes')
+                .select('user_fingerprint, vote_type')
+                .eq('hero_id', heroId);
+            const voteMap = new Map();
+            votesData?.forEach(v => voteMap.set(v.user_fingerprint, v.vote_type));
+
+            document.querySelectorAll('.comment-item').forEach(item => {
+                const fingerprint = item.getAttribute('data-fingerprint');
+                if (fingerprint) {
+                    const voteType = voteMap.get(fingerprint);
+                    let indicator = voteType === true ? '👍' : (voteType === false ? '👎' : '');
+                    const indicatorSpan = item.querySelector('.vote-indicator');
+                    if (indicatorSpan) {
+                        const oldText = indicatorSpan.textContent;
+                        if (indicator) {
+                            indicatorSpan.textContent = indicator;
+                        } else {
+                            indicatorSpan.textContent = '';
+                        }
+                        if (oldText !== indicator) {
+                            indicatorSpan.classList.remove('pop');
+                            void indicatorSpan.offsetWidth;
+                            indicatorSpan.classList.add('pop');
+                            setTimeout(() => indicatorSpan.classList.remove('pop'), 300);
+                        }
+                    }
+                    if (fingerprint === userFingerprint) {
+                        item.classList.remove('flash');
+                        void item.offsetWidth;
+                        item.classList.add('flash');
+                        setTimeout(() => item.classList.remove('flash'), 300);
+                    }
+                }
+            });
+        } catch (err) {
+            console.warn('更新指示器失败', err);
+        }
+    }
+
+    // 评论 + 反应功能
+    let reactionsMap = new Map();
+
+    async function refreshReactionsForComment(commentId) {
+        try {
+            const { data, error } = await supabaseClient
+                .from('reactions')
+                .select('comment_id, user_fingerprint, emoji')
+                .eq('comment_id', commentId);
+            if (error) throw error;
+            const entry = { counts: {}, users: {} };
+            data.forEach(r => {
+                entry.counts[r.emoji] = (entry.counts[r.emoji] || 0) + 1;
+                entry.users[r.user_fingerprint] = r.emoji;
+            });
+            reactionsMap.set(commentId, entry);
+            buildReactions(document.querySelector(`.comment-item[data-comment-id="${commentId}"]`), commentId);
+        } catch (err) {
+            console.warn('刷新反应失败', err);
+        }
+    }
+
+    function buildReactions(commentItem, commentId, changedEmoji = null) {
+        if (!commentItem) return;
+        const existing = commentItem.querySelector('.reactions');
+        if (existing) existing.remove();
+
+        const rData = reactionsMap.get(commentId);
+        if (!rData || Object.keys(rData.counts).length === 0) {
+            return;
+        }
+        const sortedEmojis = Object.keys(rData.counts).sort((a, b) => EMOJI_ORDER.indexOf(a) - EMOJI_ORDER.indexOf(b));
+        const userEmoji = getUserReactionForComment(commentId);
+        const div = document.createElement('div');
+        div.className = 'reactions';
+        sortedEmojis.forEach(emoji => {
+            const count = rData.counts[emoji];
+            const active = userEmoji === emoji ? 'active' : '';
+            const popClass = (changedEmoji && changedEmoji === emoji) ? 'pop' : '';
+            const span = document.createElement('span');
+            span.className = `reaction ${active} ${popClass}`;
+            span.setAttribute('data-comment', commentId);
+            span.setAttribute('data-emoji', emoji);
+            span.innerHTML = `<span class="emoji">${emoji}</span> <span class="count">${count}</span>`;
+            div.appendChild(span);
+        });
+        commentItem.appendChild(div);
+    }
+
+    function updateReactionDisplay(commentId, changedEmoji = null, isCancel = false) {
+        const commentItem = document.querySelector(`.comment-item[data-comment-id="${commentId}"]`);
+        if (!commentItem) return;
+
+        if (isCancel && changedEmoji) {
+            const existingReactions = commentItem.querySelector('.reactions');
+            if (existingReactions) {
+                const targetSpan = existingReactions.querySelector(`.reaction[data-emoji="${changedEmoji}"]`);
+                if (targetSpan) {
+                    targetSpan.classList.add('pop-out');
+                    setTimeout(() => {
+                        buildReactions(commentItem, commentId);
+                    }, 250);
+                    return;
+                }
+            }
+        }
+        buildReactions(commentItem, commentId, changedEmoji);
+    }
+
+    function getUserReactionForComment(commentId) {
+        const entry = reactionsMap.get(commentId);
+        if (!entry) return null;
+        for (const [emoji, users] of Object.entries(entry.users || {})) {
+            if (users === userFingerprint) return emoji;
+        }
+        return null;
+    }
+
+    async function handleReactionClick(commentId, emoji) {
+        // 立即关闭选择器（用户点击后立刻消失）
+        hideEmojiPicker();
+
+        if (!supabaseClient || !isSupabaseAvailable) {
+            showToast('数据库未连接', true);
+            return;
+        }
+        let entry = reactionsMap.get(commentId);
+        if (!entry) {
+            entry = { counts: {}, users: {} };
+            reactionsMap.set(commentId, entry);
+        }
+        const oldEmoji = entry.users[userFingerprint] || null;
+        let changedEmoji = null;
+        let isCancel = false;
+        if (oldEmoji === emoji) {
+            isCancel = true;
+            if (entry.counts[oldEmoji]) {
+                entry.counts[oldEmoji]--;
+                if (entry.counts[oldEmoji] <= 0) delete entry.counts[oldEmoji];
+            }
+            delete entry.users[userFingerprint];
+            changedEmoji = emoji;
+        } else {
+            if (oldEmoji) {
+                if (entry.counts[oldEmoji]) {
+                    entry.counts[oldEmoji]--;
+                    if (entry.counts[oldEmoji] <= 0) delete entry.counts[oldEmoji];
+                }
+                delete entry.users[userFingerprint];
+            }
+            entry.counts[emoji] = (entry.counts[emoji] || 0) + 1;
+            entry.users[userFingerprint] = emoji;
+            changedEmoji = emoji;
+        }
+
+        updateReactionDisplay(commentId, changedEmoji, isCancel);
+
+        try {
+            if (oldEmoji === emoji) {
+                await supabaseClient
+                    .from('reactions')
+                    .delete()
+                    .eq('comment_id', commentId)
+                    .eq('user_fingerprint', userFingerprint);
+            } else {
+                await supabaseClient
+                    .from('reactions')
+                    .upsert({
+                        comment_id: commentId,
+                        user_fingerprint: userFingerprint,
+                        emoji: emoji,
+                        hero_id: currentModalHeroId
+                    }, {
+                        onConflict: 'comment_id, user_fingerprint'
+                    });
+            }
+        } catch (err) {
+            console.error('反应操作失败', err);
+            await refreshReactionsForComment(commentId);
+            showToast('操作失败，请重试', true);
+        }
+    }
+
+    // 表情选择器交互
+    let currentCommentIdForPicker = null;
+    const picker = document.getElementById('emojiPicker');
+    const emojiBtns = picker.querySelectorAll('.emoji-btn');
+
+    function showEmojiPicker(x, y, commentId) {
+        picker.style.display = 'flex';
+        picker.classList.remove('hide', 'show');
+        void picker.offsetWidth;
+
+        let left = x - 10;
+        let top = y - 10;
+        const pickerWidth = 280;
+        const pickerHeight = 50;
+        if (left + pickerWidth > window.innerWidth) left = window.innerWidth - pickerWidth - 10;
+        if (top + pickerHeight > window.innerHeight) top = window.innerHeight - pickerHeight - 10;
+        if (left < 10) left = 10;
+        if (top < 10) top = 10;
+
+        picker.style.left = left + 'px';
+        picker.style.top = top + 'px';
+        picker.classList.add('show');
+        currentCommentIdForPicker = commentId;
+
+        const userEmoji = getUserReactionForComment(commentId);
+        emojiBtns.forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.emoji === userEmoji);
+        });
+    }
+
+    function hideEmojiPicker() {
+        if (!picker.classList.contains('show')) return;
+        picker.classList.remove('show');
+        picker.classList.add('hide');
+        setTimeout(() => {
+            picker.classList.remove('hide');
+            picker.style.display = 'none';
+        }, 160);
+        currentCommentIdForPicker = null;
+    }
+
+    // 评论列表点击事件
+    document.getElementById('commentList').addEventListener('click', function(e) {
+        const target = e.target;
+        const reaction = target.closest('.reaction');
+        if (reaction) {
+            e.stopPropagation();
+            const commentId = parseInt(reaction.getAttribute('data-comment'));
+            const emoji = reaction.getAttribute('data-emoji');
+            if (commentId && emoji) {
+                handleReactionClick(commentId, emoji);
+            }
+            return;
+        }
+        const commentItem = target.closest('.comment-item');
+        if (commentItem) {
+            const commentId = parseInt(commentItem.getAttribute('data-comment-id'));
+            if (commentId) {
+                e.stopPropagation();
+                if (currentCommentIdForPicker === commentId && picker.classList.contains('show')) {
+                    hideEmojiPicker();
+                } else {
+                    if (picker.classList.contains('show')) {
+                        hideEmojiPicker();
+                    }
+                    setTimeout(() => {
+                        picker.classList.remove('hide');
+                        showEmojiPicker(e.clientX, e.clientY, commentId);
+                    }, 20);
+                }
+            }
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.emoji-picker') && !e.target.closest('.comment-item')) {
+            if (picker.classList.contains('show')) {
+                hideEmojiPicker();
+            }
+        }
+    });
+
+    emojiBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const emoji = this.dataset.emoji;
+            if (currentCommentIdForPicker !== null) {
+                handleReactionClick(currentCommentIdForPicker, emoji);
+            }
+        });
+    });
+
+    // 加载评论
+    async function openCommentModal(heroId) {
+        const hero = allHeroes.find(h => h.id === heroId);
+        if (!hero) return;
+        currentModalHeroId = heroId;
+        const modal = document.getElementById('commentModal');
+        modal.setAttribute('data-hero-id', heroId);
+
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+
+        document.getElementById('commentHeroName').textContent = hero.zh;
+        const avatarContainer = document.getElementById('commentHeroAvatar');
+        const img = document.createElement('img');
+        const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
+        img.src = imgUrl;
+        img.alt = hero.zh;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.onerror = function() { this.style.display = 'none';
+            avatarContainer.textContent = hero.zh.charAt(0); };
+        avatarContainer.innerHTML = '';
+        avatarContainer.appendChild(img);
+
+        const display = document.getElementById('userNameDisplay');
+        const input = document.getElementById('userNameInput');
+        const userName = getUserName();
+        if (userName) {
+            display.textContent = userName;
+            display.style.display = 'inline';
+            input.style.display = 'none';
+        } else {
+            display.style.display = 'none';
+            input.style.display = 'inline';
+            input.value = '';
+            input.placeholder = '请输入用户名';
+            input.focus();
+        }
+
+        const textarea = document.getElementById('commentInput');
+        textarea.value = '';
+        textarea.placeholder = '加载中...';
+
+        const stats = votesMap.get(heroId) || { likes: 0, dislikes: 0 };
+        document.getElementById('commentLikeCount').textContent = stats.likes;
+        document.getElementById('commentDislikeCount').textContent = stats.dislikes;
+        const userVote = votesMap.get(heroId)?.userVote ?? null;
+        updateCommentVoteButtons(userVote);
+
+        const list = document.getElementById('commentList');
+        list.innerHTML = `<div class="empty-state"><span style="font-size:2rem;display:block;">⏳</span>加载评论...</div>`;
+        await loadComments(heroId);
+        const userComment = await getUserComment(heroId);
+        textarea.value = userComment?.content || '';
+        textarea.placeholder = '写点看法…';
+    }
+
+    function closeCommentModal() {
+        document.getElementById('commentModal').classList.remove('open');
+        document.body.style.overflow = '';
+        currentModalHeroId = null;
+        if (picker.classList.contains('show')) {
+            hideEmojiPicker();
+        }
+    }
+
+    async function loadComments(heroId) {
+        const list = document.getElementById('commentList');
+        if (!supabaseClient || !isSupabaseAvailable) {
+            list.innerHTML = '<div class="empty-state">💬 数据库未连接</div>';
+            return;
+        }
+        try {
+            const { data: comments, error: cError } = await supabaseClient
+                .from('comments')
+                .select('*')
+                .eq('hero_id', heroId)
+                .order('created_at', { ascending: false });
+            if (cError) throw cError;
+
+            const { data: reactions, error: rError } = await supabaseClient
+                .from('reactions')
+                .select('comment_id, user_fingerprint, emoji')
+                .eq('hero_id', heroId);
+            if (rError) throw rError;
+
+            const rMap = new Map();
+            reactions?.forEach(r => {
+                if (!rMap.has(r.comment_id)) {
+                    rMap.set(r.comment_id, { counts: {}, users: {} });
+                }
+                const entry = rMap.get(r.comment_id);
+                entry.counts[r.emoji] = (entry.counts[r.emoji] || 0) + 1;
+                entry.users[r.user_fingerprint] = r.emoji;
+            });
+            reactionsMap = rMap;
+
+            if (!comments || comments.length === 0) {
+                list.innerHTML = `<div class="empty-state"><span style="font-size:2rem;display:block;">💭</span>还没有评论，来说点什么吧</div>`;
+                return;
+            }
+
+            const fingerprints = comments.map(c => c.user_fingerprint).filter(f => f);
+            let userMap = new Map();
+            if (fingerprints.length > 0) {
+                const { data: profiles, error: pError } = await supabaseClient
+                    .from('user_profiles')
+                    .select('fingerprint, user_name')
+                    .in('fingerprint', fingerprints);
+                if (!pError && profiles) {
+                    profiles.forEach(p => userMap.set(p.fingerprint, p.user_name));
+                }
+            }
+
+            const { data: votesData } = await supabaseClient
+                .from('votes')
+                .select('user_fingerprint, vote_type')
+                .eq('hero_id', heroId);
+            const voteMap = new Map();
+            votesData?.forEach(v => voteMap.set(v.user_fingerprint, v.vote_type));
+
+            // 分离用户自己的评论和其他评论
+            const myComments = comments.filter(c => c.user_fingerprint === userFingerprint);
+            const otherComments = comments.filter(c => c.user_fingerprint !== userFingerprint);
+
+            // 对其它评论排序：先按emoji评价总数降序，再按时间降序
+            otherComments.sort((a, b) => {
+                const aReactions = reactionsMap.get(a.id) || { counts: {} };
+                const bReactions = reactionsMap.get(b.id) || { counts: {} };
+                const aTotal = Object.values(aReactions.counts).reduce((sum, n) => sum + n, 0);
+                const bTotal = Object.values(bReactions.counts).reduce((sum, n) => sum + n, 0);
+                if (aTotal !== bTotal) return bTotal - aTotal;
+                return new Date(b.created_at) - new Date(a.created_at);
+            });
+
+            // 我的评论置顶，其余按上述顺序
+            const sortedComments = [...myComments, ...otherComments];
+
+            let html = '';
+            sortedComments.forEach(comment => {
+                const isMe = comment.user_fingerprint === userFingerprint;
+                const voteType = voteMap.get(comment.user_fingerprint);
+                let indicator = voteType === true ? '👍' : (voteType === false ? '👎' : '');
+                const displayName = userMap.get(comment.user_fingerprint) || '匿名';
+                const avatarChar = isMe ? '我' : displayName.charAt(0).toUpperCase();
+                const timeStr = new Date(comment.created_at).toLocaleString('zh-CN', { hour12: false });
+                const meClass = isMe ? 'me' : '';
+
+                const isEdited = comment.updated_at && comment.updated_at !== comment.created_at;
+                let timeDisplay = isEdited ? `修改于 ${new Date(comment.updated_at).toLocaleString('zh-CN', { hour12: false })}` : timeStr;
+
+                const rData = reactionsMap.get(comment.id);
+                let reactionHtml = '';
+                if (rData && Object.keys(rData.counts).length > 0) {
+                    const sortedEmojis = Object.keys(rData.counts).sort((a, b) => EMOJI_ORDER.indexOf(a) - EMOJI_ORDER.indexOf(b));
+                    const userEmoji = getUserReactionForComment(comment.id);
+                    reactionHtml = `<div class="reactions">`;
+                    sortedEmojis.forEach(emoji => {
+                        const count = rData.counts[emoji];
+                        const active = userEmoji === emoji ? 'active' : '';
+                        reactionHtml += `<span class="reaction ${active}" data-comment="${comment.id}" data-emoji="${emoji}">
+                            <span class="emoji">${emoji}</span> <span class="count">${count}</span>
+                        </span>`;
+                    });
+                    reactionHtml += `</div>`;
+                }
+
+                html += `
+                    <div class="comment-item" data-fingerprint="${comment.user_fingerprint || ''}" data-comment-id="${comment.id}">
+                        <div class="comment-top">
+                            <div class="user-avatar ${meClass}">${avatarChar}</div>
+                            <div class="user-name ${meClass}">${displayName}</div>
+                            <div class="comment-time">${timeDisplay}</div>
+                        </div>
+                        <div class="comment-content">
+                            ${indicator ? `<span class="vote-indicator">${indicator}</span>` : ''}
+                            ${comment.content}
+                        </div>
+                        ${reactionHtml}
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+
+            requestAnimationFrame(() => {
+                document.querySelectorAll('.vote-indicator').forEach(el => {
+                    el.classList.remove('pop');
+                    void el.offsetWidth;
+                    el.classList.add('pop');
+                    setTimeout(() => el.classList.remove('pop'), 300);
+                });
+            });
+
+        } catch (err) {
+            console.error(err);
+            list.innerHTML = '<div class="empty-state">❌ 加载评论失败</div>';
+        }
+    }
+
+    // 评论编辑/提交
+    function updateCommentVoteButtons(userVote) {
+        const likeBtn = document.getElementById('commentLikeBtn');
+        const dislikeBtn = document.getElementById('commentDislikeBtn');
+        likeBtn.classList.remove('active-like');
+        dislikeBtn.classList.remove('active-dislike');
+        if (userVote === true) likeBtn.classList.add('active-like');
+        else if (userVote === false) dislikeBtn.classList.add('active-dislike');
+    }
+
+    async function getUserComment(heroId) {
+        if (!supabaseClient || !isSupabaseAvailable) return null;
+        const { data, error } = await supabaseClient
+            .from('comments')
+            .select('*')
+            .eq('hero_id', heroId)
+            .eq('user_fingerprint', userFingerprint)
+            .maybeSingle();
+        if (error) return null;
+        return data;
+    }
+
+    async function submitComment() {
+        const modal = document.getElementById('commentModal');
+        const heroId = parseInt(modal.getAttribute('data-hero-id'));
+        if (!heroId) {
+            showToast('无法获取英雄信息，请重试', true);
+            return;
+        }
+        const textarea = document.getElementById('commentInput');
+        const content = textarea.value.trim();
+        if (!content) { showToast('请输入评论内容', true); return; }
+
+        if (content.length > 20) {
+            showToast('评论内容不能超过20个字符', true);
+            return;
+        }
+
+        const display = document.getElementById('userNameDisplay');
+        const input = document.getElementById('userNameInput');
+        let userName = display.textContent;
+        if (display.style.display === 'none') {
+            userName = input.value.trim();
+            if (!userName) { showToast('请先输入用户名', true); input.focus(); return; }
+            if (userName.length > 10) {
+                showToast('用户名不能超过10个字符', true);
+                input.focus();
+                return;
+            }
+            if (supabaseClient && isSupabaseAvailable) {
+                const { data: existing, error: checkError } = await supabaseClient
+                    .from('user_profiles')
+                    .select('fingerprint')
+                    .eq('user_name', userName)
+                    .neq('fingerprint', userFingerprint)
+                    .maybeSingle();
+                if (checkError) console.warn(checkError);
+                if (existing) {
+                    showToast('用户名已被其他用户使用，请换一个', true);
+                    input.focus();
+                    return;
+                }
+            }
+            setUserName(userName);
+            display.textContent = userName;
+            display.style.display = 'inline';
+            input.style.display = 'none';
+        }
+
+        try {
+            if (supabaseClient && isSupabaseAvailable) {
+                await supabaseClient
+                    .from('user_profiles')
+                    .upsert({ fingerprint: userFingerprint, user_name: userName }, { onConflict: 'fingerprint' });
+            }
+        } catch (err) { console.warn(err); }
+
+        const likeBtn = document.getElementById('commentLikeBtn');
+        const dislikeBtn = document.getElementById('commentDislikeBtn');
+        let voteType = null;
+        if (likeBtn.classList.contains('active-like')) voteType = true;
+        else if (dislikeBtn.classList.contains('active-dislike')) voteType = false;
+
+        const existing = await getUserComment(heroId);
+        if (!supabaseClient || !isSupabaseAvailable) { showToast('数据库未连接', true); return; }
+
+        if (existing) {
+            const rData = reactionsMap.get(existing.id) || { counts: {} };
+            const total = Object.values(rData.counts).reduce((sum, n) => sum + n, 0);
+            if (total > 5) {
+                showToast('当前不可修改', true);
+                return;
+            }
+        }
+
+        try {
+            if (existing) {
+                await supabaseClient.from('comments').update({ content }).eq('id', existing.id);
+                showToast('评论已更新');
+                const commentItem = document.querySelector(`.comment-item[data-fingerprint="${userFingerprint}"]`);
+                if (commentItem) {
+                    const contentDiv = commentItem.querySelector('.comment-content');
+                    if (contentDiv) {
+                        const indicatorSpan = contentDiv.querySelector('.vote-indicator');
+                        const textNode = contentDiv.lastChild;
+                        if (textNode) textNode.textContent = content;
+                        commentItem.classList.remove('flash');
+                        void commentItem.offsetWidth;
+                        commentItem.classList.add('flash');
+                        setTimeout(() => commentItem.classList.remove('flash'), 300);
+                        const timeSpan = commentItem.querySelector('.comment-time');
+                        if (timeSpan) {
+                            const now = new Date().toLocaleString('zh-CN', { hour12: false });
+                            timeSpan.textContent = `修改于 ${now}`;
+                        }
+                    }
+                }
+            } else {
+                await supabaseClient.from('comments').insert({
+                    hero_id: heroId,
+                    user_fingerprint: userFingerprint,
+                    content: content,
+                    vote_type: voteType
+                });
+                showToast('评论成功！');
+                await loadComments(heroId);
+            }
+            const currentVote = votesMap.get(heroId)?.userVote ?? null;
+            if (voteType !== currentVote) {
+                if (voteType !== null) {
+                    await submitVote(heroId, voteType);
+                } else if (currentVote !== null) {
+                    await submitVote(heroId, currentVote);
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            showToast('操作失败：' + err.message, true);
+        }
+    }
+
+    async function handleCommentVoteClick(e) {
+        const btn = e.currentTarget;
+        const type = btn.getAttribute('data-type');
+        const heroId = currentModalHeroId;
+        if (!heroId) return;
+        const newVote = type === 'like' ? true : false;
+        const currentVote = votesMap.get(heroId)?.userVote ?? null;
+        const finalVote = (currentVote === newVote) ? null : newVote;
+        if (finalVote === null) {
+            await submitVote(heroId, currentVote, true);
+        } else {
+            await submitVote(heroId, finalVote, true);
+        }
+    }
+
+    // 数据加载
     async function fetchSupabaseData() {
         try {
-            // 增加 avatar_url 字段
             const { data: heroesData, error: heroesError } = await supabaseClient.from('heroes').select('id, en, zh, lane, tier, status, avatar_url');
             if (heroesError) throw heroesError;
             const { data: votesData, error: votesError } = await supabaseClient.from('votes').select('hero_id, vote_type, user_fingerprint');
@@ -855,6 +1923,24 @@
 
     async function updateVisitCount() {
         const footer = document.getElementById('footerCounter');
+        const now = Date.now();
+        const lastVisit = parseInt(localStorage.getItem('last_visit_time') || '0');
+        if (now - lastVisit < 60000) {
+            if (!supabaseClient || !isSupabaseAvailable) {
+                footer.innerHTML = `👥 访问人次: -- (本地模拟)`;
+            } else {
+                try {
+                    const { data, error } = await supabaseClient.from('stats').select('value').eq('key', 'visit_count').maybeSingle();
+                    if (error) throw error;
+                    footer.innerHTML = `👥 访问人次: ${data?.value || 0}`;
+                } catch {
+                    footer.innerHTML = `👥 访问人次: -- (数据库暂不可用)`;
+                }
+            }
+            return;
+        }
+        localStorage.setItem('last_visit_time', String(now));
+
         if (!supabaseClient || !isSupabaseAvailable) {
             let local = localStorage.getItem('visit_count_mock');
             if (!local) local = Math.floor(Math.random() * 1000) + 100;
@@ -884,13 +1970,13 @@
         } catch { isSupabaseAvailable = false; supabaseClient = null; }
     }
 
+    // 主流程
     (async function main() {
         await initSupabase();
         userFingerprint = getOrCreateFingerprint();
         await loadHeroesData();
         await updateVisitCount();
         buildTableStructure();
-        // 首次填充卡片（无动画）
         const initialGroups = computeFilteredSortedHeroes();
         for (let lane of LANES) {
             const grid = document.getElementById(`grid-${lane.key}`);
@@ -902,14 +1988,27 @@
             const countSpan = document.getElementById(`lane-count-${lane.key}`);
             if (countSpan) countSpan.innerText = `${laneHeroes.length} 位英雄`;
         }
-        bindGlobalVoteEvents();
-        const refresh = () => updateAllLanesWithAnimation();
+
+        document.querySelectorAll('.hero-card').forEach(card => {
+            card.addEventListener('click', handleCardClick);
+        });
+
+        document.getElementById('positionTable').addEventListener('click', async (e) => {
+            const btn = e.target.closest('.vote-btn');
+            if (!btn) return;
+            e.stopPropagation();
+            const heroId = parseInt(btn.getAttribute('data-id'));
+            const type = btn.getAttribute('data-type');
+            const newVoteType = type === 'like';
+            await submitVote(heroId, newVoteType, false);
+        });
+
         document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(el => {
             el.addEventListener('click', function() {
                 document.querySelectorAll('#rankFilterGroup .filter-chip').forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
                 currentRankFilter = this.getAttribute('data-rank');
-                refresh();
+                updateAllLanesWithAnimation();
             });
         });
         document.querySelectorAll('#statusFilterGroup .filter-chip').forEach(el => {
@@ -917,19 +2016,86 @@
                 document.querySelectorAll('#statusFilterGroup .filter-chip').forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
                 currentStatusFilter = this.getAttribute('data-status');
-                refresh();
+                updateAllLanesWithAnimation();
             });
         });
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchKeyword = e.target.value;
-            refresh();
+            updateAllLanesWithAnimation();
         });
         document.getElementById('moreBtn').addEventListener('click', () => showToast('很快你会知道，一切的等待都是有意义的'));
-        // 确保统计文本正确
+
+        document.getElementById('closeCommentBtn').addEventListener('click', closeCommentModal);
+        document.getElementById('commentModal').addEventListener('click', function(e) {
+            if (e.target === this) closeCommentModal();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeCommentModal();
+        });
+
+        document.getElementById('userNameDisplay').addEventListener('click', function() {
+            const input = document.getElementById('userNameInput');
+            const display = this;
+            display.style.display = 'none';
+            input.style.display = 'inline';
+            input.value = display.textContent;
+            input.focus();
+        });
+        document.getElementById('userNameInput').addEventListener('blur', async function() {
+            const val = this.value.trim();
+            if (val) {
+                if (val.length > 10) {
+                    showToast('用户名不能超过10个字符', true);
+                    this.focus();
+                    return;
+                }
+                if (supabaseClient && isSupabaseAvailable) {
+                    const { data: existing, error: checkError } = await supabaseClient
+                        .from('user_profiles')
+                        .select('fingerprint')
+                        .eq('user_name', val)
+                        .neq('fingerprint', userFingerprint)
+                        .maybeSingle();
+                    if (checkError) console.warn(checkError);
+                    if (existing) {
+                        showToast('用户名已被其他用户使用，请换一个', true);
+                        this.focus();
+                        return;
+                    }
+                }
+                setUserName(val);
+                const display = document.getElementById('userNameDisplay');
+                display.textContent = val;
+                display.style.display = 'inline';
+                this.style.display = 'none';
+                if (supabaseClient && isSupabaseAvailable) {
+                    try {
+                        await supabaseClient
+                            .from('user_profiles')
+                            .upsert({ fingerprint: userFingerprint, user_name: val }, { onConflict: 'fingerprint' });
+                    } catch (err) { console.warn(err); }
+                }
+            }
+        });
+        document.getElementById('userNameInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') this.blur();
+        });
+
+        document.getElementById('commentLikeBtn').addEventListener('click', handleCommentVoteClick);
+        document.getElementById('commentDislikeBtn').addEventListener('click', handleCommentVoteClick);
+
+        document.getElementById('submitCommentBtn').addEventListener('click', submitComment);
+        document.getElementById('commentInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault();
+                submitComment(); }
+        });
+
         const uniqueHeroCount = allHeroes.length;
         const newCount = allHeroes.filter(h => h.status === 'new').length;
         const willCount = allHeroes.filter(h => h.status === 'will').length;
         document.getElementById('heroStatsText').innerHTML = `共 ${uniqueHeroCount} 位英雄 · ${newCount} 新增 · ${willCount} 即将推出 · 更新于2026.6.15`;
+
+        console.log('✅ Outis 已启动！');
     })();
 </script>
 
@@ -955,13 +2121,10 @@
         transition: all 0.2s ease;
         user-select: none;
     }
-    #adminFab:hover {
-        background: rgba(59, 110, 255, 0.9);
+    #adminFab:hover { background: rgba(59, 110, 255, 0.9);
         transform: scale(1.05);
-        border-color: #fff;
-    }
+        border-color: #fff; }
     #adminFab .icon { font-size: 1.2rem; }
-
     .admin-modal {
         position: fixed;
         inset: 0;
@@ -1003,9 +2166,7 @@
         line-height: 1;
     }
     .admin-modal-box .close-admin:hover { color: #fff; }
-    .admin-form-group {
-        margin-bottom: 1.2rem;
-    }
+    .admin-form-group { margin-bottom: 1.2rem; }
     .admin-form-group label {
         display: block;
         font-size: 0.8rem;
@@ -1034,7 +2195,6 @@
         color: #6e7fa5;
         margin-top: 4px;
     }
-
     .avatar-preview {
         display: flex;
         align-items: center;
@@ -1049,9 +2209,7 @@
         background: #1b2338;
         border: 1px solid #2d385a;
     }
-    .avatar-preview .file-input-wrapper {
-        flex: 1;
-    }
+    .avatar-preview .file-input-wrapper { flex: 1; }
     .avatar-preview .file-input-wrapper input[type="file"] {
         padding: 6px 0;
         font-size: 0.8rem;
@@ -1070,7 +2228,6 @@
         white-space: nowrap;
     }
     .avatar-preview .clear-avatar:hover { background: #b91c1c; }
-
     .admin-submit-btn {
         width: 100%;
         padding: 12px;
@@ -1098,29 +2255,30 @@
         border-radius: 8px;
         display: none;
     }
-    .admin-status-msg.success {
-        background: #166534;
+    .admin-status-msg.success { background: #166534;
         color: #eef2ff;
-        display: block;
-    }
-    .admin-status-msg.error {
-        background: #991b1b;
+        display: block; }
+    .admin-status-msg.error { background: #991b1b;
         color: #fff;
-        display: block;
-    }
-
+        display: block; }
     @keyframes slideUp {
-        from { transform: translateY(30px) scale(0.96); opacity: 0; }
-        to { transform: translateY(0) scale(1); opacity: 1; }
+        from { transform: translateY(30px) scale(0.96);
+            opacity: 0; }
+        to { transform: translateY(0) scale(1);
+            opacity: 1; }
     }
     @media (max-width: 600px) {
         .admin-modal-box { padding: 1.2rem; }
-        #adminFab { bottom: 16px; right: 16px; padding: 10px 16px; font-size: 0.8rem; }
+        #adminFab { bottom: 16px;
+            right: 16px;
+            padding: 10px 16px;
+            font-size: 0.8rem; }
         .avatar-preview { flex-wrap: wrap; }
     }
 </style>
 
 <div id="adminFab"><span class="icon">⚙️</span> 管理</div>
+
 <div class="admin-modal" id="adminModal">
     <div class="admin-modal-box">
         <div style="display: flex; align-items: center; margin-bottom: 1.2rem;">
@@ -1182,14 +2340,11 @@
         const secretCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight'];
         let inputIndex = 0;
         const fab = document.getElementById('adminFab');
-        let secretTriggered = false;
-
         document.addEventListener('keydown', function(e) {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
             if (e.key === secretCode[inputIndex]) {
                 inputIndex++;
                 if (inputIndex === secretCode.length) {
-                    secretTriggered = true;
                     inputIndex = 0;
                     fab.style.display = 'flex';
                     fab.style.transform = 'scale(1.2)';
@@ -1225,7 +2380,6 @@
     const avatarFileInput = document.getElementById('avatarFileInput');
     const avatarPreview = document.getElementById('avatarPreview');
     const clearAvatarBtn = document.getElementById('clearAvatarBtn');
-
     let selectedAvatarFile = null;
 
     document.getElementById('adminFab').addEventListener('click', function() {
@@ -1261,16 +2415,12 @@
     avatarFileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            if (!file.type.startsWith('image/')) {
-                alert('请选择图片文件');
+            if (!file.type.startsWith('image/')) { alert('请选择图片文件');
                 avatarFileInput.value = '';
-                return;
-            }
-            if (file.size > 2 * 1024 * 1024) {
-                alert('图片大小不能超过 2MB');
+                return; }
+            if (file.size > 2 * 1024 * 1024) { alert('图片大小不能超过 2MB');
                 avatarFileInput.value = '';
-                return;
-            }
+                return; }
             selectedAvatarFile = file;
             const reader = new FileReader();
             reader.onload = function(ev) {
@@ -1284,7 +2434,6 @@
             avatarPreview.src = '';
         }
     });
-
     clearAvatarBtn.addEventListener('click', function() {
         avatarFileInput.value = '';
         selectedAvatarFile = null;
@@ -1294,16 +2443,9 @@
 
     async function uploadAvatar(file) {
         const fileName = `${Date.now()}_${file.name}`;
-        const { data, error } = await supabaseClient.storage
-            .from('avatars')
-            .upload(fileName, file, {
-                cacheControl: '3600',
-                upsert: false
-            });
+        const { data, error } = await supabaseClient.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: false });
         if (error) throw error;
-        const { data: urlData } = supabaseClient.storage
-            .from('avatars')
-            .getPublicUrl(fileName);
+        const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
         return urlData.publicUrl;
     }
 
@@ -1314,41 +2456,33 @@
         const lane = adminLane.value.trim() || 'top';
         const tier = adminTier.value || '';
         const status = adminStatus.value || 'normal';
-
         if (!en || !zh) {
             adminStatusMsg.textContent = '⚠️ 英文名和中文名不能为空';
             adminStatusMsg.className = 'admin-status-msg error';
             return;
         }
-
         if (!supabaseClient || !isSupabaseAvailable) {
             adminStatusMsg.textContent = '❌ 数据库未连接，请检查网络';
             adminStatusMsg.className = 'admin-status-msg error';
             return;
         }
-
         adminSubmitBtn.disabled = true;
         adminSubmitBtn.textContent = '上传中...';
-
         try {
             let avatarUrl = null;
             if (selectedAvatarFile) {
                 adminSubmitBtn.textContent = '上传头像...';
                 avatarUrl = await uploadAvatar(selectedAvatarFile);
             }
-
             adminSubmitBtn.textContent = '添加英雄...';
             const { data, error } = await supabaseClient
                 .from('heroes')
                 .insert([{ en, zh, lane, tier, status, avatar_url: avatarUrl }])
                 .select();
-
             if (error) throw error;
-
             adminStatusMsg.textContent = '✅ 英雄添加成功！刷新列表中...';
             adminStatusMsg.className = 'admin-status-msg success';
             adminSubmitBtn.textContent = '已添加';
-
             adminEn.value = '';
             adminZh.value = '';
             adminLane.value = 'top';
@@ -1358,23 +2492,11 @@
             selectedAvatarFile = null;
             avatarPreview.style.display = 'none';
             avatarPreview.src = '';
-
             await loadHeroesData();
-            if (typeof updateAllLanesWithAnimation === 'function') {
-                await updateAllLanesWithAnimation();
-            } else if (typeof render === 'function') {
-                render();
-            } else {
-                location.reload();
-            }
-
+            await updateAllLanesWithAnimation();
             adminSubmitBtn.disabled = false;
             adminSubmitBtn.textContent = '添加英雄';
-
-            setTimeout(() => {
-                closeAdminPanel();
-            }, 1200);
-
+            setTimeout(() => closeAdminPanel(), 1200);
         } catch (err) {
             console.error('添加英雄失败', err);
             adminStatusMsg.textContent = '❌ 添加失败：' + err.message;
