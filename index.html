@@ -1417,6 +1417,7 @@
             isSupabaseAvailable = false;
         let allHeroes = [],
             votesMap = new Map();
+        let ddragonVersion = '16.13.1'; // 新增：默认回退版本，启动时自动更新
         let userFingerprint = '';
         let currentRankFilter = 'all',
             currentStatusFilter = 'all',
@@ -1608,7 +1609,7 @@
             if (hero.status === 'new') statusHtml = `<div class="status-badge-sm status-new">NEW</div>`;
             else if (hero.status === 'will') statusHtml = `<div class="status-badge-sm status-will">WILL</div>`;
             const willClass = hero.status === 'will' ? 'will-hero' : '';
-            const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
+            const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/${ddragonVersion}/img/champion/${hero.en}.png`;
             const fallbackIcon =
                 "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231d2a44'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%238aa2ff' font-size='12'%3EOS%3C/text%3E%3C/svg%3E";
             const likeActive = stats.userVote === true ? 'active-vote' : '';
@@ -2160,7 +2161,7 @@
             document.getElementById('commentHeroName').textContent = hero.zh;
             const avatarContainer = document.getElementById('commentHeroAvatar');
             const img = document.createElement('img');
-            const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/16.12.1/img/champion/${hero.en}.png`;
+            const imgUrl = hero.avatar_url || `https://ddragon.leagueoflegends.com/cdn/${ddragonVersion}/img/champion/${hero.en}.png`;
             img.src = imgUrl;
             img.alt = hero.zh;
             img.style.width = '100%';
@@ -2586,6 +2587,21 @@
             }
         }
 
+        // 获取 DDragon 最新版本
+        async function fetchLatestDdragonVersion() {
+            try {
+                const res = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
+                if (res.ok) {
+                    const versions = await res.json();
+                    if (versions && versions.length > 0) {
+                        ddragonVersion = versions[0];
+                        console.log('✅ DDragon 版本已更新为:', ddragonVersion);
+                    }
+                }
+            } catch (e) {
+                console.warn('⚠️ 获取 DDragon 版本失败，使用默认版本 16.13.1', e);
+            }
+        }
         // 数据加载
         async function fetchSupabaseData() {
             try {
@@ -2695,6 +2711,7 @@
             await loadHeroesData();
             await updateVisitCount();
             await initPresence();
+            await fetchLatestDdragonVersion();
 
             buildTableStructure();
             const initialGroups = computeFilteredSortedHeroes();
